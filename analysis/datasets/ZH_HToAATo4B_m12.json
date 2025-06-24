@@ -1,0 +1,16 @@
+{
+    "ZH_HToAATo4B_M-12": {
+        "metadata": {
+      
+            "sample": "ZH_HToAATo4B_M-12",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "50000",
+            "size": ""
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_HToAATo4B_M-12/ZH_HToAATo4B_M-12.root"               
+        ]
+    }
+}
