@@ -1,0 +1,20 @@
+{
+    "ZH_HToAATo4B_M-30": {
+        "metadata": {
+      
+            "sample": "ZH_HToAATo4B_M-30",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "250000",
+            "size": ""
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_HToAATo4B_m30/ZH30_NANO_1.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_HToAATo4B_m30/ZH30_NANO_2.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_HToAATo4B_m30/ZH30_NANO_3.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_HToAATo4B_m30/ZH30_NANO_4.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_HToAATo4B_m30/ZH30_NANO_5.root"
+        ]
+    }
+}
