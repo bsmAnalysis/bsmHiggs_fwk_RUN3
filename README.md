@@ -76,4 +76,55 @@ Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chai
 - Output files are written as `${PROCNAME}_${JOBNUM}.root`
 - Each job uses a unique seed injected via `inject_rand.py`
 
+# Running your analysis
+### 1. Clone the repository
 
+```bash
+git clone https://github.com/bsmAnalysis/HToAATo4B_RUN3_NANOv15.git
+cd HToAATo4B_RUN3_NANOv15
+```
+
+### 2. Set up your proxy (if running on the grid)
+
+```bash
+source init_cms_proxy.sh
+```
+
+### 3. Define your analysis processor and import it in `run_analysis.py`
+
+Make sure your processor is in the project and correctly referenced.
+
+### 4. Test locally inside the Coffea Singularity container
+
+```bash
+singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
+python run_analysis.py --json datasets/ZH_HToAATo4B_m20.json --job-index 0 --output ZH_m20_test.root
+```
+
+### 5. Submit all jobs
+
+```bash
+python submit_all.py
+```
+
+Also update the `FILES_TO_TRANSFER` list inside `submit_all.py` to include your processor. If you want to run for specific datasets define in line 14 eg:
+```bash
+json_files = glob.glob("datasets/ZH*.json")
+```
+### 6. Resubmit failed/missing jobs
+
+```bash
+python resubmit_jobs.py
+```
+
+### 7. Clean up and move output `.root` files to CMSSW output directory (if you have installed CMSSW as described in production instructions)
+
+```bash
+python clean_dir.py
+```
+
+All `.root` outputs will be moved to:
+
+```
+CMSSW_15_0_5/src/outputs/
+```
