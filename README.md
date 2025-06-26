@@ -56,7 +56,7 @@ eg: if you want to hadd the first 100 files to have 50k events in that file you 
 ```bash
  python3 haddNano.py ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff_.root $(printf "_%d.root " {0..99})
  ```
-
+You can run the merge_files.py script, defining the input/output file names and the no of output files 
 ##  Physics Chain
 
 Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chain
