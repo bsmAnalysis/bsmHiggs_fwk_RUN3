@@ -1,0 +1,40 @@
+universe = vanilla
+executable = run_chain.sh
+
+# Custom job arguments
+arguments = $(JOBNUM) $(PROCNAME)
+
+output = out/job_$(Cluster)_$(Process)_$(PROCNAME).out
+error  = err/job_$(Cluster)_$(Process)_$(PROCNAME).err
+log    = log/job_$(Cluster)_$(Process)_$(PROCNAME).log
+
+x509userproxy = MyProxy
++JobFlavour = "workday"
++ProjectName = "cms.org"
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/el8:x86_64"
++SingularityBindCVMFS = True
+
+transfer_input_files = run_chain.sh, inject_rand.py, \
+Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
+Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff.py
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+request_cpus = 2
+request_memory = 12000
+
+
+
+
+#PROCNAME = ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff
+#Queue JOBNUM from seq 0 1499 |
+
+#PROCNAME = ZH_ZToAll_HToAATo4B_M-15_TuneCP5_13p6TeV-madgraph_pythia8_cff
+#Queue JOBNUM from seq 0 1499 |
+
+PROCNAME = ZH_ZToAll_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff
+Queue JOBNUM from seq 0 1499 |
+
+PROCNAME = ZH_ZToAll_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff
+Queue JOBNUM from seq 0 1499 |
