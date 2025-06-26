@@ -15,6 +15,8 @@ x509userproxy = MyProxy
 +SingularityBindCVMFS = True
 
 transfer_input_files = run_chain.sh, inject_rand.py, \
+Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
+Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-15_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
 Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
 Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff.py
 
@@ -25,7 +27,7 @@ request_cpus = 2
 request_memory = 12000
 
 
-
+#submit 1500 jobs of 500 events each one for each "a" mass->produce 1500*500=750k event for each "a" mass 12-25
 
 #PROCNAME = ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff
 #Queue JOBNUM from seq 0 1499 |
