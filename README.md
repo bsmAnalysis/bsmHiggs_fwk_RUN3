@@ -75,6 +75,26 @@ Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chai
 
 - Output files are written as `${PROCNAME}_${JOBNUM}.root`
 - Each job uses a unique seed injected via `inject_rand.py`
+  
+# Perform skimming to your datasets and save to selected eos path (optional but recommended)
+### Prepare the Skimming Configuration
+Modify skimming/skim_config.py to select the branches and objects you want to keep.Configure HLT trigger groups if needed.
+If you want to change config script, you may need to do some changes to the skim_processor.py, depending on what kind of changes
+### define the datasets you want to skim
+From inside the skimming/ directory: put the datasets you want to skim inside the dataset folder
+and also define in the submit_all.py script (line 14) 
+### define the eos path you want to save the files
+in run_skimming.sh script (line 25)
+### skim your selected dataset and save to your eos path
+run:
+```bash
+python submit_all.py
+```
+### Resubmit  if missing files from your generated eos folder:
+run:
+```bash
+python resubmit_skim.py
+```
 
 # Running your analysis
 ### 1. Clone the repository
