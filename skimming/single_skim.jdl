@@ -1,0 +1,27 @@
+universe = vanilla
+executable = run_single_skim.sh
+arguments = $(Process) $(dataset)
+
+transfer_input_files = run_skim.py, skim_config.py, skim_processor.py, $(X509), $(dataset), 
+run_single_skim.sh
+
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+
+output = out/job_$(Cluster)_$(Process).out
+error  = err/job_$(Cluster)_$(Process).err
+log    = log/job_$(Cluster)_$(Process).log
+
++SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest"
++SingularityBindCVMFS = True
++JobFlavour = "workday"
+
+request_cpus = 1
+request_memory = 3000
+
+# Important: CMSConnect expects this
+environment = "X509_USER_PROXY=x509up"
+X509 = x509up
+dataset = TTto2L2Nu.json
+
+queue 780

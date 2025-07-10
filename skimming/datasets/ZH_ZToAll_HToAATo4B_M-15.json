@@ -1,0 +1,30 @@
+{
+    "ZH_ZToAll_HToAATo4B_M-15": {
+        "metadata": {
+      
+            "sample": "ZH_ZToAll_HToAATo4B_M-15",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "750000",
+            "size": ""
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_0.root",
+            "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_1.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_2.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_3.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_4.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_5.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_6.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_7.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_8.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_9.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_10.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_11.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_12.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_13.root",
+	    "root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/ZH_ZToAll_HToAATo4B_M-15/ZH_ZToAll_HToAATo4B_M-15_14.root"
+        ]
+    }
+}
