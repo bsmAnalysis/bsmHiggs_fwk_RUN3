@@ -8,6 +8,8 @@ branches_to_keep = {
             "PFMET": ["pt", "phi","sumEt"],
             "PuppiMET": ["pt", "phi","sumEt"],
             "Pileup":["nTrueInt","nPU"],
+            "LHE": ["HT","NJets"],
+            "PV": ["npvsGood","npvs"],
             #"SubJet":["btagDeepFlavB","btagUParTAK4B"],
             
         }
