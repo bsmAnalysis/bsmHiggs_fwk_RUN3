@@ -163,3 +163,7 @@ mkdir -p /eos/user/a/ataxeidi/prod/${PROCNAME}
 cp ${PROCNAME}_${JOB_NUMBER}.root /eos/user/a/ataxeidi/prod/${PROCNAME}/${PROCNAME}_${JOB_NUMBER}.root
 rm ${PROCNAME}_${JOB_NUMBER}.root
 echo "=== All steps completed successfully"
+#remove out/err/log files
+rm -rf out/job_$(Cluster)_$(Process)_$(PROCNAME).out
+rm -rf log/job_$(Cluster)_$(Process)_$(PROCNAME).log
+rm -rf err/job_$(Cluster)_$(Process)_$(PROCNAME).err
