@@ -157,4 +157,9 @@ cmsRun step5_${PROCNAME}_NANO_cfg.py || exit 13
 mv step5_${PROCNAME}_NANO.root ${PROCNAME}_${JOB_NUMBER}.root
 mv ${PROCNAME}_${JOB_NUMBER}.root  ../../
 cd ../..
+rm step3_${PROCNAME}_AODSIM.root
+# move output root to eos and remove from afs
+mkdir -p /eos/user/a/ataxeidi/prod/${PROCNAME}
+cp ${PROCNAME}_${JOB_NUMBER}.root /eos/user/a/ataxeidi/prod/${PROCNAME}/${PROCNAME}_${JOB_NUMBER}.root
+rm ${PROCNAME}_${JOB_NUMBER}.root
 echo "=== All steps completed successfully"
