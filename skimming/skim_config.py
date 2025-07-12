@@ -29,4 +29,18 @@ trigger_groups = {
     10: ["QuadPFJet105_90_76_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1", "QuadPFJet105_88_76_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1"],
     11: ["QuadPFJet105_88_76_15"],
     12: ["DoublePFJets116MaxDeta1p6_DoubleCaloBTagDeepCSV_p71"],
+    13: ["PFHT330PT30_QuadPFJet_75_60_45_40_PNet3BTag_2p0"],
+    14: ["PFHT330PT30_QuadPFJet_75_60_45_40_PNet3BTag_4p3"],
+    15: ["PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepJet_4p5"],
+    16: ["PFHT400_FivePFJet_120_120_60_30_30"],
+    17: ["PFHT400_FivePFJet_120_120_60_30_30_PNet2BTag_4p3"],
+    18: ["PFHT400_FivePFJet_120_120_60_30_30_PNet2BTag_5p6"],
+    19: ["QuadPFJet103_88_75_15_PNet2BTag_0p4_0p12_VBF1"],
+    20: ["QuadPFJet103_88_75_15_PNetBTag_0p4_VBF2"],
+    21: ["QuadPFJet105_88_76_15_PNet2BTag_0p4_0p12_VBF1"],
+    22: ["QuadPFJet105_88_76_15_PNetBTag_0p4_VBF2"],
+    23: ["QuadPFJet111_90_80_15_PNet2BTag_0p4_0p12_VBF1"],
+    24: ["QuadPFJet111_90_80_15_PNetBTag_0p4_VBF2"],
+    25: ["PFHT340_QuadPFJet70_50_40_40_PNet2BTagMean0p70"],
+   
 }
