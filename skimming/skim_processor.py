@@ -24,12 +24,12 @@ class NanoAODSkimmer(processor.ProcessorABC):
         out["run"] = events.run
         out["event"] = events.event
         out["luminosityBlock"] = events.luminosityBlock
-        '''
+        
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
         if hasattr(events, "bunchCrossing"):
             out["bunchCrossing"] = events.bunchCrossing
-        '''
+        
         # Trigger logic
         
         trigger_mask = ak.zeros_like(events.event, dtype=bool)
@@ -51,37 +51,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
 
         out["has_trigger"] = trigger_mask
         out["trigger_type"] = trigger_type
-        '''
-        for bit, triggers in self.trigger_groups.items():
-            group_fired = ak.zeros_like(events.event, dtype=bool)
-
-            for trig in triggers:
-                if hasattr(events.HLT, trig):
-                    group_fired = group_fired | events.HLT[trig]
-            trigger_mask = trigger_mask | group_fired
-            trigger_type = trigger_type | (group_fired * (1 << bit))
-
-        out["has_trigger"] = trigger_mask
-        out["trigger_type"] = trigger_type
         
-        # Get all available trigger names from the file
-        available_hlt = dir(events.HLT)
-
-        for bit, patterns in self.trigger_groups.items():
-            group_fired = ak.zeros_like(events.event, dtype=bool)
-            
-            for pattern in patterns:
-                # Match all triggers in the file that match this pattern (e.g., with *)
-                matched_triggers = fnmatch.filter(available_hlt, pattern)
-
-                for trig in matched_triggers:
-                    group_fired = group_fired | events.HLT[trig]
-                trigger_mask = trigger_mask | group_fired
-                trigger_type = trigger_type | (group_fired * (1 << bit))
-
-            out["has_trigger"] = trigger_mask
-            out["trigger_type"] = trigger_type
-        '''
         # Object selections
         for obj in self.branches_to_keep:
             if not hasattr(events, obj):
