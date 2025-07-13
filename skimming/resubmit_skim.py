@@ -7,7 +7,7 @@ import json
 with open(f"datasets/{dataset_name}.json") as jf:
     data = json.load(jf)
 n_expected_jobs = len(data[dataset_name]["files"])
-base_eos_dir = "/eos/user/a/ataxeidi/prod"
+base_eos_dir = "/eos/user/a/ataxeidi/skim"
 eos_dataset_path = f"{base_eos_dir}/{dataset_name}"
 
 print(f"Checking missing jobs for: {dataset_name}")
