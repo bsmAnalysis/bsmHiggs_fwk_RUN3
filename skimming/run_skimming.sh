@@ -5,27 +5,18 @@ echo "Current directory: $(pwd)"
 
 JOBIDX=$1
 DATASET_JSON=$2
+DATASET_KEY=$3
 
-# Use the proxy
 export X509_USER_PROXY=$(realpath x509up)
 
+OUTFILE=${DATASET_KEY}_${JOBIDX}.root
 
+python run_skim.py --job-index ${JOBIDX} --json ${DATASET_JSON} --dataset ${DATASET_KEY} --output ${OUTFILE}
 
-# Extract sample name from JSON
-SAMPLE=$(python -c "import json; d=json.load(open('${DATASET_JSON}')); print(list(d.keys())[0])")
-
-# Define output file
-OUTFILE=${SAMPLE}_${JOBIDX}.root
-
-# Run the processor
-python run_skim.py --job-index ${JOBIDX} --json ${DATASET_JSON} --output ${OUTFILE}
-
-# XRDCP the result to EOS (into a subfolder)                                                                      
 echo "Copying ${OUTFILE} to EOS..."
-xrdcp -f ${OUTFILE} root://eosuser.cern.ch//eos/user/a/ataxeidi/skim/${SAMPLE}/${OUTFILE}
+xrdcp -f ${OUTFILE} root://eosuser.cern.ch//eos/user/a/ataxeidi/skim/${DATASET_KEY}/${OUTFILE}
 
-# Clean up                                                                                                        
 rm -f ${OUTFILE}
 echo "Removed local copy: ${OUTFILE}"
 
-echo "job finished"
+echo "Job finished"
