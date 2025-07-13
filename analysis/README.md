@@ -95,9 +95,13 @@ python write_json_eos.py --dataset_name.json -- eos_dataset_name.json
 Holds helper scripts or functions (e.g., `matching.py`, `jet_id.py`) used by the processor.
 
 These are included in the job tarball and imported dynamically.
+### Important: about utils to run on condor:
+when y want to update somenthing in this folder, in order to update the tarbal as well run:
+```bash
+ tar -czf utils.tar.gz utils/
+```
 
----
-
+---------
 ## 🛠️ Instructions for Use
 
 ### 1. Clone the repository
