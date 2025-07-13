@@ -130,9 +130,9 @@ python run_analysis.py --job-index ${JOBIDX} --json ${DATASET_JSON} --dataset ${
 ```bash
 python submit_all.py
 #or of a selected process:
-python submit_all.py ZH*.json  # all datasets inside each ZH*.json
+python submit_all.py ZH_HToAATo4B.json  # all datasets inside  ZH_HToAATo4B.json
 #or of a selected dataset of a process:
-FILTER_KEY=M-15 python submit_all.py ZH.json
+FILTER_KEY=M-15 python submit_all.py ZH_HToAATo4B.json
 ```
 Also update the `FILES_TO_TRANSFER` list inside `submit_all.py` to include your processor. 
 
