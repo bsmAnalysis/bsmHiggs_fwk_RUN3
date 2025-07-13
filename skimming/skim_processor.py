@@ -73,7 +73,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
                     raw_pt = collection.pt * (1 - rawFactor)
 
                     # Step 2: Apply cut on raw_pt
-                    selection_mask = (raw_pt > 15) & (abs(collection.eta) < 2.5)
+                    selection_mask = (raw_pt > 15) & (abs(collection.eta) < 4.8)
                     collection = collection[selection_mask]
                     raw_pt = raw_pt[selection_mask]  # update raw_pt to match
 
