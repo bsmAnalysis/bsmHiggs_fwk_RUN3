@@ -1,72 +1,82 @@
 #!/usr/bin/env python3
 import subprocess
 import os
-
-dataset_name = "TTto2L2Nu"
 import json
-with open(f"datasets/{dataset_name}.json") as jf:
-    data = json.load(jf)
-n_expected_jobs = len(data[dataset_name]["files"])
+import glob
+
+DATASET_DIR = "datasets"
+FILES_TO_TRANSFER = ["run_skim.py", "skim_processor.py", "x509up", "run_skimming.sh", "skim_config.py"]
+
 base_eos_dir = "/eos/user/a/ataxeidi/skim"
-eos_dataset_path = f"{base_eos_dir}/{dataset_name}"
 
-print(f"Checking missing jobs for: {dataset_name}")
+# Match all relevant JSON files (you can change pattern here)
+json_files = sorted(glob.glob(f"{DATASET_DIR}/QCD*.json"))
 
-# Get list of existing .root files
-try:
-    result = subprocess.run(
-        ["xrdfs", "root://eosuser.cern.ch", "ls", eos_dataset_path],
-        capture_output=True, text=True, check=True
-    )
-    files = result.stdout.strip().split("\n")
-except subprocess.CalledProcessError:
-    print(f"ERROR: Could not list EOS directory {eos_dataset_path}")
-    exit()
+for json_path in json_files:
+    dataset_name = os.path.basename(json_path).replace(".json", "")
 
-existing = set()
-for f in files:
-    if f.endswith(".root") and dataset_name in f:
-        try:
-            idx = int(f.split("_")[-1].replace(".root", ""))
-            existing.add(idx)
-        except ValueError:
-            continue
+    with open(json_path) as jf:
+        data = json.load(jf)
 
-expected = set(range(n_expected_jobs))
-missing = sorted(expected - existing)
-print(f"Found {len(missing)} missing jobs.")
+    n_expected_jobs = len(data[dataset_name]["files"])
+    eos_dataset_path = f"{base_eos_dir}/{dataset_name}"
 
-if not missing:
-    print("All skim jobs exist.")
-    exit()
+    print(f"\nChecking missing jobs for: {dataset_name}")
 
-# Write resubmission JDL
-resub_jdl = "resubmit_skim_missing.jdl"
-with open(resub_jdl, "w") as f:
-    f.write(f"""universe = vanilla
-executable = run_skimming.sh
-transfer_input_files = run_skim.py, skim_config.py, skim_processor.py, x509up, {dataset_name}.json, run_skimming.sh
-should_transfer_files = YES
-when_to_transfer_output = ON_EXIT
-+SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest"
-+SingularityBindCVMFS = True
-+JobFlavour = "workday"
-request_cpus = 1
-request_memory = 3000
-environment = "X509_USER_PROXY=x509up"
-X509 = x509up
-dataset = {dataset_name}.json
+    # Get list of existing .root files
+    try:
+        result = subprocess.run(
+            ["xrdfs", "root://eosuser.cern.ch", "ls", eos_dataset_path],
+            capture_output=True, text=True, check=True
+        )
+        files = result.stdout.strip().split("\n")
+    except subprocess.CalledProcessError:
+        print(f"ERROR: Could not list EOS directory {eos_dataset_path}")
+        continue
 
-""")
-    for idx in missing:
-        f.write(f"""arguments = {idx} $(dataset)
-output = out/job_$(Cluster)_{idx}.out
-error  = err/job_$(Cluster)_{idx}.err
-log    = log/job_$(Cluster)_{idx}.log
+    existing = set()
+    for f in files:
+        if f.endswith(".root") and dataset_name in f:
+            try:
+                idx = int(f.split("_")[-1].replace(".root", ""))
+                existing.add(idx)
+            except ValueError:
+                continue
+
+    expected = set(range(n_expected_jobs))
+    missing = sorted(expected - existing)
+    print(f"Found {len(missing)} missing jobs.")
+
+    if not missing:
+        print("All skim jobs exist.")
+        continue
+
+    # Write JDL for missing jobs
+    resub_jdl = f"resubmit_missing_{dataset_name}.jdl"
+    with open(resub_jdl, "w") as f:
+        f.write("universe = vanilla\n")
+        f.write("executable = run_skimming.sh\n")
+        f.write(f"transfer_input_files = {', '.join(FILES_TO_TRANSFER)}, {dataset_name}.json\n")
+        f.write("should_transfer_files = YES\n")
+        f.write("when_to_transfer_output = ON_EXIT\n")
+        f.write('+SingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest"\n')
+        f.write("+SingularityBindCVMFS = True\n")
+        f.write('+JobFlavour = "workday"\n')
+        f.write("request_cpus = 1\n")
+        f.write("request_memory = 3000\n")
+        f.write('environment = "X509_USER_PROXY=x509up"\n')
+        f.write("X509 = x509up\n")
+        f.write(f"dataset = {dataset_name}.json\n\n")
+
+        for idx in missing:
+            f.write(f"""arguments = {idx} $(dataset)
+output = out/job_$(Cluster)_{idx}_{dataset_name}.out
+error  = err/job_$(Cluster)_{idx}_{dataset_name}.err
+log    = log/job_$(Cluster)_{idx}_{dataset_name}.log
 queue 1
 
 """)
 
-print(f"Created: {resub_jdl}")
-print("Submitting...")
-subprocess.run(["condor_submit", resub_jdl])
+    print(f"Created: {resub_jdl}")
+    print("Submitting...")
+    subprocess.run(["condor_submit", resub_jdl])
