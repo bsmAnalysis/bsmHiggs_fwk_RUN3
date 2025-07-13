@@ -82,13 +82,17 @@ Modify skimming/skim_config.py to select the branches and objects you want to ke
 If you want to change config script, you may need to do some changes to the skim_processor.py, depending on what kind of changes
 ### define the datasets you want to skim
 From inside the skimming/ directory: put the datasets you want to skim inside the dataset folder
-and also define in the submit_all.py script (line 14) 
 ### define the eos path you want to save the files
 in run_skimming.sh script (line 25)
 ### skim your selected dataset and save to your eos path
 run:
 ```bash
+#to skim all datasets of all processes (in all json files)
 python submit_all.py
+# to skim the datasets of a selected process
+python submit_all.py QCD.json
+#to skim a single dataset of a selected process
+FILTER_KEY=HT100to200 python submit_all.py QCD.json
 ```
 ### Resubmit  if missing files from your generated eos folder:
 run:
@@ -118,31 +122,30 @@ Make sure your processor is in the project and correctly referenced.
 
 ```bash
 singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
-python run_analysis.py --json datasets/ZH_HToAATo4B_m20.json --job-index 0 --output ZH_m20_test.root
+python run_analysis.py --job-index ${JOBIDX} --json ${DATASET_JSON} --dataset ${DATASET_KEY} --output ${OUTFILE}
+#you define them hardcoded
 ```
-
 ### 5. Submit all jobs
 
 ```bash
 python submit_all.py
+#or of a selected process:
+python submit_all.py ZH*.json  # all datasets inside each ZH*.json
+#or of a selected dataset of a process:
+FILTER_KEY=M-15 python submit_all.py ZH.json
 ```
+Also update the `FILES_TO_TRANSFER` list inside `submit_all.py` to include your processor. 
 
-Also update the `FILES_TO_TRANSFER` list inside `submit_all.py` to include your processor. If you want to run for specific datasets define in line 14 eg:
-```bash
-json_files = glob.glob("datasets/ZH*.json")
-```
 ### 6. Resubmit failed/missing jobs
 
 ```bash
 python resubmit_jobs.py
 ```
-
 ### 7. Clean up and move output `.root` files to CMSSW output directory (if you have installed CMSSW as described in production instructions)
 
 ```bash
 python clean_dir.py
 ```
-
 All `.root` outputs will be moved to:
 
 ```
