@@ -22,7 +22,7 @@ python run_skim.py --job-index ${JOBIDX} --json ${DATASET_JSON} --output ${OUTFI
 
 # XRDCP the result to EOS (into a subfolder)                                                                      
 echo "Copying ${OUTFILE} to EOS..."
-xrdcp -f ${OUTFILE} root://eosuser.cern.ch//eos/user/a/ataxeidi/prod/${SAMPLE}/${OUTFILE}
+xrdcp -f ${OUTFILE} root://eosuser.cern.ch//eos/user/a/ataxeidi/skim/${SAMPLE}/${OUTFILE}
 
 # Clean up                                                                                                        
 rm -f ${OUTFILE}
