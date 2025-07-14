@@ -17,9 +17,7 @@ args = parser.parse_args()
 # Load .json file
 with open(args.json) as f:
     all_datasets = json.load(f)
-#  assume you have one dataset in the json (else specify key)
-#dataset_name = list(all_datasets.keys())[0]
-#dataset = all_datasets[dataset_name]
+
 if args.dataset not in all_datasets:
     raise ValueError(f"[ERROR] Dataset {args.dataset} not found in {args.json}")
 
