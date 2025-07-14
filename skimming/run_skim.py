@@ -22,12 +22,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--json", type=str, required=True, help="Path to JSON file")
 parser.add_argument("--job-index", type=int, required=True, help="Index of file to process")
 parser.add_argument("--output", type=str, default="skimmed_output.root")
+parser.add_argument("--dataset", type=str, required=True, help="Key in the JSON to process")
 args = parser.parse_args()
 with open(args.json) as f:
     all_datasets = json.load(f)
-
-
-parser.add_argument("--dataset", type=str, required=True, help="Key in the JSON to process")
 
 if args.dataset not in all_datasets:
     raise ValueError(f"Dataset {args.dataset} not found in {args.json}")
