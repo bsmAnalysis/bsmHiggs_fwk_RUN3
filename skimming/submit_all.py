@@ -5,7 +5,7 @@ import subprocess
 
 DATASET_DIR = "datasets"
 FILES_TO_TRANSFER = ["run_skim.py", "skim_processor.py", "x509up", "run_skimming.sh", "skim_config.py"]
-#json_files = sorted(glob.glob(f"{DATASET_DIR}/*.json"))
+
 import sys
 
 # Accept a file or pattern as an argument, default to all
@@ -14,12 +14,8 @@ json_files = sorted(glob.glob(f"{DATASET_DIR}/{pattern}"))
 
 import re
 
-dataset_key_pattern = os.environ.get("FILTER_KEY")  # Optional env variable
-'''
-for dataset_key, dataset_info in data.items():
-    if dataset_key_pattern and not re.search(dataset_key_pattern, dataset_key):
-        continue
-'''
+dataset_key_pattern = os.environ.get("FILTER_KEY")  # to coose running a single dataset of a process json
+
 for json_path in json_files:
     with open(json_path) as f:
         data = json.load(f)
@@ -29,9 +25,7 @@ for json_path in json_files:
     for dataset_key, dataset_info in data.items():
         if dataset_key_pattern and not re.search(dataset_key_pattern, dataset_key):
             continue
-        #for i in range(len(dataset_info["files"])):
-        #    jf.write(f"{i} {dataset_basename} {dataset_key}\n")
-        
+       
     # Copy the file for condor
     if not os.path.exists(dataset_basename):
         os.system(f"cp {json_path} {dataset_basename}")
