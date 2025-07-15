@@ -6,17 +6,6 @@ import hist
 import coffea.util
 
 
-def delta_r(obj1, obj2):
-    deta = obj1.eta - obj2.eta
-    dphi = np.abs(obj1.phi - obj2.phi)
-    dphi = np.where(dphi > np.pi, 2 * np.pi - dphi, dphi)
-    return np.sqrt(deta**2 + dphi**2)
-
-def clean_by_dr(objects, others, drmin):
-    pairs = ak.cartesian([objects, others], nested=True)
-    dr = delta_r(pairs['0'], pairs['1'])
-    mask = ak.all(dr > drmin, axis=-1)
-    return objects[mask]
 
 def extract_gen_bb_pairs(events):
     genparts = events.GenPart
