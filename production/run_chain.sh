@@ -31,11 +31,10 @@ cd CMSSW_14_0_21/src
 eval `scramv1 runtime -sh`
 
 mkdir -p Configuration/GenProduction/python
-cp ../../ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff.py Configuration/GenProduction/python/
-cp ../../ZH_ZToAll_HToAATo4B_M-15_TuneCP5_13p6TeV-madgraph_pythia8_cff.py Configuration/GenProduction/python/
-cp ../../ZH_ZToAll_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff.py Configuration/GenProduction/python/
-cp ../../ZH_ZToAll_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff.py Configuration/GenProduction/python/
-scram b -j4 
+cp ../../VBFH_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff.py Configuration/GenProduction/python/
+cp ../../VBFH_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff.py Configuration/GenProduction/python/
+scram b -j4
+
 #[[ ! -f Configuration/GenProduction/python/${PROCNAME}.py ]] && echo "ERROR: Fragment ${PROCNAME}.py not found!" && exit 90
 #mkdir -p Configuration/GenProduction/python/
 #cp Configuration/GenProduction/python/${PROCNAME}.py Configuration/GenProduction/python/
@@ -158,12 +157,19 @@ mv step5_${PROCNAME}_NANO.root ${PROCNAME}_${JOB_NUMBER}.root
 mv ${PROCNAME}_${JOB_NUMBER}.root  ../../
 cd ../..
 rm step3_${PROCNAME}_AODSIM.root
-# move output root to eos and remove from afs
-mkdir -p /eos/user/a/ataxeidi/prod/${PROCNAME}
-cp ${PROCNAME}_${JOB_NUMBER}.root /eos/user/a/ataxeidi/prod/${PROCNAME}/${PROCNAME}_${JOB_NUMBER}.root
+
+# move output root to eos and remove from afs                                        
+xrdcp -f ${PROCNAME}_${JOB_NUMBER}.root root://eosuser.cern.ch//eos/user/a/ataxeidi/\
+prod/${PROCNAME}/${PROCNAME}_${JOB_NUMBER}.root
 rm ${PROCNAME}_${JOB_NUMBER}.root
+
 echo "=== All steps completed successfully"
-#remove out/err/log files
-rm -rf out/job_$(Cluster)_$(Process)_$(PROCNAME).out
-rm -rf log/job_$(Cluster)_$(Process)_$(PROCNAME).log
-rm -rf err/job_$(Cluster)_$(Process)_$(PROCNAME).err
+
+#remove out/err/log files                                                            
+# clean logs                                                                         
+rm -f out/job_*_${PROCNAME}.out
+rm -f err/job_*_${PROCNAME}.err
+rm -f log/job_*_${PROCNAME}.log
+exit 0
+
+

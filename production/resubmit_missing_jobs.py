@@ -1,19 +1,27 @@
+#!/usr/bin/env python3
+
+import subprocess
 import os
 
-# === Config ===
-output_dir = os.getcwd()  # or set your output dir explicitly
-resubmit_jdl = "resubmit.jdl"
+# === Configuration ===
+EOS_BASE = "/eos/user/a/ataxeidi/prod"
+EOS_XRDFS = "root://eosuser.cern.ch"
+EVENTS_PER_JOB = 500
+TOTAL_JOBS = 500
+OUTPUT_DIR = os.getcwd()
 
-# Your processes and expected job counts
-processes = {
-    "ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff": 1500,
-    "ZH_ZToAll_HToAATo4B_M-15_TuneCP5_13p6TeV-madgraph_pythia8_cff": 1500,
-    "ZH_ZToAll_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff": 1500,
-    "ZH_ZToAll_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff": 1500,
-}
+# List of processes
+PROCESSES = [
+    "VBFH_HToAATo4B_M-45_TuneCP5_13p6TeV-madgraph_pythia8_cff",
+    "VBFH_HToAATo4B_M-40_TuneCP5_13p6TeV-madgraph_pythia8_cff",
+    "VBFH_HToAATo4B_M-35_TuneCP5_13p6TeV-madgraph_pythia8_cff",
+    "VBFH_HToAATo4B_M-30_TuneCP5_13p6TeV-madgraph_pythia8_cff",
+    "VBFH_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff",
+    "VBFH_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff"
+]
 
-# === JDL Header ===
-jdl_header = f"""universe = vanilla
+# JDL Header
+JDL_HEADER = """universe = vanilla
 executable = run_chain.sh
 arguments = $(JOBNUM) $(PROCNAME)
 
@@ -29,36 +37,68 @@ x509userproxy = MyProxy
 
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = run_chain.sh, inject_rand.py, \\
-Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-12_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \\
-Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-15_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \\
-Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \\
-Configuration/GenProduction/python/ZH_ZToAll_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff.py
+
+transfer_input_files = run_chain.sh, inject_rand.py, \
+Configuration/GenProduction/python/VBFH_HToAATo4B_M-45_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
+Configuration/GenProduction/python/VBFH_HToAATo4B_M-40_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
+Configuration/GenProduction/python/VBFH_HToAATo4B_M-35_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \                                              
+Configuration/GenProduction/python/VBFH_HToAATo4B_M-30_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
+Configuration/GenProduction/python/VBFH_HToAATo4B_M-25_TuneCP5_13p6TeV-madgraph_pythia8_cff.py, \
+Configuration/GenProduction/python/VBFH_HToAATo4B_M-20_TuneCP5_13p6TeV-madgraph_pythia8_cff.py 
+
 
 request_cpus = 2
 request_memory = 12000
 
 """
 
-# === Find Missing Jobs ===
 missing_jobs = []
 
-for procname, njobs in processes.items():
-    for i in range(njobs):
-        expected_file = os.path.join(output_dir, f"{procname}_{i}.root")
-        if not os.path.isfile(expected_file):
-            missing_jobs.append((procname, i))
+for proc in PROCESSES:
+    eos_path = f"{EOS_BASE}/{proc}"
+    print(f"\n Checking EOS for: {proc}")
 
-# === Write JDL ===
-with open(resubmit_jdl, "w") as jdl:
-    jdl.write(jdl_header + "\n")
+    try:
+        result = subprocess.run(
+            ["xrdfs", EOS_XRDFS, "ls", eos_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        files = result.stdout.strip().split("\n")
+        existing = set()
 
-    if missing_jobs:
-        jdl.write("Queue PROCNAME, JOBNUM from (\n")
-        for proc, num in missing_jobs:
-            jdl.write(f"{proc} {num}\n")
-        jdl.write(")\n")
-    else:
-        print(" No missing jobs")
+        for f in files:
+            basename = os.path.basename(f)
+            if basename.endswith(".root") and basename.startswith(proc):
+                idx = basename.replace(f"{proc}_", "").replace(".root", "")
+                if idx.isdigit():
+                    existing.add(int(idx))
 
-print(f"Wrote {resubmit_jdl} with {len(missing_jobs)} missing jobs.")
+        expected = set(range(TOTAL_JOBS))
+        missing = sorted(expected - existing)
+
+        if missing:
+            print(f"Missing: {len(missing)} jobs")
+            for idx in missing:
+                missing_jobs.append((proc, idx))
+        else:
+            print("All jobs exist")
+
+    except subprocess.CalledProcessError:
+        print(f" Could not access EOS folder: {eos_path}")
+
+# === Write resubmission JDL ===
+resub_jdl = "resubmit_missing_jobs.jdl"
+if missing_jobs:
+    print(f"\n Writing {len(missing_jobs)} missing jobs to {resub_jdl}")
+
+    with open(resub_jdl, "w") as f:
+        f.write(JDL_HEADER + "\n")
+        f.write("Queue PROCNAME, JOBNUM from (\n")
+        for procname, jobnum in missing_jobs:
+            f.write(f"{procname} {jobnum}\n")
+        f.write(")\n")
+    print("Done.")
+else:
+    print(" No missing jobs found!")
