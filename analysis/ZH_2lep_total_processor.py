@@ -275,7 +275,7 @@ class TOTAL_Processor(processor.ProcessorABC):
             vec_lep1_res = make_vector(lep_res[:, 0])
             vec_lep2_res = make_vector(lep_res[:, 1])
             vec_dilepton_res = make_vector(dilepton_res)
-            
+            vec_H = make_vector(vec_H)
             # Fill histograms
             output["pt_ll_resolved"].fill(pt=dilepton_res.pt, weight=weights_res_valid)
             output["mass_ll_resolved"].fill(m=dilepton_res.mass, weight=weights_res_valid)
