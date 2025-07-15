@@ -12,8 +12,8 @@ cd bsmHiggs_fwk_RUN3/production
 ```bash
 cmssw-el8
 cmsrel CMSSW_14_0_21
-cd CMSSW_14_0_21/src
-cp -r ../../production/* .
+shopt -s extglob
+mv !(CMSSW_14_0_21) CMSSW_14_0_21/src/
 cmsenv
 scram b -j4
 cd ..
