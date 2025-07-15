@@ -120,14 +120,14 @@ class TOTAL_Processor(processor.ProcessorABC):
         n_leptons = ak.num(leptons)
        
         # Decide whether to compute Jet ID (XROOTD) or use existing branches (from skimmed file on eos)
-        if self.dataset_name and self.dataset_name.startswith("eos"):
+        if self.dataset_name and self.dataset_name.startswith("ZH_ZToll_HToAATo4B"):
+            
+            # Compute on the fly
+            tight_id, tight_lep_veto = compute_jet_id(events.Jet)
+        else:
             # Use already-stored tight ID from skimmed data
             tight_id = events.Jet.passJetIdTight
             tight_lep_veto = events.Jet.passJetIdTightLepVeto
-        else:
-            # Compute on the fly
-            tight_id, tight_lep_veto = compute_jet_id(events.Jet)
-        #single jets
         single_jets =events.Jet[(events.Jet.pt > 20) & (np.abs(events.Jet.eta) < 2.5) &  tight_id & tight_lep_veto ]
         #cc single jets with leptons.
         single_jets = clean_by_dr(single_jets, leptons, 0.4)
