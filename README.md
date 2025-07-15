@@ -151,3 +151,8 @@ All `.root` outputs will be moved to:
 ```
 CMSSW_15_0_5/src/outputs/
 ```
+### Important: about utils to run on condor:
+when y want to update something in this folder, eg more fucntions to use in your analysis, in order to update the tarbal as well run:
+```bash
+ tar -czf utils.tar.gz utils/
+```
