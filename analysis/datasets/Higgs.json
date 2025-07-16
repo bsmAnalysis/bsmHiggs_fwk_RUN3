@@ -315,7 +315,7 @@
             "sample": "WminusH-WtoLNu-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "3*0.06380*0.53",
+            "xsec": "0.06380*0.53",
             "nevents": "1976960",
             "size": "4869438965"
         },
@@ -391,7 +391,7 @@
             "sample": "WplusH-WtoLNu-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "3*0.09896*0.53",
+            "xsec": "0.09896*0.53",
             "nevents": "3068881",
             "size": "7613191207"
         },
