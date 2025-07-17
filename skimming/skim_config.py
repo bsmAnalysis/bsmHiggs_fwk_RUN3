@@ -3,14 +3,12 @@ branches_to_keep = {
             "Muon": ["pt", "eta", "phi","charge","pdgId","tightId","mass","pfRelIso03_all"],  # keep all fields                                                                                       
             "Electron": ["pt", "eta", "phi","charge","pdgId","cutBased","mass","pfRelIso04_all"],  # keep all fields                                                                                   
             "Jet": ["pt", "eta", "phi","btagUParTAK4probbb","svIdx1","svIdx2","mass","btagDeepFlavB","btagUParTAK4","passJetIdTight", "passJetIdTightLepVeto","pt_regressed","hadronFlavour","partonFlavour","pnet_resol"],
-            "FatJet": ["pt", "eta", "phi", "msoftdrop","globalParT3_Xbb","globalParT3_QCD","mass","particleNet_XbbVsQCD", "subJetIdx1", "subJetIdx2","passJetIdTight", "passJetIdTightLepVeto"],
-            #"GenPart": ["pt", "eta", "phi", "pdgId","statusFlags", "status", "genPartIdxMother"],
             "PFMET": ["pt", "phi","sumEt"],
             "PuppiMET": ["pt", "phi","sumEt"],
             "Pileup":["nTrueInt","nPU"],
             "LHE": ["HT","NJets"],
             "PV": ["npvsGood","npvs"],
-            #"SubJet":["btagDeepFlavB","btagUParTAK4B"],
+            
             
         }
 
