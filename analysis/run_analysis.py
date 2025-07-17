@@ -1,6 +1,6 @@
 import sys, hist, uproot, time, warnings, awkward 
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-from ZH_2lep_total_processor  import TOTAL_Processor
+from ZH_0lep_total_processor  import TOTAL_Processor
 
 warnings.filterwarnings("ignore", message="Missing cross-reference index")
 
@@ -36,6 +36,7 @@ file_to_process = files[args.job_index]
 dataset_name = meta["sample"]
 xsec = float(meta["xsec"])
 nevts = int(meta["nevents"])
+isMC = bool(meta["isMC"])
 lumi=112700
 print(f"[INFO] Processing: {file_to_process}")
 print(f"[INFO] Sample: {dataset_name}, xsec={xsec}, nevts={nevts}")
@@ -60,7 +61,7 @@ for attempt in range(1, 6):
         time.sleep(10)
 
 # --- Run processor ---
-processor_instance = TOTAL_Processor(xsec=xsec, lumi=lumi, nevts=nevts, dataset_name=dataset_name)
+processor_instance = TOTAL_Processor(xsec=xsec, lumi=lumi, nevts=nevts, isMC=isMC, dataset_name=dataset_name)
 output = processor_instance.process(events)
 
 # --- Save output root file---
