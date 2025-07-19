@@ -21,7 +21,7 @@ OUTFILE="${DATASET_KEY}_0l_${JOBIDX}.root"
 BDTFILE="bdt_${DATASET_KEY}_0l_${JOBIDX}.root"
 
 # Run main analysis
-python run_analysis2.py \
+python run_analysis.py \
     --job-index ${JOBIDX} \
     --json ${DATASET_JSON} \
     --dataset ${DATASET_KEY} \
