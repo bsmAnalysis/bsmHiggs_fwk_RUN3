@@ -27,6 +27,7 @@ args = parser.parse_args()
 with open(args.json) as f:
     all_datasets = json.load(f)
 
+
 if args.dataset not in all_datasets:
     raise ValueError(f"Dataset {args.dataset} not found in {args.json}")
 dataset_name = args.dataset
@@ -46,13 +47,13 @@ print(f"[INFO] Processing {file_to_process}")
 print(f"[INFO] Sample: {sample_name}, xsec={xsec}, nevts={nevts}")
 
 # Adjust the config based on the sample name
-include_genpart = any(x in dataset_name for x in ["ZH", "WH"])
+include_genpart = any(x in dataset_name for x in ["ZH_ZToAll_HToAATo4B", "WH_WToAll_HToAATo4B","VBFH_HToAATo4B","TTH_TTToAll_HToAATo4B"])
 include_genttbarid = "TTto" in dataset_name
 
 # Modify the branches to keep
 if include_genpart:
     if "GenPart" not in branches_to_keep:
-        branches_to_keep["GenPart"] = ["pt", "eta", "phi", "pdgId", "status", "statusFlags", "genPartIdxMother"]
+        branches_to_keep["GenPart"] = ["pt", "eta", "phi","mass", "pdgId", "status", "statusFlags", "genPartIdxMother"]
 
 if include_genttbarid:
     if "genTtbarId" not in branches_to_keep:
