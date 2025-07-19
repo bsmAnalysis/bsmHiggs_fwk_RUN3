@@ -8,7 +8,7 @@ import hist
 import warnings
 
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-from ZH_0lep_total_processor2 import TOTAL_Processor
+from ZH_0lep_total_processor import TOTAL_Processor
 
 warnings.filterwarnings("ignore", message="Missing cross-reference index")
 
