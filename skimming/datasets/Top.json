@@ -688,7 +688,7 @@
             "sample": "TBbarQtoLNu",
             "year": "2024",
             "isMC": "True",
-            "xsec": "145.0*0.322",
+            "xsec": "46.69",
             "nevents": "44258039",
             "size": "105727397370"
         },
@@ -1092,7 +1092,7 @@
             "sample": "TbarBQtoLNu",
             "year": "2024",
             "isMC": "True",
-            "xsec": "87.20*0.322",
+            "xsec": "28.0784",
             "nevents": "22102160",
             "size": "53410989759"
         },
