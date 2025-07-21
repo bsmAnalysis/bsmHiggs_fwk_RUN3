@@ -5,7 +5,7 @@
             "sample": "GluGluH-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "52.23*0.53",
+            "xsec": "27.6819",
             "nevents": "9874198",
             "size": "18380111104"
         },
@@ -54,7 +54,7 @@
             "sample": "VBFH-Hto2B_ext1",
             "year": "2024",
             "isMC": "True",
-            "xsec": "4.078*0.53",
+            "xsec": "2.16134",
             "nevents": "19990298",
             "size": "44181147941"
         },
@@ -315,7 +315,7 @@
             "sample": "WminusH-WtoLNu-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "0.06380*0.53",
+            "xsec": "0.033814",
             "nevents": "1976960",
             "size": "4869438965"
         },
@@ -348,7 +348,7 @@
             "sample": "WplusH-Wto2Q-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "0.8889*0.6741*0.53",
+            "xsec": "0.31757997",
             "nevents": "6261825",
             "size": "15083546081"
         },
@@ -391,7 +391,7 @@
             "sample": "WplusH-WtoLNu-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "0.09896*0.53",
+            "xsec": "0.0524488",
             "nevents": "3068881",
             "size": "7613191207"
         },
