@@ -289,7 +289,7 @@
             "sample": "WminusH-Wto2Q-Hto2B",
             "year": "2024",
             "isMC": "True",
-            "xsec": "0.5677*0.6741*0.53",
+            "xsec": "0.20282388",
             "nevents": "3966909",
             "size": "9569482415"
         },
