@@ -146,7 +146,13 @@ class TOTAL_Processor(processor.ProcessorABC):
             return
         for key, val in data_dict.items():
             self._trees[regime][key].extend(np.atleast_1d(val))
-        
+
+    
+    def compat_tree_variables(self, tree_dict):
+        '''Ensure all output branches are float64 numpy arrays for hadd compatibility.'''
+        for key in tree_dict:
+            tree_dict[key] = np.asarray(tree_dict[key], dtype=np.float64)
+
 
     def process(self, events):
         try:
@@ -166,7 +172,7 @@ class TOTAL_Processor(processor.ProcessorABC):
              self.dataset_name.startswith("WH_WToAll_HToAATo4B") and self.is_MC)
         )
         #for bdt train label
-        label_value = 1 if is_signal else 0
+        #label_value = 1 if is_signal else 0
 
         weight_array = np.ones(n) * ( self.xsec / self.nevts)
         weights = Weights(n)
@@ -177,7 +183,7 @@ class TOTAL_Processor(processor.ProcessorABC):
         
         #object configuration
         muons = events.Muon[(events.Muon.pt > 10) & (np.abs(events.Muon.eta) < 2.5) & events.Muon.tightId & (events.Muon.pfRelIso03_all < 0.15)]
-        electrons = events.Electron[(events.Electron.pt > 15) & (np.abs(events.Electron.eta) < 2.4) & (events.Electron.cutBased >= 4)]
+        electrons = events.Electron[(events.Electron.pt > 15) & (np.abs(events.Electron.eta) < 2.4) & (events.Electron.cutBased >= 4) & (events.Electron.pfRelIso03_all < 0.15)]
 
         leptons = ak.concatenate([muons, electrons], axis=1)
         leptons = leptons[ak.argsort(leptons.pt, axis=-1, ascending=False)]
@@ -289,11 +295,11 @@ class TOTAL_Processor(processor.ProcessorABC):
                 np.abs(lead_untag_boosted[valid_mask_boo].delta_phi(met_boosted[valid_mask_boo])), n_boost
             ),
             "n_untag": safe_array(n_untagged_boo, n_boost),
-            "label": np.full(n_boost, label_value),
             "weight": ak.to_numpy(weights_boosted),
         }
 
         if self.is_MVA:
+            self.compat_tree_variables(bdt_boosted)
             self.add_tree_entry("boosted", bdt_boosted)
 
        
@@ -435,11 +441,11 @@ class TOTAL_Processor(processor.ProcessorABC):
                 np.abs(first_untagged[valid_mask].delta_phi(puppimet_res[valid_mask])),
                 n_res
             ),
-            "label": np.full(n_res, label_value),
             "weight": ak.to_numpy(weights_res),
         }
 
         if self.is_MVA:
+            self.compat_tree_variables(bdt_resolved)
             self.add_tree_entry("resolved", bdt_resolved)
         #merged
         full_mask_merged = mask0 & ((n_double_bjets >= 1) & (n_single_bjets_cc >= 1))
@@ -578,10 +584,10 @@ class TOTAL_Processor(processor.ProcessorABC):
             ),
             "n_doubleb": safe_array(n_dbb, n_merged),
             "n_singleb": safe_array(n_sbb, n_merged),
-            "label": np.full(n_merged, label_value),
             "weight": ak.to_numpy(weights_merged),
         }
         if self.is_MVA:
+            self.compat_tree_variables(bdt_merged)
             self.add_tree_entry("merged", bdt_merged)
 
         if self.is_MVA:
