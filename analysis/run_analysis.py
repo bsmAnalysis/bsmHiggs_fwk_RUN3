@@ -6,6 +6,7 @@ import argparse
 import uproot
 import hist
 import warnings
+import awkward as ak
 
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from ZH_0lep_total_processor import TOTAL_Processor
@@ -40,8 +41,8 @@ dataset_name = meta["sample"]
 xsec = float(meta["xsec"])
 nevts = int(meta["nevents"])
 isMC = bool(meta["isMC"])
-#lumi = 112700  # 112.7 fb^-1
-is_MVA= True
+#### define here if is_MVA
+is_MVA = False
 print(f"[INFO] Processing file {args.job_index+1}/{len(files)}: {file_to_process}")
 print(f"[INFO] Sample: {dataset_name} (xsec={xsec}, nevts={nevts})")
 
@@ -62,37 +63,79 @@ for attempt in range(1, 6):
             sys.exit(1)
         time.sleep(10)
 
-# --- Run processor ---
-processor_instance = TOTAL_Processor(
-    xsec=xsec,
-    nevts=nevts,
-    isMC=isMC,
-    dataset_name=dataset_name,
-    is_MVA= True
-)
-output = processor_instance.process(events)
+#  Split TTbar samples to tt+bb tt+cc tt+qq
+#  way to split found at: https://github.com/cms-sw/cmssw/blob/master/TopQuarkAnalysis/TopTools/plugins/GenTtbarCategorizer.cc
+is_ttbar = dataset_name.startswith("TT")
 
-# --- Save histograms ---
-output_name = args.output
-with uproot.recreate(output_name) as rootfile:
-    for name, obj in output.items():
-        if isinstance(obj, hist.Hist):
-            rootfile[name] = obj.to_numpy()
-print(f"[INFO] Saved histogram ROOT file: {output_name}")
+if is_ttbar  and not is_MVA:
+    print("[INFO] TTbar sample detected splitting into ttLF, ttCC, ttBB")
+    tt_id = events.genTtbarId
 
-# --- Save BDT trees ---
-bdt_output_name = args.bdt_output or f"bdt_{os.path.basename(args.output)}"
-tree_data = output.get("trees", None)
+    masks = {
+        "ttLF": (tt_id % 100 == 0),
+        "ttCC": (tt_id % 100 >= 41) & (tt_id % 100 <= 45),
+        "ttBB": (tt_id % 100 >= 51) & (tt_id % 100 <= 55),
+    }
 
-# fallback in case trees not injected into output
-if not tree_data and hasattr(processor_instance, "_trees"):
-    tree_data = processor_instance._trees
+    job_suffix = os.path.basename(args.output).split("_")[-1]
 
-if tree_data:
-    with uproot.recreate(bdt_output_name) as bdtfile:
-        for regime, tree_dict in tree_data.items():
-            bdtfile[regime] = tree_dict
-    print(f"[INFO] Saved BDT training trees in: {bdt_output_name}")
+    for flavor, mask in masks.items():
+        events_flavor = events[mask]
+        n_flavor = len(events_flavor)
+        print(f"[INFO] Processing flavor: {flavor} (nEvents: {n_flavor})")
+
+        if n_flavor == 0:
+            print(f"[INFO] No events found for {flavor} — skipping.")
+            continue
+
+        processor_instance = TOTAL_Processor(
+            xsec=xsec,
+            nevts=nevts,
+            isMC=isMC,
+            dataset_name=dataset_name,
+            is_MVA=False  
+        )
+        output = processor_instance.process(events_flavor)
+
+        
+        sample_base = os.path.basename(dataset_name).replace(".root", "").replace("/", "_")
+        out_name = f"{sample_base}_{flavor}_{job_suffix}"
+
+        with uproot.recreate(out_name) as rootfile:
+            for name, obj in output.items():
+                if isinstance(obj, hist.Hist):
+                    rootfile[name] = obj.to_numpy()
+        print(f"[INFO] Saved histogram ROOT file: {out_name}")
+
 else:
-    print("[WARNING] No BDT trees found — nothing was written to tree output file.")
+    # non-TTbar processing 
+    processor_instance = TOTAL_Processor(
+        xsec=xsec,
+        nevts=nevts,
+        isMC=isMC,
+        dataset_name=dataset_name,
+        is_MVA=True
+    )
+    output = processor_instance.process(events)
 
+    output_name = args.output
+    with uproot.recreate(output_name) as rootfile:
+        for name, obj in output.items():
+            if isinstance(obj, hist.Hist):
+                rootfile[name] = obj.to_numpy()
+    print(f"[INFO] Saved histogram ROOT file: {output_name}")
+
+    # --- Save BDT trees ---
+    bdt_output_name = args.bdt_output or f"bdt_{os.path.basename(args.output)}"
+    tree_data = output.get("trees", None)
+
+    if not tree_data and hasattr(processor_instance, "_trees"):
+        tree_data = processor_instance._trees
+
+    if tree_data:
+        with uproot.recreate(bdt_output_name) as bdtfile:
+            for regime, tree_dict in tree_data.items():
+                bdtfile[regime] = tree_dict
+        print(f"[INFO] Saved BDT training trees in: {bdt_output_name}")
+    else:
+        print("[WARNING] No BDT trees found — nothing was written to tree output file.")
