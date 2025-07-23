@@ -1,0 +1,22 @@
+name: bdt_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - jupyterlab
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - xgboost
+  - uproot
+  - awkward
+  - vector
+  - boost-histogram
+  - hist
+  - tqdm
+  - ipykernel
+  - jupyterlab_widgets
+  - ipywidgets
