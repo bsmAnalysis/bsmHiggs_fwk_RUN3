@@ -9,7 +9,7 @@ import warnings
 import awkward as ak
 
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-from ZH_0lep_total_processor import TOTAL_Processor
+from ZH_0lep_total_processor_v3  import TOTAL_Processor
 
 warnings.filterwarnings("ignore", message="Missing cross-reference index")
 
@@ -41,8 +41,10 @@ dataset_name = meta["sample"]
 xsec = float(meta["xsec"])
 nevts = int(meta["nevents"])
 isMC = bool(meta["isMC"])
-#### define here if is_MVA
+#### define here if is_MVA or run_eval####################################################
 is_MVA = False
+run_eval=True
+############################################################################################
 print(f"[INFO] Processing file {args.job_index+1}/{len(files)}: {file_to_process}")
 print(f"[INFO] Sample: {dataset_name} (xsec={xsec}, nevts={nevts})")
 
@@ -63,18 +65,17 @@ for attempt in range(1, 6):
             sys.exit(1)
         time.sleep(10)
 
-#  Split TTbar samples to tt+bb tt+cc tt+qq
-#  way to split found at: https://github.com/cms-sw/cmssw/blob/master/TopQuarkAnalysis/TopTools/plugins/GenTtbarCategorizer.cc
+# --- Split TTbar samples by genTtbarId ---
 is_ttbar = dataset_name.startswith("TT")
 
 if is_ttbar  and not is_MVA:
-    print("[INFO] TTbar sample detected splitting into ttLF, ttCC, ttBB")
-    tt_id = events.genTtbarId
+    print("[INFO] TTbar sample detected – splitting into ttLF, ttCC, ttBB")
+    gen_id = events.genTtbarId
 
     masks = {
-        "ttLF": (tt_id % 100 == 0),
-        "ttCC": (tt_id % 100 >= 41) & (tt_id % 100 <= 45),
-        "ttBB": (tt_id % 100 >= 51) & (tt_id % 100 <= 55),
+        "ttLF": (gen_id % 100 == 0),
+        "ttCC": (gen_id % 100 >= 41) & (gen_id % 100 <= 45),
+        "ttBB": (gen_id % 100 >= 51) & (gen_id % 100 <= 55),
     }
 
     job_suffix = os.path.basename(args.output).split("_")[-1]
@@ -93,7 +94,8 @@ if is_ttbar  and not is_MVA:
             nevts=nevts,
             isMC=isMC,
             dataset_name=dataset_name,
-            is_MVA=False  
+            is_MVA=False,
+            run_eval=True
         )
         output = processor_instance.process(events_flavor)
 
@@ -108,13 +110,14 @@ if is_ttbar  and not is_MVA:
         print(f"[INFO] Saved histogram ROOT file: {out_name}")
 
 else:
-    # non-TTbar processing 
+    # --- Normal (non-TTbar) processing ---
     processor_instance = TOTAL_Processor(
         xsec=xsec,
         nevts=nevts,
         isMC=isMC,
         dataset_name=dataset_name,
-        is_MVA=True
+        is_MVA=False,
+        run_eval=True
     )
     output = processor_instance.process(events)
 

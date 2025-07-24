@@ -7,9 +7,9 @@ import subprocess
 
 OUTPUT_DIR = "."
 DATASET_DIR = "datasets"
-FILES_TO_TRANSFER = ["run_analysis.py", "ZH_2lep_total_processor.py", "x509up", "run_analysis.sh", "utils.tar.gz"]
+FILES_TO_TRANSFER = ["run_analysis.py", "ZH_0lep_total_processor_v3.py", "x509up", "run_analysis.sh", "utils.tar.gz", "xgb_model.tar.gz"]
 
-json_files = sorted(glob.glob(f"{DATASET_DIR}/ZH*.json"))
+json_files = sorted(glob.glob(f"{DATASET_DIR}/Wto*.json"))
 
 for json_path in json_files:
     with open(json_path) as f:
@@ -22,7 +22,7 @@ for json_path in json_files:
         missing_jobs = []
 
         for i in range(n_jobs):
-            expected_file = f"{dataset_key}_ak4_m_{i}.root"
+            expected_file = f"{dataset_key}_0l_{i}.root"
             if not os.path.exists(os.path.join(OUTPUT_DIR, expected_file)):
                 missing_jobs.append(i)
 

@@ -16,9 +16,16 @@ if [ -f utils.tar.gz ]; then
     export PYTHONPATH=$PYTHONPATH:$(pwd)
 fi
 
+# Unpack XGBoost models
+if [ -f xgb_model.tar.gz ]; then
+    tar -xzf xgb_model.tar.gz
+    export PYTHONPATH=$PYTHONPATH:$(pwd)
+fi
+
+
 # Output file names (written in current working directory)
-OUTFILE="${DATASET_KEY}_0l_${JOBIDX}.root"
-BDTFILE="bdt_${DATASET_KEY}_0l_${JOBIDX}.root"
+OUTFILE="${DATASET_KEY}_${JOBIDX}.root"
+BDTFILE="bdt_${DATASET_KEY}_${JOBIDX}.root"
 
 # Run main analysis
 python run_analysis.py \
