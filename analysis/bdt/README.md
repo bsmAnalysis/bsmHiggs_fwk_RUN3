@@ -9,5 +9,5 @@ conda activate bdt_env
 ```
 then jsut type:
 ```bash
-jupiter lab
+jupyter lab
 ```
