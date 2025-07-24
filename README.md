@@ -156,3 +156,13 @@ when y want to update something in this folder, eg more fucntions to use in your
 ```bash
  tar -czf utils.tar.gz utils/
 ```
+### To make the trees of each regime for bdt training:
+define your branches of each regime in your processor and have the run_eval=Falsee and is_MVA=True in run_analysis.py (line 45-46)
+
+### To run bdt evalutation:
+upload your json files from the xgb training in the xgb_model folder and to submit on condor do:
+```bash
+# From the root of the repo
+tar -czf analysis/xgb_model.tar.gz xgb_model/
+```
+have the run_eval=True and is_MVA=False in run_analysis.py (line 45-46)
