@@ -98,7 +98,7 @@ def build_sum_reg_vector(jets, mask, n):
     return vec_sum
 
 class TOTAL_Processor(processor.ProcessorABC):
-    def __init__(self, xsec=0.89, nevts=3000, isMC=False, dataset_name=None, is_MVA=False, run_eval=True):
+    def __init__(self, xsec=0.89, nevts=3000, isMC=True, dataset_name=None, is_MVA=False, run_eval=True):
         self.xsec = xsec
         self.nevts = nevts
         self.dataset_name = dataset_name
@@ -109,7 +109,7 @@ class TOTAL_Processor(processor.ProcessorABC):
         self._histograms = {}
         self.bdt_eval_boost=XGBHelper(os.path.join("xgb_model", "bdt_model_boosted.json"), ["H_mass", "H_pt", "HT","puppimet_pt","btag_max","btag_min","dr_bb_ave","dm_bb_bb_min","dphi_H_MET","pt_untag_max","dphi_untag_MET","pt_tag_max","n_untag"])
         self.bdt_eval_mer=XGBHelper(os.path.join("xgb_model", "bdt_model_merged.json"), ["H_mass", "H_pt", "HT","puppimet_pt","n_untag","pt_untag_max", "dphi_untag_MET", "btag_min","dr_bb_ave","dm_bb_bb_min", "dphi_H_MET"])
-        self.bdt_eval_res=XGBHelper(os.path.join("xgb_model", "bdt_model_resolved.json"), ["H_mass", "H_pt", "HT","dphi_H_MET","dm_bb_bb_min","mbbj","puppimet_pt","n_untag","btag_min", "pt_untag_max","dr_bb_ave","dphi_untag_MET"])
+        self.bdt_eval_res=XGBHelper(os.path.join("xgb_model", "bdt_model_resolved.json"), ["H_mass", "H_pt", "HT","dphi_H_MET","dm_bb_bb_min","m_bbj","puppimet_pt","n_untag","btag_min", "pt_untag_max","dr_bb_ave","dphi_untag_MET"])
         self._histograms["cutflow_2l"] = hist.Hist(
             hist.axis.StrCategory(["raw", "2lep", "Mll", "boosted", "merged", "resolved"], name="cut"),
             storage=storage.Double()
@@ -119,7 +119,7 @@ class TOTAL_Processor(processor.ProcessorABC):
         
         for suffix in ["_boosted", "_merged", "_resolved"]:
             self._histograms[f"bdt_score{suffix}"] = (
-                Hist.new.Reg(100, 0, 1, name="bdt", label=f"bdt score {suffix}").Weight()
+                Hist.new.Reg(300, 0, 1, name="bdt", label=f"bdt score {suffix}").Weight()
             )
             self._histograms[f"mass_H{suffix}"] = (
                 Hist.new.Reg(80, 0, 400, name="m", label=f"Higgs mass {suffix}").Weight()
@@ -302,8 +302,6 @@ class TOTAL_Processor(processor.ProcessorABC):
         output["dm_bb_bb_min_boosted"].fill(dm=dm_boosted, weight=weights_boosted)
         lead_untag_boosted = ak.firsts(double_untag_jets_boosted)
         valid_mask_boo = ~ak.is_none(lead_untag_boosted)
-       
-        #double_bjets_sorted_by_pt = ak.sort(double_bjets_boosted, axis=-1, ascending=False, key=lambda jet: jet.pt_regressed)
         pt_tag_max_boo = ak.max(double_bjets_boosted.pt_regressed, axis=1)
 
         
@@ -343,10 +341,10 @@ class TOTAL_Processor(processor.ProcessorABC):
 
         ### MODEL EVAL BOOST###
         if self.run_eval and not self.is_MVA :
-            inputs_boost = {key: bdt_boosted[key] for key in self.bdt_eval_boost.var_list}
+            inputs_boost = {key: safe_array(bdt_boosted[key], n_boost) for key in self.bdt_eval_boost.var_list}
             bdt_score_boost = self.bdt_eval_boost.eval(inputs_boost)
-            output["bdt_score_boosted"].fill(bdt=bdt_score_boost, weight=weights_boosted)
-
+            bdt_score_boost = safe_array(bdt_score_boost, n_boost)
+            output["bdt_score_boosted"].fill(bdt=np.ravel(bdt_score_boost),weight=np.ravel(safe_array(weights_boosted, n_boost)))
             
         #resolved
         # For resolved regime
@@ -484,15 +482,13 @@ class TOTAL_Processor(processor.ProcessorABC):
         if self.is_MVA:
             self.compat_tree_variables(bdt_resolved)
             self.add_tree_entry("resolved", bdt_resolved)
-         ### MODEL EVAL resolved###
-         
-        if self.run_eval and not self.is_MVA :
-            #bdt_score_res= self.bdt_eval_res.eval(inputs_res)
-            #output["bdt_score_resolved"].fill(bdt=bdt_score_res, weight=weights_res)
-            inputs_res = {key: bdt_resolved[key] for key in self.bdt_eval_res.var_list}
-            bdt_score_res = self.bdt_eval_res.eval(inputs_res)
-            output["bdt_score_resolved"].fill(bdt=bdt_score_res, weight=weights_res)
 
+        ### MODEL EVAL resolved###
+        if self.run_eval and not self.is_MVA:
+            inputs_res = {key: safe_array(bdt_resolved[key], n_res) for key in self.bdt_eval_res.var_list}
+            bdt_score_res = self.bdt_eval_res.eval(inputs_res)
+            bdt_score_res = safe_array(bdt_score_res, n_res)
+            output["bdt_score_resolved"].fill(bdt=np.ravel(bdt_score_res),weight=np.ravel(safe_array(weights_res, n_res)))
         #merged
         full_mask_merged = mask0 & ((n_double_bjets >= 1) & (n_single_bjets_cc >= 1))
         output["cutflow_2l"].fill(cut="merged", weight=np.sum(weights.weight()[full_mask_merged]))
@@ -627,10 +623,11 @@ class TOTAL_Processor(processor.ProcessorABC):
 
          ### MODEL EVAL Merged###                                                                       
         if self.run_eval and not self.is_MVA :
-            inputs_mer = {key: bdt_merged[key] for key in self.bdt_eval_mer.var_list}
+            inputs_mer = {key: safe_array(bdt_merged[key], n_merged) for key in self.bdt_eval_mer.var_list}
             bdt_score_mer = self.bdt_eval_mer.eval(inputs_mer)
-            output["bdt_score_merged"].fill(bdt=bdt_score_mer, weight=weights_merged)
-
+            bdt_score_mer = safe_array(bdt_score_mer, n_merged)
+            output["bdt_score_merged"].fill(bdt= np.ravel(bdt_score_mer), weight=np.ravel(safe_array(weights_merged, n_merged)))
+            
         if self.is_MVA:
             output["trees"] = self._trees
             for regime, trees in self._trees.items():
