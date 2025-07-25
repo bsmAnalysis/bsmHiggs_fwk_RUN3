@@ -6,7 +6,7 @@ branches_to_keep = {
             "PFMET": ["pt", "phi","sumEt"],
             "PuppiMET": ["pt", "phi","sumEt"],
             "Pileup":["nTrueInt","nPU"],
-            "LHE": ["HT","NJets"],
+            "LHE": ["HT","Njets"],
             "PV": ["npvsGood","npvs"],
             
             
