@@ -126,92 +126,7 @@ hist_60, stat_60 = Read_Root_File(gen_dir_60, Rebin_Factor)
 #extract bins and values
 
 ###############################################################################
-#First Plot: eta b-quarks
-###############################################################################
-
-names  = ["eta_gen:b1", "eta_gen:b2", "eta_gen:b3", "eta_gen:b4"]
-colors = ["green", "darkkhaki", "darkorange", "gold"]
-labels = [r"$b_1$", r"$b_2$", r"$b_3$", r"$b_4$"]
-fig, ax = plt.subplots(figsize=(8, 8))
-for index, name in enumerate(names):
-    bin_edges, bin_values, _ = Bin_Edges_Values_Errors(hist_60, name)
-    ax.stairs(bin_values, bin_edges, color=colors[index], label=labels[index], linewidth=1.2)
-leg = ax.legend(
-    fontsize=15, frameon=False, loc="upper right", bbox_to_anchor=(0.95, 0.95))
-for i in range(len(leg.get_lines())):
-    leg.get_lines()[i].set_linewidth(3)
-
-ax.set_ylabel(r"$N_{Events}$", loc="top", fontweight="bold", fontsize=22)
-ax.set_xlabel(r"$\eta$", fontsize=22, loc="right",  fontweight="bold")
-ax.minorticks_on()
-ax.tick_params(which='major', length=7, width=1.5, direction='in', 
-                right=True, top=True, labelsize=14)
-ax.tick_params(which='minor', length=3, width=1.3, direction='in', 
-                right=True, top=True, labelsize=12)
-bin_edges, bin_values, _ = Bin_Edges_Values_Errors(hist_60, "eta_gen:b1")
-ax.set_ylim([0, 1.15*max(bin_values)])
-ax.grid(linestyle=':', color='gray')
-#ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
-#ax.set_title(r'$\bf{CMS}$' + " " +  r'$\it{Simulation}$', fontsize=18, loc="left")
-ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
-
-ax.text(
-    0.05, 0.95,  
-    r"$Wh\rightarrow aa \rightarrow 4b$" + "\n" + r"$m_{a}=60$",
-    #transform=plt.gca().transAxes,  # Use Axes coordinates (0,0 bottom-left, 1,1 top-right)
-    transform=ax.transAxes,
-    fontsize=17,  # Text font size
-    verticalalignment='top',  # Align the text vertically to the top
-    horizontalalignment='left',  # Align the text horizontally to the left
-)
-
-
-###############################################################################
-#Second Plot: pt b-quarks
-###############################################################################
-
-names = ["pt_gen:b1", "pt_gen:b2", "pt_gen:b3", "pt_gen:b4"]
-colors = ["green", "darkkhaki", "darkorange", "gold"]
-labels = [r"$b_1$", r"$b_2$", r"$b_3$", r"$b_4$"]
-fig, ax = plt.subplots(figsize=(8, 8))
-for index, name in enumerate(names):
-    bin_edges, bin_values, _ = Bin_Edges_Values_Errors(hist_60, name)
-    ax.stairs(bin_values, bin_edges, color=colors[index], label=labels[index], linewidth=1.7)
-leg = ax.legend(
-    fontsize=15, frameon=False, loc="upper right", bbox_to_anchor=(0.95, 0.95))
-for i in range(len(leg.get_lines())):
-    leg.get_lines()[i].set_linewidth(3)
-
-ax.set_ylabel(r"$N_{Events}$", loc="top", fontweight="bold", fontsize=22)
-ax.set_xlabel(r"$p_{T}$" + "[GeV]", fontsize=22, loc="right")
-ax.minorticks_on()
-ax.tick_params(which='major', length=7, width=1.5, direction='in', 
-                right=True, top=True, labelsize=14)
-ax.tick_params(which='minor', length=3, width=1.3, direction='in', 
-                right=True, top=True, labelsize=12)
-bin_edges, bin_values, _ = Bin_Edges_Values_Errors(hist_60, "pT_gen:b4")
-ax.set_ylim([0, 1.15*max(bin_values)])
-ax.grid(linestyle=':', color='gray')
-ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
-
-ax.text(
-    0.05, 0.95,  
-    r"$Wh\rightarrow aa \rightarrow 4b$" + "\n" + r"$m_{a}=60$",
-    #transform=plt.gca().transAxes,  # Use Axes coordinates (0,0 bottom-left, 1,1 top-right)
-    transform=ax.transAxes,
-    fontsize=17,  # Text font size
-    verticalalignment='top',  # Align the text vertically to the top
-    horizontalalignment='left',  # Align the text horizontally to the left
-)
-ax.set_xlim([0,300])
-
-
-###############################################################################
-#Third Plot: pt b1 
+#1st Plot: pt b1 
 ###############################################################################
 
 name = "pt_gen:b1"
@@ -265,7 +180,7 @@ ax.text(
 )
 
 ###############################################################################
-#Fourth Plo: pt b4
+#2nd Plot: pt b4
 ###############################################################################
 
 name = "pt_gen:b4"
@@ -317,7 +232,7 @@ ax.text(
 )
 
 ###############################################################################
-#Fifth Plot: deltaR bb1
+#3rd Plot: deltaR bb1
 ###############################################################################
 
 name = "dr_gen:bb1"
@@ -369,7 +284,7 @@ ax.text(
 
 
 ###############################################################################
-#Sixth Plot: pt A
+#4th Plot: pt A
 ###############################################################################
 
 name = "pt_gen:A"
@@ -403,7 +318,7 @@ ax.tick_params(which='major', length=7, width=1.3, direction='in',
                 right=True, top=True, labelsize=14)
 ax.tick_params(which='minor', length=3, width=1.1, direction='in', 
                 right=True, top=True, labelsize=12)
-ax.set_xlim([0, 350])
+ax.set_xlim([0, 500])
 ax.set_ylim([0, 1.2*max(bin_values_60)])
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
@@ -419,7 +334,7 @@ ax.text(
 )
 
 ###############################################################################
-#Seventh Plot: eta A
+#5th Plot: eta A
 ###############################################################################
 
 name = "eta_gen:A"
@@ -468,7 +383,7 @@ ax.text(
 )
 
 ###############################################################################
-#Eighth Plot: pt higgs
+#6th Plot: pt higgs
 ###############################################################################
 
 name = "pt_gen:H"
@@ -518,7 +433,7 @@ ax.text(
 )
 
 ###############################################################################
-#Ninth Plot: eta higgs
+#7th Plot: eta higgs
 ###############################################################################
 
 name = "eta_gen:H"
@@ -567,7 +482,7 @@ ax.text(
 )
 
 ###############################################################################
-#Fifth Plot: deltaR AA
+#8th Plot: deltaR AA
 ###############################################################################
 
 name = "dr_gen:AA"
@@ -618,7 +533,7 @@ ax.text(
 )
 
 ###############################################################################
-#Eleventh Plot: pt W
+#9th Plot: pt W
 ###############################################################################
 
 name = "pt_gen:W"
@@ -668,7 +583,7 @@ ax.text(
 )
 
 ###############################################################################
-#Twelveth Plot: eta W
+#10th Plot: eta W
 ###############################################################################
 
 name = "eta_gen:W"
@@ -717,7 +632,7 @@ ax.text(
 )
 
 ###############################################################################
-#Thirteenth Plot: pt lepton
+#11th Plot: pt lepton
 ###############################################################################
 
 name = "pt_gen:lepton"
@@ -768,7 +683,7 @@ ax.text(
 )
 
 ###############################################################################
-#Fourteenth Plot: MET
+#12th Plot: MET
 ###############################################################################
 
 name = "pt_gen:neutrino"
@@ -819,7 +734,7 @@ ax.text(
 )
 
 ###############################################################################
-#FIfteenth Plot: eta lepton
+#13th Plot: eta lepton
 ###############################################################################
 
 name = "eta_gen:lepton"
