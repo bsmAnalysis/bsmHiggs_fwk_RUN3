@@ -99,7 +99,7 @@ def Bin_Edges_Values_Errors(dataframe, name):
 #Generator Plots
 ###############################################################################
 
-Rebin_Factor = 2;
+Rebin_Factor = 1;
 
 '''
 Read Signal and Background paths
@@ -167,8 +167,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 
 ax.text(
     0.7, 0.98, 
@@ -220,8 +219,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.7, 0.98, 
     r"$Wh\rightarrow aa \rightarrow 4b$" + "\n" + r"$b_{4}:\min ~ p_{T}$",
@@ -270,8 +268,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 
 ax.text(
     0.68, 0.96, 
@@ -322,8 +319,7 @@ ax.set_xlim([0, 500])
 ax.set_ylim([0, 1.2*max(bin_values_60)])
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.7, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -362,7 +358,7 @@ leg = ax.legend(
 for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.set_ylabel(r"$\frac{1}{N} \frac{dN}{dx}$", loc="top", fontweight="bold", fontsize=22)
-ax.set_xlabel(r"$\eta$(a)", fontsize=22, loc="right")
+ax.set_xlabel(r"$\eta$_{a}", fontsize=22, loc="right")
 ax.minorticks_on()
 ax.tick_params(which='major', length=7, width=1.3, direction='in', 
                 right=True, top=True, labelsize=14)
@@ -371,8 +367,7 @@ ax.tick_params(which='minor', length=3, width=1.1, direction='in',
 ax.set_ylim([0, 1.2*max(bin_values_20)])
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -421,8 +416,7 @@ ax.set_xlim([0, 500])
 ax.set_ylim([0, 1.2*max(bin_values_60)])
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -461,7 +455,7 @@ leg = ax.legend(
 for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.set_ylabel(r"$\frac{1}{N} \frac{dN}{dx}$", loc="top", fontweight="bold", fontsize=22)
-ax.set_xlabel(r"$\eta(h)$", fontsize=22, loc="right")
+ax.set_xlabel(r"$\eta_{h}$", fontsize=22, loc="right")
 ax.minorticks_on()
 ax.tick_params(which='major', length=7, width=1.3, direction='in', 
                 right=True, top=True, labelsize=14)
@@ -470,8 +464,7 @@ ax.tick_params(which='minor', length=3, width=1.1, direction='in',
 ax.set_ylim([0, 1.2*max(bin_values_60)])
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -520,8 +513,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 
 ax.text(
     0.68, 0.96, 
@@ -571,8 +563,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -611,7 +602,7 @@ leg = ax.legend(
 for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.set_ylabel(r"$\frac{1}{N} \frac{dN}{dx}$", loc="top", fontweight="bold", fontsize=22)
-ax.set_xlabel(r"$\eta(W)$", fontsize=22, loc="right")
+ax.set_xlabel(r"$\eta_{W}$", fontsize=22, loc="right")
 ax.minorticks_on()
 ax.tick_params(which='major', length=7, width=1.3, direction='in', 
                 right=True, top=True, labelsize=14)
@@ -620,8 +611,7 @@ ax.tick_params(which='minor', length=3, width=1.1, direction='in',
 ax.set_ylim([0, 1.2*max(bin_values_60)])
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -671,8 +661,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -722,8 +711,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
@@ -758,7 +746,7 @@ ax.stairs(bin_values_60, bin_edges_60, color="red",
           label=r"$m_{a}=60$", linewidth=1.2)
 
 ax.set_ylabel(r"$\frac{1}{N} \frac{dN}{dx}$", loc="top", fontweight="bold", fontsize=22)
-ax.set_xlabel(r"$\eta(lepton)$", fontsize=22, loc="right")
+ax.set_xlabel(r"$\eta_{lepton}$", fontsize=22, loc="right")
 ax.minorticks_on()
 ax.tick_params(which='major', length=7, width=1.3, direction='in', 
                 right=True, top=True, labelsize=14)
@@ -773,8 +761,7 @@ for i in range(len(leg.get_lines())):
     leg.get_lines()[i].set_linewidth(3)
 ax.grid(linestyle=':', color='gray')
 ax.set_title(r'$\bf{CMS}$  $\it{Simulation}$', fontsize=18, loc="left")
-ax.text(1.0, 1.02, "(13.6 TeV)", transform=ax.transAxes,
-        ha='right', va='bottom', fontsize=18)
+ax.set_title("(13.6 TeV)", loc="right", fontsize=18)
 ax.text(
     0.72, 0.96, 
     r"$Wh\rightarrow aa \rightarrow 4b$",
