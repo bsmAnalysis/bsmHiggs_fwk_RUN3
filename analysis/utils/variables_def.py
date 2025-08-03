@@ -235,12 +235,12 @@ def higgs_kin(bjets, all_jets):
         - Case 1: len(all_jets) == 3 -> use the 3 b-jets (if ≥3 available)
         - Case 2: len(all_jets) >= 4 -> use top 4 all_jets by pt
     Returns:
-        Tuple of ak.Arrays: (mass, pt, phi)
+        Tuple of ak.Arrays: (mass, pt,ETA, phi)
     '''
     mass_list = []
     pt_list = []
     phi_list = []
-
+    eta_list = []
     for bjs, jets in zip(bjets, all_jets):
         bjs = list(bjs)
         jets = list(jets)
@@ -261,12 +261,13 @@ def higgs_kin(bjets, all_jets):
             mass_list.append(0.0)
             pt_list.append(0.0)
             phi_list.append(0.0)
+            eta_list.append(0.0)
         else:
             mass_list.append(vec.mass)
             pt_list.append(vec.pt)
             phi_list.append(vec.phi)
-
-    return ak.Array(mass_list), ak.Array(pt_list), ak.Array(phi_list)
+            eta_list.append(vec.eta)
+    return ak.Array(mass_list), ak.Array(pt_list), ak.Array(phi_list), ak.Array(eta_list)
 
 
 def m_bbj(bjets, all_jets):
