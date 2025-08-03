@@ -9,6 +9,10 @@ from coffea.analysis_tools import Weights
 import coffea.util
 import itertools
 
+def delta_phi_raw(phi1, phi2):
+    dphi = phi1 - phi2
+    return (dphi + np.pi) % (2 * np.pi) - np.pi
+    
 def delta_phi(obj1, obj2):
     dphi = obj1.phi - obj2.phi
     return (dphi + np.pi) % (2 * np.pi) - np.pi
