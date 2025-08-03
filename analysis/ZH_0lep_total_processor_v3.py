@@ -16,34 +16,24 @@ from utils.deltas_array import (
     delta_r,
     clean_by_dr,
     delta_phi,
-    delta_eta
+    delta_eta,
 )
+def delta_phi_raw(phi1, phi2):
+    dphi = phi1 - phi2
+    return (dphi + np.pi) % (2 * np.pi) - np.pi
+
 from utils.variables_def import (
     min_dm_bb_bb,
     dr_bb_bb_avg,
     min_dm_doubleb_bb,
     dr_doubleb_bb,
     m_bbj,
-    dr_bb_avg
+    dr_bb_avg,
+    higgs_kin
 )
 from utils.jet_tight_id import compute_jet_id
 from utils.xgb_tools import XGBHelper
 import itertools
-
-def safe_array(array, target_len, fill_value=np.nan):
-    array = ak.fill_none(array, fill_value)
-    np_array = ak.to_numpy(array)
-
-    if np.isscalar(np_array):
-        np_array = np.full(target_len, fill_value)
-
-    if len(np_array) == target_len:
-        return np_array
-    elif len(np_array) < target_len:
-        pad_width = target_len - len(np_array)
-        return np.concatenate([np_array, np.full(pad_width, fill_value)])
-    else:
-        return np_array[:target_len]
 
 def make_vector(obj):
     return ak.zip({
@@ -70,32 +60,8 @@ def make_vector_met(met):
         "mass": ak.zeros_like(met.pt)
     },with_name="PtEtaPhiMLorentzVector", behavior=vector.behavior)
 
-def build_sum_vector(jets, mask, n):
-    '''
-    Constructs a summed Lorentz vector from the first `n` jets per event **after applying a mask**.
-    
-    '''
-    jets_masked = jets[mask]
-    
-    vec_sum = None
-    for i in range(n):
-        component = make_vector(jets_masked[:, i])
-        vec_sum = component if vec_sum is None else vec_sum + component
 
-    return vec_sum
 
-def build_sum_reg_vector(jets, mask, n):
-    '''                                                                                                                              
-    Constructs a summed Lorentz vector from the first `n` jets per event 
-    '''
-    jets_masked = jets[mask]
-
-    vec_sum = None
-    for i in range(n):
-        component = make_regressed_vector(jets_masked[:, i])
-        vec_sum = component if vec_sum is None else vec_sum + component
-
-    return vec_sum
 
 class TOTAL_Processor(processor.ProcessorABC):
     def __init__(self, xsec=0.89, nevts=3000, isMC=True, dataset_name=None, is_MVA=False, run_eval=True):
@@ -104,20 +70,17 @@ class TOTAL_Processor(processor.ProcessorABC):
         self.dataset_name = dataset_name
         self.isMC = isMC
         self.is_MVA= is_MVA
-        self._trees = {regime: defaultdict(list) for regime in ["boosted", "resolved", "merged"]} if is_MVA else None
+        self._trees = {regime: defaultdict(list) for regime in ["boosted", "resolved"]} if is_MVA else None
         self.run_eval= run_eval
         self._histograms = {}
-        self.bdt_eval_boost=XGBHelper(os.path.join("xgb_model", "bdt_model_boosted.json"), ["H_mass", "H_pt", "HT","puppimet_pt","btag_max","btag_min","dr_bb_ave","dm_bb_bb_min","dphi_H_MET","pt_untag_max","dphi_untag_MET","pt_tag_max","n_untag"])
-        self.bdt_eval_mer=XGBHelper(os.path.join("xgb_model", "bdt_model_merged.json"), ["H_mass", "H_pt", "HT","puppimet_pt","n_untag","pt_untag_max", "dphi_untag_MET", "btag_min","dr_bb_ave","dm_bb_bb_min", "dphi_H_MET"])
-        self.bdt_eval_res=XGBHelper(os.path.join("xgb_model", "bdt_model_resolved.json"), ["H_mass", "H_pt", "HT","dphi_H_MET","dm_bb_bb_min","m_bbj","puppimet_pt","n_untag","btag_min", "pt_untag_max","dr_bb_ave","dphi_untag_MET"])
-        self._histograms["cutflow_2l"] = hist.Hist(
-            hist.axis.StrCategory(["raw", "2lep", "Mll", "boosted", "merged", "resolved"], name="cut"),
+        self.bdt_eval_boost=XGBHelper(os.path.join("xgb_model", "bdt_model_boosted.json"), ["H_mass", "H_pt", "HT","btag_max","btag_min","btag_prod","dr_bb_ave","dm_bb_bb_min","dphi_H_MET","dphi_untag_MET","pt_tag_max","n_untag"])
+        self.bdt_eval_res=XGBHelper(os.path.join("xgb_model", "bdt_model_resolved.json"), ["H_mass", "H_pt", "HT","dphi_H_MET","dm_bb_bb_min","m_bbj","n_untag","btag_min", "pt_untag_max","dr_bb_ave","dphi_untag_MET"])
+        self._histograms["cutflow_0l"] = hist.Hist(
+            hist.axis.StrCategory(["raw", "0lep", "met","bef_boosted", "boosted","bef_resolved", "resolved"], name="cut"),
             storage=storage.Double()
         )
-        self._histograms["n_doubleb_merged"] = hist.Hist(hist.axis.Integer(0, 6, name="n", label="N double-b jets (merged)"), storage=storage.Double())
-        self._histograms["n_singleb_merged"] = hist.Hist(hist.axis.Integer(0, 6, name="n", label="N single-b jets (merged)"), storage=storage.Double())
-        
-        for suffix in ["_boosted", "_merged", "_resolved"]:
+       
+        for suffix in ["_boosted", "_resolved"]:
             self._histograms[f"bdt_score{suffix}"] = (
                 Hist.new.Reg(300, 0, 1, name="bdt", label=f"bdt score {suffix}").Weight()
             )
@@ -151,9 +114,13 @@ class TOTAL_Processor(processor.ProcessorABC):
             self._histograms[f"btag_max{suffix}"] = (
                 Hist.new.Reg(50, 0, 1, name="btag", label=f"btag max {suffix}").Weight()
             )
+            self._histograms[f"btag_prod{suffix}"] = (
+                Hist.new.Reg(50, 0, 1, name="btag", label=f"btag max {suffix}").Weight()
+            )
             self._histograms[f"dphi_H_MET{suffix}"] = Hist.new.Reg(50, 0, 5, name="dphi", label=f"dphi(H, Z) {suffix}").Weight()
             self._histograms[f"dphi_untag_MET{suffix}"] = Hist.new.Reg(50, 0, 5, name="dphi", label=f"dphi(j, met) {suffix}").Weight()
-
+            self._histograms[f"dphi_J_MET_bef{suffix}"] = Hist.new.Reg(50, 0, 5, name="dphi", label=f"dphi(j, met) {suffix}").Weight()
+            self._histograms[f"dphi_J_MET_after{suffix}"] = Hist.new.Reg(50, 0, 5, name="dphi", label=f"dphi(j, met) {suffix}").Weight()
             self._histograms[f"dm_bb_bb_min{suffix}"] = (
                Hist.new.Reg(100, 0, 200, name="dm", label=f"|ΔM(bb, bb)|_min {suffix}").Weight()
             )
@@ -207,7 +174,7 @@ class TOTAL_Processor(processor.ProcessorABC):
         weights.add("norm", weight_array)
         output = {key: hist if not hasattr(hist, "copy") else hist.copy() for key, hist in self._histograms.items()}
         
-        output["cutflow_2l"].fill(cut="raw", weight=np.sum(weights.weight()))
+        output["cutflow_0l"].fill(cut="raw", weight=np.sum(weights.weight()))
         
         #object configuration
         muons = events.Muon[(events.Muon.pt > 10) & (np.abs(events.Muon.eta) < 2.5) & events.Muon.tightId & (events.Muon.pfRelIso03_all < 0.15)]
@@ -217,15 +184,10 @@ class TOTAL_Processor(processor.ProcessorABC):
         leptons = leptons[ak.argsort(leptons.pt, axis=-1, ascending=False)]
         n_leptons = ak.num(leptons)
        
-        # Decide whether to compute Jet ID (XROOTD) or use existing branches (from skimmed file on eos)
-        if is_signal:
-            # Compute on the fly
-            tight_id, tight_lep_veto = compute_jet_id(events.Jet)
-            
-        else:
-            # Use already-stored tight ID from skimmed data
-            tight_id = events.Jet.passJetIdTight
-            tight_lep_veto = events.Jet.passJetIdTightLepVeto
+        # Jet ID : use existing branches (from skimmed file on eos)
+        
+        tight_id = events.Jet.passJetIdTight
+        tight_lep_veto = events.Jet.passJetIdTightLepVeto
         #single jets§
         single_jets =events.Jet[(events.Jet.pt_regressed > 20) & (np.abs(events.Jet.eta) < 2.5) &  tight_id & tight_lep_veto ]
         #cc single jets with leptons.
@@ -262,17 +224,45 @@ class TOTAL_Processor(processor.ProcessorABC):
         n_double_bjets=ak.num(double_bjets)
         #0lep
         mask_0lep = n_leptons == 0
+        output["cutflow_0l"].fill(cut="0lep", weight=np.sum(weights.weight()[mask_0lep]))
+        #met
         mask_met = events.PuppiMET.pt > 170
         mask0 = mask_0lep & mask_met
-        
+        output["cutflow_0l"].fill(cut="met", weight=np.sum(weights.weight()[mask0]))
+        #dphi(j,met)
+        jets_for_dphi_res = single_jets[single_jets.pt_regressed > 30]
+        dphi_res = np.abs(delta_phi_raw(jets_for_dphi_res.phi, events.PuppiMET.phi))
+        min_dphi_res = ak.min(dphi_res, axis=1, initial=999, mask_identity=False)
+        mask_dphi_res = ak.fill_none(min_dphi_res > 0.5, False)
+        mask_0_res = mask0 & mask_dphi_res
+
+        jets_for_dphi_boo = double_jets[double_jets.pt > 30]
+        dphi_boo = np.abs(delta_phi_raw(jets_for_dphi_boo.phi, events.PuppiMET.phi))
+        min_dphi_boo = ak.min(dphi_boo, axis=1, initial=999, mask_identity=False)
+        mask_dphi_boo = ak.fill_none(min_dphi_boo > 0.5, False)
+        mask_0_boo = mask0 & mask_dphi_boo
+
+        jets_for_dphi_mer = ak.concatenate([
+        single_jets[single_jets.pt > 30],
+            double_jets[double_jets.pt > 30]
+        ], axis=1)
+        dphi_mer = np.abs(delta_phi_raw(jets_for_dphi_mer.phi, events.PuppiMET.phi))
+        min_dphi_mer = ak.min(dphi_mer, axis=1, initial=999, mask_identity=False)
+        mask_dphi_mer = ak.fill_none(min_dphi_mer > 0.5, False)
+
+        mask_0_mer = mask0 & mask_dphi_mer
+        #bef cut boo 
+        bef_mask_double = mask0 & (n_double_bjets >= 2)
+        output["cutflow_0l"].fill(cut="bef_boosted", weight=np.sum(weights.weight()[bef_mask_double]))
+        output["dphi_J_MET_bef_boosted"].fill(min_dphi_boo[bef_mask_double], weight=weights.weight()[bef_mask_double])
         #boosted 
-        full_mask_double = mask0 & (n_double_bjets >= 2)
-        output["cutflow_2l"].fill(cut="boosted", weight=np.sum(weights.weight()[full_mask_double]))
+        full_mask_double = mask_0_boo & (n_double_bjets >= 2)
+        output["cutflow_0l"].fill(cut="boosted", weight=ak.sum(weights.weight()[full_mask_double]))
+        output["dphi_J_MET_after_boosted"].fill(min_dphi_boo[full_mask_double], weight=weights.weight()[full_mask_double])
         weights_boosted= weights.weight()[full_mask_double]
         double_bjets_boosted = double_bjets[full_mask_double]
         double_jets_boosted = double_jets[full_mask_double]
         double_untag_jets_boosted = double_untag_jets[full_mask_double]
-        
         n_untagged_boo = ak.num(double_untag_jets[full_mask_double])
         output["n_untag_boosted"].fill(n=n_untagged_boo, weight=weights_boosted)
         met_boosted = events.PuppiMET[full_mask_double]
@@ -285,7 +275,7 @@ class TOTAL_Processor(processor.ProcessorABC):
         btag_min_boosted=double_bjets_boosted[:, 1].btagUParTAK4probbb
         output["btag_max_boosted"].fill(btag=btag_max_boosted, weight=weights_boosted)
         output["btag_min_boosted"].fill(btag=btag_min_boosted, weight=weights_boosted)
-
+        output["btag_prod_boosted"].fill(btag=btag_min_boosted*btag_max_boosted, weight=weights_boosted)
         lead_bb = double_bjets_boosted[:, 0]
         sublead_bb = double_bjets_boosted[:, 1]  
         # Build Lorentz vectors from regressed pt manually
@@ -301,37 +291,37 @@ class TOTAL_Processor(processor.ProcessorABC):
         dm_boosted = np.abs(lead_bb.mass - sublead_bb.mass)
         output["dm_bb_bb_min_boosted"].fill(dm=dm_boosted, weight=weights_boosted)
         lead_untag_boosted = ak.firsts(double_untag_jets_boosted)
-        valid_mask_boo = ~ak.is_none(lead_untag_boosted)
-        pt_tag_max_boo = ak.max(double_bjets_boosted.pt_regressed, axis=1)
-
-        
-        output["pt_untag_max_boosted"].fill(
-            pt=lead_untag_boosted[valid_mask_boo].pt_regressed,
-            weight=weights_boosted[valid_mask_boo]
+        # Fallback: bjet with minimum b-tag
+        fallback_bjet_boo = ak.firsts(
+            double_bjets_boosted[
+                ak.argmin(double_bjets_boosted.btagUParTAK4probbb, axis=1, keepdims=True)
+            ]
         )
 
-        output["dphi_untag_MET_boosted"].fill(
-            dphi=lead_untag_boosted[valid_mask_boo].delta_phi(met_boosted[valid_mask_boo]),
-            weight=weights_boosted[valid_mask_boo]
-        )
+        # Use leading untagged jet if it exists
+        has_untagged_boo = ak.num(double_untag_jets_boosted) > 0
+        proxy_jet_boo = ak.where(has_untagged_boo, lead_untag_boosted, fallback_bjet_boo)
+
+        # Use proxy for Δφ and pt
+        dphi_proxy_MET_boo = proxy_jet_boo.delta_phi(met_boosted)
+        pt_proxy_boo = proxy_jet_boo.pt_regressed
+
       
         n_boost = len(weights_boosted)
         bdt_boosted = {
-            "H_mass": safe_array(higgs_boost.mass, n_boost),
-            "H_pt": safe_array(higgs_boost.pt, n_boost),
-            "HT": safe_array(ht_boosted, n_boost),
-            "puppimet_pt": safe_array(puppimet_boo.pt, n_boost),
-            "btag_max": safe_array(btag_max_boosted, n_boost),
-            "btag_min": safe_array(btag_min_boosted, n_boost),
-            "dr_bb_ave": safe_array(dr_bb_avg(double_bjets_boosted), n_boost),
-            "dm_bb_bb_min": safe_array(dm_boosted, n_boost),
-            "dphi_H_MET": safe_array(np.abs(higgs_boost.delta_phi(met_boosted)), n_boost),
-            "pt_untag_max": safe_array(lead_untag_boosted[valid_mask_boo].pt_regressed, n_boost),
-            "dphi_untag_MET": safe_array(
-                np.abs(lead_untag_boosted[valid_mask_boo].delta_phi(met_boosted[valid_mask_boo])), n_boost
-            ),
-            "pt_tag_max": safe_array(pt_tag_max_boo, n_boost),
-            "n_untag": safe_array(n_untagged_boo, n_boost),
+            "H_mass": ak.to_numpy(higgs_boost.mass),
+            "H_pt": ak.to_numpy(higgs_boost.pt),
+            "HT": ak.to_numpy(ht_boosted),
+            "btag_max": ak.to_numpy(btag_max_boosted),
+            "btag_min": ak.to_numpy(btag_min_boosted),
+            "btag_prod": ak.to_numpy(btag_min_boosted * btag_max_boosted),
+            "dr_bb_ave": ak.to_numpy(ak.fill_none(dr_bb_avg(double_bjets_boosted), np.nan)),
+            "dm_bb_bb_min": ak.to_numpy(dm_boosted),
+            "dphi_H_MET": ak.to_numpy(np.abs(higgs_boost.delta_phi(met_boosted))),
+            "pt_untag_max": ak.to_numpy(ak.fill_none(pt_proxy_boo, np.nan)),
+            "dphi_untag_MET": ak.to_numpy(np.abs(dphi_proxy_MET_boo)),
+            "n_untag": ak.to_numpy(n_untagged_boo),
+            "min_jmet": ak.to_numpy(min_dphi_boo[full_mask_double]),
             "weight": ak.to_numpy(weights_boosted),
         }
 
@@ -340,61 +330,53 @@ class TOTAL_Processor(processor.ProcessorABC):
             self.add_tree_entry("boosted", bdt_boosted)
 
         ### MODEL EVAL BOOST###
-        if self.run_eval and not self.is_MVA :
-            inputs_boost = {key: safe_array(bdt_boosted[key], n_boost) for key in self.bdt_eval_boost.var_list}
+        if self.run_eval and not self.is_MVA:
+            inputs_boost = {
+                key: np.asarray(bdt_boosted[key], dtype=np.float64)
+                for key in self.bdt_eval_boost.var_list
+            }
             bdt_score_boost = self.bdt_eval_boost.eval(inputs_boost)
-            bdt_score_boost = safe_array(bdt_score_boost, n_boost)
-            output["bdt_score_boosted"].fill(bdt=np.ravel(bdt_score_boost),weight=np.ravel(safe_array(weights_boosted, n_boost)))
-            
+            output["bdt_score_boosted"].fill(
+                bdt=np.ravel(bdt_score_boost),
+                weight=np.ravel(np.asarray(weights_boosted, dtype=np.float64))
+            )
+
         #resolved
+        #bef res 
+        bef_mask_res = mask0 & (n_single_bjets >= 3)
+        output["cutflow_0l"].fill(cut="bef_resolved", weight=np.sum(weights.weight()[bef_mask_res]))
+        output["dphi_J_MET_bef_resolved"].fill(min_dphi_res[bef_mask_res], weight=weights.weight()[bef_mask_res])
         # For resolved regime
-        full_mask_res = mask0 & (n_single_bjets >= 3)
-        output["cutflow_2l"].fill(cut="resolved", weight=np.sum(weights.weight()[full_mask_res]))
+        full_mask_res = mask_0_res & (n_single_bjets >= 3)
+        output["dphi_J_MET_after_resolved"].fill(min_dphi_res[full_mask_res], weight=weights.weight()[full_mask_res])
+        output["cutflow_0l"].fill(cut="resolved", weight=ak.sum(weights.weight()[full_mask_res]))
         weights_res = weights.weight()[full_mask_res]
         # Filtered objects
         single_bjets_resolved = single_bjets[full_mask_res]
         single_jets_resolved = single_jets[full_mask_res]
         single_untag_jets_resolved = single_untag_jets[full_mask_res]
 
-        #single_bjets_sorted_by_pt = ak.sort(single_bjets_resolved, axis=-1, ascending=False, key=lambda jet: jet.pt_regressed)
+        
         pt_tag_max_res = ak.max(double_bjets_boosted.pt_regressed, axis=1)
 
 
         vec_single_bjets_resolved = make_regressed_vector(single_bjets_resolved)
         vec_single_jets_resolved = make_regressed_vector(single_jets_resolved)
         # Select top 3 or 4 b-tagged jets
-        # Boolean masks per condition
-        mask_3b_3j = (ak.num(single_bjets_resolved) == 3) & (ak.num(single_jets_resolved) == 3)
-        mask_4b = ak.num(single_bjets_resolved) == 4
-        mask_3b_4j = (ak.num(single_bjets_resolved) == 3) & (ak.num(single_jets_resolved) == 4)
+       # Masks
 
-        # Combine first two into same behavior (3b+3j or 4b)
-        vec_H1_res = build_sum_reg_vector(single_bjets_resolved, mask_3b_3j , n=3)
-        vec_H2_res = build_sum_reg_vector(single_bjets_resolved, mask_4b , n=4)
-        vec_H3_res = build_sum_reg_vector(single_jets_resolved,mask_3b_4j, n=4)
-        
-        vec_H_res = ak.concatenate([vec_H1_res, vec_H2_res, vec_H3_res])
-        weights_res_all = ak.concatenate([
-            weights_res[mask_3b_3j],
-            weights_res[mask_4b],
-            weights_res[mask_3b_4j]
-        ])
+        # Build masks
 
-        output["mass_H_resolved"].fill(m=vec_H_res.mass, weight=weights_res_all)
-        output["pt_H_resolved"].fill(pt=vec_H_res.pt, weight=weights_res_all)
-       
-        # MET
-        puppimet_res = events.PuppiMET[full_mask_res]
-        puppimet_res1 = puppimet_res[mask_3b_3j]
-        puppimet_res2 = puppimet_res[mask_4b]
-        puppimet_res3 = puppimet_res[mask_3b_4j]
-
-        puppimet_all_res = ak.concatenate([puppimet_res1, puppimet_res2, puppimet_res3])
+        mass_H, pt_H, phi_H = higgs_kin(single_bjets_resolved, single_jets_resolved)
+        met_res = events.PuppiMET[full_mask_res]
+        output["mass_H_resolved"].fill(m=mass_H, weight=weights_res)
+        output["pt_H_resolved"].fill(pt=pt_H, weight=weights_res)
+        output["dphi_H_MET_resolved"].fill(
+            dphi=np.abs(delta_phi_raw(phi_H, met_res.phi)),
+            weight=weights_res
+        )
 
         
-        vec_H_res= make_vector(vec_H_res)
-        output["dphi_H_MET_merged"].fill(dphi=vec_H_res.delta_phi(make_vector_met(puppimet_all_res)),weight=weights_res_all)
-
         # --- Quantities independent of Higgs definition ---
         output["dm_bb_bb_min_resolved"].fill(
             dm=min_dm_bb_bb(vec_single_bjets_resolved, all_jets=vec_single_jets_resolved),
@@ -407,11 +389,9 @@ class TOTAL_Processor(processor.ProcessorABC):
         )
 
         mbbj_resolved = m_bbj(vec_single_bjets_resolved, vec_single_jets_resolved)
-        valid_mask_mbbj = ~ak.is_none(mbbj_resolved)
-        output["m_bbj"].fill(
-            m=mbbj_resolved[valid_mask_mbbj],
-            weight=weights_res[valid_mask_mbbj]
-        )
+
+        output["m_bbj"].fill( m=mbbj_resolved,weight=weights_res)
+
 
         output["HT_resolved"].fill(
             ht=ak.sum(single_jets_resolved.pt_regressed, axis=1),
@@ -419,7 +399,7 @@ class TOTAL_Processor(processor.ProcessorABC):
         )
 
         output["puppimet_pt_resolved"].fill(
-            met=puppimet_res.pt,
+            met=met_res.pt,
             weight=weights_res
         )
 
@@ -433,49 +413,49 @@ class TOTAL_Processor(processor.ProcessorABC):
             weight=weights_res
         )
 
-        pt_max_untagged_res = ak.firsts(single_untag_jets_resolved).pt_regressed
-        valid = ~ak.is_none(pt_max_untagged_res)
-
-        output["pt_untag_max_resolved"].fill(
-            pt=ak.to_numpy(pt_max_untagged_res[valid]),
-            weight=ak.to_numpy(weights_res[valid])
-        )
-        
         output["dr_bb_ave_resolved"].fill(
             dr=dr_bb_avg(single_bjets_resolved),
             weight=weights_res
         )
         
-        first_untagged = ak.firsts(single_untag_jets_resolved)
-        valid_mask = ~ak.is_none(first_untagged)
+        # Define a fallback: bjet with minimum b-tag
+        fallback_bjet = ak.firsts(
+            single_bjets_resolved[
+                ak.argmin(single_bjets_resolved.btagUParTAK4B, axis=1, keepdims=True)
+            ]
+        )
+
+        # Regular leading untagged jet
+        leading_untagged = ak.firsts(single_untag_jets_resolved)
+
+        # Condition: if there are untagged jets
+        has_untagged = ak.num(single_untag_jets_resolved) > 0
+
+        # Final jet: use untagged if it exists, else fallback
+        proxy_jet = ak.where(has_untagged, leading_untagged, fallback_bjet)
+
+        # Compute Δφ between selected proxy jet and MET
+        dphi_proxy_MET = proxy_jet.delta_phi(met_res)
+
         
         output["dphi_untag_MET_resolved"].fill(
-            dphi=first_untagged[valid_mask].delta_phi(puppimet_res[valid_mask]),
-            weight=weights_res[valid_mask]
+            dphi=np.abs(dphi_proxy_MET),
+            weight=weights_res
         )
+
         n_res = len(weights_res)
         bdt_resolved = {
-            "H_mass": safe_array(vec_H_res.mass, n_res),
-            "H_pt": safe_array(vec_H_res.pt, n_res),
-            "HT": safe_array(ak.sum(single_jets_resolved.pt_regressed, axis=1), n_res),
-            "dphi_H_MET": safe_array(
-                np.abs(vec_H_res.delta_phi(make_vector_met(puppimet_all_res))), n_res
-            ),
-            "dm_bb_bb_min": safe_array(
-                min_dm_bb_bb(vec_single_bjets_resolved, all_jets=vec_single_jets_resolved),
-                n_res
-            ),
-            "m_bbj": safe_array(mbbj_resolved[valid_mask_mbbj], n_res),
-            "puppimet_pt": safe_array(puppimet_res.pt, n_res),
-            "n_untag": safe_array(ak.num(single_untag_jets_resolved), n_res),
-            "btag_min": safe_array(ak.min(single_bjets_resolved.btagUParTAK4B, axis=1), n_res),
-            "pt_untag_max": safe_array(pt_max_untagged_res[valid], n_res),
-            "dr_bb_ave": safe_array(dr_bb_avg(single_bjets_resolved), n_res),
-            "dphi_untag_MET": safe_array(
-                np.abs(first_untagged[valid_mask].delta_phi(puppimet_res[valid_mask])),
-                n_res
-            ),
-            
+            "mass_H": ak.to_numpy(mass_H),
+            "pt_H": ak.to_numpy(pt_H),
+            "HT": ak.to_numpy(ak.sum(single_jets_resolved.pt_regressed, axis=1)),
+            "dphi_H_MET": ak.to_numpy(np.abs(delta_phi_raw(phi_H, met_res.phi))),
+            "dm_bb_bb_min": ak.to_numpy(min_dm_bb_bb(vec_single_bjets_resolved, all_jets=vec_single_jets_resolved)),
+            "min_jmet": ak.to_numpy(min_dphi_res[full_mask_res]),
+            "m_bbj": ak.to_numpy(mbbj_resolved),
+            "n_untag": ak.to_numpy(ak.num(single_untag_jets_resolved)),
+            "btag_min": ak.to_numpy(ak.min(single_bjets_resolved.btagUParTAK4B, axis=1)),
+            "dr_bb_ave": ak.to_numpy(ak.fill_none(dr_bb_avg(single_bjets_resolved), np.nan)),
+            "dphi_untag_MET": ak.to_numpy(np.abs(dphi_proxy_MET)),
             "weight": ak.to_numpy(weights_res),
         }
 
@@ -484,150 +464,18 @@ class TOTAL_Processor(processor.ProcessorABC):
             self.add_tree_entry("resolved", bdt_resolved)
 
         ### MODEL EVAL resolved###
+        
         if self.run_eval and not self.is_MVA:
-            inputs_res = {key: safe_array(bdt_resolved[key], n_res) for key in self.bdt_eval_res.var_list}
+            inputs_res = {
+                key: np.asarray(bdt_resolved[key], dtype=np.float64)
+                for key in self.bdt_eval_res.var_list
+            }
             bdt_score_res = self.bdt_eval_res.eval(inputs_res)
-            bdt_score_res = safe_array(bdt_score_res, n_res)
-            output["bdt_score_resolved"].fill(bdt=np.ravel(bdt_score_res),weight=np.ravel(safe_array(weights_res, n_res)))
-        #merged
-        full_mask_merged = mask0 & ((n_double_bjets >= 1) & (n_single_bjets_cc >= 1))
-        output["cutflow_2l"].fill(cut="merged", weight=np.sum(weights.weight()[full_mask_merged]))
-        double_bjets_merged = double_bjets[full_mask_merged]
-        single_bjets_merged = single_bjets_cc[full_mask_merged]
-        pt_tag_max_mer = double_bjets_merged[:, 0].pt_regressed
-        double_jets_merged = double_jets[full_mask_merged]
-        single_jets_merged = single_jets_cc[full_mask_merged]
-        single_untag_jets_merged = single_untag_jets_cc[full_mask_merged]
-        weights_merged = weights.weight()[full_mask_merged]
-        output["n_doubleb_merged"].fill(n=ak.num(double_bjets_merged),weight=weights_merged)
-        output["n_singleb_merged"].fill(n=ak.num(single_bjets_merged), weight=weights_merged)
-        n_dbb = ak.num(double_bjets_merged)
-        n_sbb = ak.num(single_bjets_merged)
-        n_sj  = ak.num(single_jets_merged)
+            output["bdt_score_resolved"].fill(
+                bdt=np.ravel(bdt_score_res),
+                weight=np.ravel(np.asarray(weights_res, dtype=np.float64))
+            )
 
-        # Case 1: 1 double-b + 1 single-b + 1 jet
-        mask_case1 = (n_dbb == 1) & (n_sbb == 1) & (n_sj == 1)
-
-        # Case 2: 1 double-b + 2 single-b
-        mask_case2 = (n_dbb == 1) & (n_sbb == 2)
-
-        # Case 3: 1 double-b + 1 single-b + ≥2 jets
-        mask_case3 = (n_dbb == 1) & (n_sbb == 1) & (n_sj > 1)
-        vec_H1 = build_sum_reg_vector(double_bjets_merged,mask_case1,1)+ build_sum_vector(single_bjets_merged,mask_case1,1)
-      
-        vec_H2 = build_sum_reg_vector(double_bjets_merged,mask_case2,1)+ build_sum_vector(single_bjets_merged,mask_case2,2)
-       
-        vec_H3 = build_sum_reg_vector(double_bjets_merged,mask_case3,1)+ build_sum_vector(single_jets_merged,mask_case3,2)
-        
-        vec_H_merged = ak.concatenate([vec_H1, vec_H2, vec_H3])
-        weights_merged_all = ak.concatenate([
-            weights_merged[mask_case1],
-            weights_merged[mask_case2],
-            weights_merged[mask_case3]
-        ])
-
-
-
-        output["mass_H_merged"].fill(m=vec_H_merged.mass, weight=weights_merged_all)
-        output["pt_H_merged"].fill(pt=vec_H_merged.pt, weight=weights_merged_all)
-        # MET
-        puppimet_merged = events.PuppiMET[full_mask_merged]
-        puppimet_case1 = puppimet_merged[mask_case1]
-        puppimet_case2 = puppimet_merged[mask_case2]
-        puppimet_case3 = puppimet_merged[mask_case3]
-
-        puppimet_all = ak.concatenate([puppimet_case1, puppimet_case2, puppimet_case3])
-
-        
-        vec_H_merged= make_vector(vec_H_merged)
-        output["dphi_H_MET_merged"].fill(dphi=np.abs(ak.to_numpy(vec_H_merged.delta_phi(make_vector_met(puppimet_all)))),weight=weights_merged_all)
-
-        # Other variables that don’t depend on Higgs candidate
-        
-        ht_single = ak.sum(single_jets_merged.pt_regressed, axis=1)
-        ht_double = ak.sum(double_jets_merged.pt_regressed, axis=1)
-        ht_total = ht_single + ht_double
-        output["HT_merged"].fill(
-            ht=ak.to_numpy(ht_total),
-            weight=ak.to_numpy(weights_merged)
-        )
-
-        output["puppimet_pt_merged"].fill(
-            met=puppimet_merged.pt,
-            weight=weights_merged
-        )
-        
-        # Count is safe as-is
-        output["n_untag_merged"].fill(
-            n=ak.num(single_untag_jets_merged),
-            weight=weights_merged
-        )
-        
-        # First jet selections
-        first_untag_merged = ak.firsts(single_untag_jets_merged)
-        valid_mask_merged = ~ak.is_none(first_untag_merged)
-        
-        # pt histogram
-        output["pt_untag_max_merged"].fill(
-            pt=ak.to_numpy(first_untag_merged[valid_mask_merged].pt_regressed),
-            weight=ak.to_numpy(weights_merged[valid_mask_merged])
-        )
-        
-        # dphi histogram
-        output["dphi_untag_MET_merged"].fill(
-            dphi=np.abs(ak.to_numpy(first_untag_merged[valid_mask_merged].delta_phi(puppimet_merged[valid_mask_merged]))),
-            weight=ak.to_numpy(weights_merged[valid_mask_merged])
-        )
-
-    
-        output["btag_min_merged"].fill(
-            btag=ak.min(single_bjets_merged.btagUParTAK4B, axis=1),
-            weight=weights_merged
-        )
-
-        output["dr_bb_ave_merged"].fill(
-            dr=dr_bb_avg(single_bjets_merged),
-            weight=weights_merged
-        )
-
-        output["dm_bb_bb_min_merged"].fill(
-            dm=min_dm_bb_bb(make_regressed_vector(single_bjets_merged), all_jets=make_regressed_vector(single_jets_merged)),
-            weight=weights_merged
-        )
-        n_merged = len(weights_merged)
-        bdt_merged = {
-            "H_mass": safe_array(vec_H_merged.mass, n_merged),
-            "H_pt": safe_array(vec_H_merged.pt, n_merged),
-            "HT": safe_array(ht_total, n_merged),
-            "puppimet_pt": safe_array(puppimet_merged.pt, n_merged),
-            "n_untag": safe_array(ak.num(single_untag_jets_merged), n_merged),
-            "pt_untag_max": safe_array(first_untag_merged[valid_mask_merged].pt_regressed, n_merged),
-            "dphi_untag_MET": safe_array(
-                np.abs(first_untag_merged[valid_mask_merged].delta_phi(puppimet_merged[valid_mask_merged])),n_merged),
-            "btag_min": safe_array(ak.min(single_bjets_merged.btagUParTAK4B, axis=1), n_merged),
-            "dr_bb_ave": safe_array(dr_bb_avg(single_bjets_merged), n_merged),
-            "dm_bb_bb_min": safe_array(
-                min_dm_bb_bb(make_regressed_vector(single_bjets_merged), all_jets=make_regressed_vector(single_jets_merged)),
-                n_merged
-            ),
-            
-            "dphi_H_MET": safe_array(
-                np.abs(vec_H_merged.delta_phi(make_vector_met(puppimet_all))), n_merged
-            ),
-            
-            "weight": ak.to_numpy(weights_merged),
-        }
-        if self.is_MVA:
-            self.compat_tree_variables(bdt_merged)
-            self.add_tree_entry("merged", bdt_merged)
-
-         ### MODEL EVAL Merged###                                                                       
-        if self.run_eval and not self.is_MVA :
-            inputs_mer = {key: safe_array(bdt_merged[key], n_merged) for key in self.bdt_eval_mer.var_list}
-            bdt_score_mer = self.bdt_eval_mer.eval(inputs_mer)
-            bdt_score_mer = safe_array(bdt_score_mer, n_merged)
-            output["bdt_score_merged"].fill(bdt= np.ravel(bdt_score_mer), weight=np.ravel(safe_array(weights_merged, n_merged)))
-            
         if self.is_MVA:
             output["trees"] = self._trees
             for regime, trees in self._trees.items():
