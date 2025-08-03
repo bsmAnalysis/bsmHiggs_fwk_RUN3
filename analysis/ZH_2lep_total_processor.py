@@ -459,7 +459,6 @@ class TOTAL_Processor(processor.ProcessorABC):
                 "puppimet_pt": ak.to_numpy(puppimet_res.pt),
                 "n_untag": ak.to_numpy(ak.num(single_untag_jets_resolved)),
                 "btag_min": ak.to_numpy(ak.min(single_bjets_resolved.btagUParTAK4B, axis=1)),
-                "pt_untag_max": ak.to_numpy(ak.fill_none(pt_proxy_boo, np.nan)),
                 "dphi_untag_Z": ak.to_numpy(np.abs(dphi_proxy_Z)),
                 "dr_bb_ave": ak.to_numpy(dr_bb_avg(single_bjets_resolved)),
                 "pt_ll": ak.to_numpy(dilepton_res.pt),
