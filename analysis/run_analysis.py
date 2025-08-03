@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import sys
 import time
 import json
@@ -9,7 +10,7 @@ import warnings
 import awkward as ak
 
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-from ZH_0lep_total_processor_v3  import TOTAL_Processor
+from  ZH_0lep_total_processor_v3  import TOTAL_Processor
 
 warnings.filterwarnings("ignore", message="Missing cross-reference index")
 
@@ -40,10 +41,12 @@ file_to_process = files[args.job_index]
 dataset_name = meta["sample"]
 xsec = float(meta["xsec"])
 nevts = int(meta["nevents"])
+########################################################
 isMC = bool(meta["isMC"])
-#### define here if is_MVA or run_eval####################################################
-is_MVA = False
-run_eval=True
+is_MVA= True
+run_eval= False
+#run_eval = not is_MVA  # enable eval only in non-training runs
+
 ############################################################################################
 print(f"[INFO] Processing file {args.job_index+1}/{len(files)}: {file_to_process}")
 print(f"[INFO] Sample: {dataset_name} (xsec={xsec}, nevts={nevts})")
@@ -116,8 +119,8 @@ else:
         nevts=nevts,
         isMC=isMC,
         dataset_name=dataset_name,
-        is_MVA=False,
-        run_eval=True
+        is_MVA=True,
+        run_eval=False
     )
     output = processor_instance.process(events)
 
@@ -138,7 +141,23 @@ else:
     if tree_data:
         with uproot.recreate(bdt_output_name) as bdtfile:
             for regime, tree_dict in tree_data.items():
+                if not tree_dict:
+                    # Define expected variables per regime
+                    if regime == "boosted":
+                        keys = processor_instance.bdt_eval_boost.var_list
+                    elif regime == "resolved":
+                        keys = processor_instance.bdt_eval_res.var_list
+                    else:
+                        keys = ["dummy"]
+
+                    # Write empty tree with correct structure
+                    dummy_tree = {k: np.array([], dtype=np.float64) for k in keys}
+                    print(f"[INFO] Writing empty tree for regime '{regime}' to maintain hadd compatibility.")
+                    bdtfile[regime] = dummy_tree
+                    continue
+
                 bdtfile[regime] = tree_dict
+
         print(f"[INFO] Saved BDT training trees in: {bdt_output_name}")
     else:
         print("[WARNING] No BDT trees found — nothing was written to tree output file.")
