@@ -120,7 +120,7 @@ events["Pileup"] = ak.zip({
 
 # --- Rebuild LHE info ---
 events["LHE"] = ak.zip({
-    f: events[f"LHE_{f}"] for f in ["HT", "Njets"]
+    f: events[f"LHE_{f}"] for f in ["HT"]
 })
 
 # --- Rebuild PV info ---
