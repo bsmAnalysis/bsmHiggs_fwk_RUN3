@@ -8,8 +8,8 @@ import uproot
 import hist
 import warnings
 import awkward as ak
-
-from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
+from coffea.nanoevents import NanoEventsFactory, BaseSchema
+#from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from  ZH_0lep_total_processor_v3  import TOTAL_Processor
 
 warnings.filterwarnings("ignore", message="Missing cross-reference index")
@@ -43,8 +43,8 @@ xsec = float(meta["xsec"])
 nevts = int(meta["nevents"])
 ########################################################
 isMC = bool(meta["isMC"])
-is_MVA= True
-run_eval= False
+is_MVA= False
+run_eval= True
 #run_eval = not is_MVA  # enable eval only in non-training runs
 
 ############################################################################################
@@ -54,12 +54,20 @@ print(f"[INFO] Sample: {dataset_name} (xsec={xsec}, nevts={nevts})")
 # --- Load NanoAOD events ---
 for attempt in range(1, 6):
     try:
-        factory = NanoEventsFactory.from_root(
+        #factory = NanoEventsFactory.from_root(
+        #    file_to_process,
+        #    schemaclass=NanoAODSchema,
+        #    uproot_options={"timeout": 300}
+        #)
+        #events = factory.events()
+        
+        events = NanoEventsFactory.from_root(
             file_to_process,
-            schemaclass=NanoAODSchema,
+            treepath="Events",  # only needed if tree is not the default
+            schemaclass=BaseSchema,
             uproot_options={"timeout": 300}
-        )
-        events = factory.events()
+        ).events()
+
         break
     except Exception as e:
         print(f"[WARNING] Attempt {attempt} failed: {e}")
@@ -67,6 +75,58 @@ for attempt in range(1, 6):
             print("[ERROR] Max attempts reached. Skipping file.")
             sys.exit(1)
         time.sleep(10)
+
+# --- Rebuild Muon ---
+events["Muon"] = ak.zip({
+    f: events[f"Muon_{f}"] for f in [
+        "pt", "eta", "phi", "charge", "pdgId",
+        "tightId", "mass", "pfRelIso03_all", "pfRelIso04_all"
+    ]
+})
+
+# --- Rebuild Electron ---
+events["Electron"] = ak.zip({
+    f: events[f"Electron_{f}"] for f in [
+        "pt", "eta", "phi", "charge", "pdgId",
+        "cutBased", "mass", "pfRelIso03_all", "pfRelIso04_all"
+    ]
+})
+
+# --- Rebuild Jet ---
+events["Jet"] = ak.zip({
+    f: events[f"Jet_{f}"] for f in [
+        "pt", "eta", "phi", "mass",
+        "btagUParTAK4probbb", "svIdx1", "svIdx2",
+        "btagDeepFlavB", "btagUParTAK4B",
+        "passJetIdTight", "passJetIdTightLepVeto",
+        "pt_regressed", "hadronFlavour", "partonFlavour"
+    ]
+})
+
+# --- Rebuild PuppiMET ---
+events["PuppiMET"] = ak.zip({
+    f: events[f"PuppiMET_{f}"] for f in ["pt", "phi", "sumEt"]
+})
+
+# --- Rebuild PFMET (if used) ---
+events["PFMET"] = ak.zip({
+    f: events[f"PFMET_{f}"] for f in ["pt", "phi", "sumEt"]
+})
+
+# --- Rebuild Pileup (PU) info ---
+events["Pileup"] = ak.zip({
+    f: events[f"Pileup_{f}"] for f in ["nTrueInt", "nPU"]
+})
+
+# --- Rebuild LHE info ---
+events["LHE"] = ak.zip({
+    f: events[f"LHE_{f}"] for f in ["HT", "Njets"]
+})
+
+# --- Rebuild PV info ---
+events["PV"] = ak.zip({
+    f: events[f"PV_{f}"] for f in ["npvsGood", "npvs"]
+})
 
 # --- Split TTbar samples by genTtbarId ---
 is_ttbar = dataset_name.startswith("TT")
@@ -119,8 +179,8 @@ else:
         nevts=nevts,
         isMC=isMC,
         dataset_name=dataset_name,
-        is_MVA=True,
-        run_eval=False
+        is_MVA=False,
+        run_eval=True
     )
     output = processor_instance.process(events)
 
@@ -137,6 +197,11 @@ else:
 
     if not tree_data and hasattr(processor_instance, "_trees"):
         tree_data = processor_instance._trees
+
+    #if tree_data:
+    #    with uproot.recreate(bdt_output_name) as bdtfile:
+    #        for regime, tree_dict in tree_data.items():
+    #            bdtfile[regime] = tree_dict
 
     if tree_data:
         with uproot.recreate(bdt_output_name) as bdtfile:
