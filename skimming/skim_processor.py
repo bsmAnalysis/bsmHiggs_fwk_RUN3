@@ -4,6 +4,7 @@ import fnmatch
 import gzip
 import json
 import os
+import uproot
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea import processor
 import correctionlib
@@ -16,20 +17,34 @@ class NanoAODSkimmer(processor.ProcessorABC):
             branches_to_keep, 
             trigger_groups, 
             dataset_name= None,
-            # ---- EGM configuration / eT-dependent correction---# 
+            
             # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3#2022_2023_and_2024_Scale_and_Sme
-            # https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/blob/master/examples/egmScaleAndSmearingExample.py
-            # egm_json_path = "electronSS_EtDependent.json.gz",     # local test : xrdcp root://eoscms.cern.ch/<egm_json_path> . 
+          
+            # ---- EGM configuration / eT-dependent correction---# 
+            # https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/blob/master/examples/egmScaleAndSmearingExample.py   
+            # egm_json_path = "electronSS_EtDependent.json.gz", # local test : xrdcp root://eoscms.cern.ch/<> . 
             egm_json_path  = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/SS/electronSS_EtDependent.json.gz",
             egm_scale_name = "EGMScale_Compound_Ele_2024",          # DATA
             egm_smear_name = "EGMSmearAndSyst_ElePTsplit_2024",     # MC
-            save_mc_variations = False
+            save_mc_variations = True,
+            
+            #--- ID Tight SFs (2024 combined egamma) ---#
+            # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3
+            # id_sf_merged_path = "merged_EGamma_SF2D_Tight.root",
+            id_sf_merged_path = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/EleID/passingCutBasedTight122XV1/merged_EGamma_SF2D_Tight.root",
+            
+            #--- HLT Ele30 TightID (2023D proxy) / Need to change later (expected at the beginning of September) ---#
+            # hlt_ele30_path = "egammaEffi.txt_EGM2D.root",
+            hlt_ele30_path = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2023/ForPrompt23D/tnpEleHLT/HLT_SF_Ele30_TightID/egammaEffi.txt_EGM2D.root",
+            hlt_use_2023_proxy = True,
             ):
         
         self.branches_to_keep = branches_to_keep
         self.trigger_groups = trigger_groups
         self.dataset_name = dataset_name 
-        # --- Load EGM corrections ---#
+        self._rng = np.random.default_rng(12345)   
+        
+        #--- Load EGM corrections ---#
         self.save_mc_variations = save_mc_variations
         if egm_json_path is not None:
             if not os.path.exists(egm_json_path) and os.path.exists(egm_json_path + ".gz"):
@@ -38,7 +53,28 @@ class NanoAODSkimmer(processor.ProcessorABC):
             cset = correctionlib.CorrectionSet.from_file(egm_json_path)
             self.scale_eval = cset.compound[egm_scale_name]
             self.smear_eval = cset[egm_smear_name]
-        self._rng = np.random.default_rng(12345)     
+            
+        #---Load ID Tight TH2D 2024 (eta on x, pT on y) ---#
+        with uproot.open(id_sf_merged_path) as f:
+            h = f["EGamma_SF2D"]
+            self.id_xedges = h.axes[0].edges()   
+            self.id_yedges = h.axes[1].edges()   
+            self.id_vals   = h.values()     
+            
+        #--- Load HLT Ele30 TightID ---#   
+        self.hlt_has = True
+        self.hlt_xedges = self.hlt_yedges = None
+        self.hlt_sf2d = None
+        
+        if hlt_ele30_path and os.path.exists(hlt_ele30_path):
+            with uproot.open(hlt_ele30_path) as f:
+                hS = f["EGamma_SF2D"]
+                self.hlt_xedges = hS.axes[0].edges()   # x = SuperCluster eta
+                self.hlt_yedges = hS.axes[1].edges()   # y = pT [GeV]
+                self.hlt_sf2d   = hS.values()
+                self.hlt_has = True
+        else:
+            print(f"[HLT] File not found: {hlt_ele30_path} — HLT SF disabled.")
         
 #----------------------------------------------------------------------------------------------------------------------------#
         
@@ -55,6 +91,45 @@ class NanoAODSkimmer(processor.ProcessorABC):
         return collection[list(selected_fields)]
     
 #----------------------------------------------------------------------------------------------------------------------------#
+
+    def _lookup_th2(self, x, y, xedges, yedges, vals):
+        """
+        Vectorized TH2 lookup with clipping to edge bins.
+        x: eta (jagged), y: pt (jagged)
+        xedges: bin edges for x axis, yedges: bin edges for y axis
+        """
+        xf = ak.to_numpy(ak.flatten(x)).astype(np.float64, copy=False)
+        yf = ak.to_numpy(ak.flatten(y)).astype(np.float64, copy=False)
+        
+        nx = len(xedges) - 1
+        ny = len(yedges) - 1
+        
+        x_min = np.nextafter(xedges[0], xedges[1])
+        x_max = np.nextafter(xedges[-1], xedges[0])  
+        y_min = np.nextafter(yedges[0], yedges[1])
+        y_max = np.nextafter(yedges[-1], yedges[0])
+        
+        xf = np.clip(xf, x_min, x_max)
+        yf = np.clip(yf, y_min, y_max)
+        
+        ix = np.digitize(xf, xedges, right=False) - 1  
+        iy = np.digitize(yf, yedges, right=False) - 1  
+        
+        ix = np.clip(ix, 0, nx - 1)
+        iy = np.clip(iy, 0, ny - 1)
+        
+        shape = vals.shape
+        if shape == (ny, nx):         
+            sf_flat = vals[iy, ix]
+        elif shape == (nx, ny):      
+            sf_flat = vals[ix, iy]
+        else:
+            raise RuntimeError(f"Unexpected TH2 shape {shape}; expected (ny,nx) or (nx,ny).")
+
+        return ak.unflatten(ak.Array(sf_flat), ak.num(x))
+
+#----------------------------------------------------------------------------------------------------------------------------#
+
 
     def process(self, events):
         out = {}
@@ -181,9 +256,49 @@ class NanoAODSkimmer(processor.ProcessorABC):
                         unc_scale = ak.unflatten(ak.Array(unc_scale_flat), counts)
                         ele = ak.with_field(ele, ele.pt * (1.0 + unc_scale), "pt_scaleUp")
                         ele = ak.with_field(ele, ele.pt * (1.0 - unc_scale), "pt_scaleDown")
-                    
-                collection = ele[(ele.pt > 15) & (abs(ele.eta) < 2.5)]
                 
+                # The Scale and Smearing corrections should not be used for electrons 
+                # below ~15 GeV and should be used with caution between 15 and 20 GeV, 
+                # as they were not tuned for this pT range.
+                collection = ele[(ele.pt > 20) & (abs(ele.eta) < 2.5)]
+                
+                #########################################
+                # Apply cut-based Tight ID SFs (for MC) #
+                #########################################  
+                
+                if not is_data:
+                    ele_sel = collection
+                    
+                    eta_for_sf = ele_sel.eta
+                    pt_for_sf  = ele_sel.pt
+                    
+                    sf_ele = self._lookup_th2(eta_for_sf, pt_for_sf, self.id_xedges, self.id_yedges, self.id_vals)
+                    
+                    w_ele_id_tight = ak.prod(sf_ele, axis=1, mask_identity=True)
+                    w_ele_id_tight = ak.fill_none(w_ele_id_tight, 1.0)
+                    out["weight_ele_id_tight"] = w_ele_id_tight
+                    
+                    
+                ############################################
+                # HLT Ele30 TightID event weight (for MC)  #
+                ############################################
+                if not is_data:
+                    if self.hlt_has:
+                        
+                        x = collection.superclusterEta
+                        y = collection.pt
+                        
+                        x_lead = x[:, :1] 
+                        y_lead = y[:, :1]
+                        
+                        sf_lead = self._lookup_th2(x_lead, y_lead, self.hlt_xedges, self.hlt_yedges, self.hlt_sf2d)
+                        
+                        w_hlt = ak.fill_none(ak.firsts(sf_lead), 1.0)
+                    else:
+                        w_hlt = ak.ones_like(out["run"], dtype=float)
+
+                    out["weight_ele_hlt_Ele30_TightID"] = w_hlt
+                                         
                 
             ###-- JET SELECTION --###
             elif obj == "Jet":
