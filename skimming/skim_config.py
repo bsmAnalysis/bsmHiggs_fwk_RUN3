@@ -1,8 +1,10 @@
 
 branches_to_keep = {
             "Muon": ["pt", "eta", "phi","charge","pdgId","tightId","mass","pfRelIso03_all","pfRelIso04_all"],                                                                                       
-            "Electron": ["pt", "eta", "phi","charge","pdgId","cutBased","mass","pfRelIso03_all","pfRelIso04_all"],                                                                                  
-            "Jet": ["pt", "eta", "phi","btagUParTAK4probbb","svIdx1","svIdx2","mass","btagDeepFlavB","btagUParTAK4B","passJetIdTight", "passJetIdTightLepVeto","pt_regressed","hadronFlavour","partonFlavour","pnet_resol"],
+            "Electron": ["pt", "eta", "phi","charge","pdgId","cutBased","mass","pfRelIso03_all","pfRelIso04_all",
+                         "seedGain","r9","superclusterEta","pt_raw","pt_smearUp", "pt_smearDown","pt_scaleUp","pt_scaleDown"],                                                                                  
+            "Jet": ["pt", "eta", "phi","btagUParTAK4probbb","svIdx1","svIdx2","mass","btagDeepFlavB","btagUParTAK4B","passJetIdTight", 
+                    "passJetIdTightLepVeto","pt_regressed","hadronFlavour","partonFlavour","pnet_resol"],
             "PFMET": ["pt", "phi","sumEt"],
             "PuppiMET": ["pt", "phi","sumEt"],
             "Pileup":["nTrueInt","nPU"],
@@ -19,8 +21,8 @@ trigger_groups = {
     2: ["IsoMu24"],
     3: ["Mu50"],
     4: ["Ele23_Ele12_CaloIdL_TrackIdL_IsoVL","DoubleEle25_CaloIdL_MW"],
-    5: ["Ele32_WPTight_Gsf"],
-    6: ["Ele35_WPTight_Gsf"],
+    5: ["Ele30_WPTight_Gsf"],
+    6: ["Ele32_WPTight_Gsf"],
     7: ["Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ", "Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", "Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"],
     8: ["PFMET120_PFMHT120_IDTight","PFMET120_PFMHT120_IDTight_PFHT60"],
     9: ["QuadPFJet105_88_76_15_PFBTagDeepCSV_1p3_VBF2"],
@@ -40,5 +42,4 @@ trigger_groups = {
     23: ["QuadPFJet111_90_80_15_PNet2BTag_0p4_0p12_VBF1"],
     24: ["QuadPFJet111_90_80_15_PNetBTag_0p4_VBF2"],
     25: ["PFHT340_QuadPFJet70_50_40_40_PNet2BTagMean0p70"],
-   
 }
