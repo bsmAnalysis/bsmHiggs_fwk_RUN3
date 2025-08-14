@@ -15,15 +15,16 @@ class NanoAODSkimmer(processor.ProcessorABC):
     def __init__(
             self, 
             branches_to_keep, 
-            trigger_groups, 
+            trigger_groups,
+            met_filter_flags,
             dataset_name= None,
-            
+           
             # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3#2022_2023_and_2024_Scale_and_Sme
           
             # ---- EGM configuration / eT-dependent correction---# 
             # https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/blob/master/examples/egmScaleAndSmearingExample.py   
             # egm_json_path = "electronSS_EtDependent.json.gz", # local test : xrdcp root://eoscms.cern.ch/<> . 
-            egm_json_path  = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/SS/electronSS_EtDependent.json.gz",
+            egm_json_path  = "root://eoscms.cern.ch//eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/SS/electronSS_EtDependent.json.gz",
             egm_scale_name = "EGMScale_Compound_Ele_2024",          # DATA
             egm_smear_name = "EGMSmearAndSyst_ElePTsplit_2024",     # MC
             save_mc_variations = True,
@@ -31,16 +32,17 @@ class NanoAODSkimmer(processor.ProcessorABC):
             #--- ID Tight SFs (2024 combined egamma) ---#
             # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3
             # id_sf_merged_path = "merged_EGamma_SF2D_Tight.root",
-            id_sf_merged_path = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/EleID/passingCutBasedTight122XV1/merged_EGamma_SF2D_Tight.root",
+            id_sf_merged_path = "root://eoscms.cern.ch//eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/EleID/passingCutBasedTight122XV1/merged_EGamma_SF2D_Tight.root",
             
             #--- HLT Ele30 TightID (2023D proxy) / Need to change later (expected at the beginning of September) ---#
             # hlt_ele30_path = "egammaEffi.txt_EGM2D.root",
-            hlt_ele30_path = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2023/ForPrompt23D/tnpEleHLT/HLT_SF_Ele30_TightID/egammaEffi.txt_EGM2D.root",
+            hlt_ele30_path = "root://eoscms.cern.ch//eos/cms/store/group/phys_egamma/ScaleFactors/Data2023/ForPrompt23D/tnpEleHLT/HLT_SF_Ele30_TightID/egammaEffi.txt_EGM2D.root",
             hlt_use_2023_proxy = True,
             ):
         
         self.branches_to_keep = branches_to_keep
         self.trigger_groups = trigger_groups
+        self.met_filter_flags = met_filter_flags
         self.dataset_name = dataset_name 
         self._rng = np.random.default_rng(12345)   
         
@@ -164,8 +166,21 @@ class NanoAODSkimmer(processor.ProcessorABC):
 
             trigger_mask = trigger_mask | group_fired
             trigger_type = trigger_type | (group_fired * (1 << bit))
+        # --- MET filter logic ---
+        met_filter_mask = ak.ones_like(events.event, dtype=bool)
+        
+        for idx, flag in enumerate(self.met_filter_flags):
+            if hasattr(events, flag):
+                passed = getattr(events, flag)
+                met_filter_mask &= passed  # combine filters
+               
+        
+        out["passMETFilters"] = met_filter_mask
 
-        out["has_trigger"] = trigger_mask
+        # Combine trigger and MET filter results into `has_trigger`
+        combined_trigger_mask = trigger_mask & met_filter_mask
+        
+        out["has_trigger"] = combined_trigger_mask
         out["trigger_type"] = trigger_type
         
         #======================================================#
