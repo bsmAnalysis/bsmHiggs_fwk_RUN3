@@ -1,53 +1,16 @@
 import awkward as ak
 import numpy as np
 import fnmatch
-import gzip
-import json
-import os
-import uproot
-from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
 from coffea import processor
-import correctionlib
 
 #----------------------------------------------------------------------------------------------------------------------------#
 
 class NanoAODSkimmer(processor.ProcessorABC):
-    def __init__(
-            self, 
-            branches_to_keep, 
-            trigger_groups, 
-            met_filter_flags,
-            dataset_name= None,
-            
-            ########################################
-            # Energy and Smearing Corrections 2024 #
-            ########################################
-            
-            # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3#2022_2023_and_2024_Scale_and_Sme         
-            # ---- EGM configuration / eT-dependent correction---# 
-            # https://gitlab.cern.ch/cms-nanoAOD/jsonpog-integration/-/blob/master/examples/egmScaleAndSmearingExample.py   
-            egm_json_path = "electronSS_EtDependent.json.gz", # local test : xrdcp root://eoscms.cern.ch/<your working direcory> . 
-            #egm_json_path  = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/SS/electronSS_EtDependent.json.gz",
-            egm_scale_name = "EGMScale_Compound_Ele_2024",          # DATA
-            egm_smear_name = "EGMSmearAndSyst_ElePTsplit_2024",     # MC
-            save_mc_variations = True,
-            ):
-        
+    def __init__(self, branches_to_keep, trigger_groups, met_filter_flags, dataset_name=None):
         self.branches_to_keep = branches_to_keep
         self.trigger_groups = trigger_groups
         self.met_filter_flags = met_filter_flags
-        self.dataset_name = dataset_name 
-        self._rng = np.random.default_rng(12345)   
-        
-        #--- Load EGM corrections ---#
-        self.save_mc_variations = save_mc_variations
-        if egm_json_path is not None:
-            if not os.path.exists(egm_json_path) and os.path.exists(egm_json_path + ".gz"):
-                os.system(f"gunzip -k {egm_json_path}.gz")
-            
-            cset = correctionlib.CorrectionSet.from_file(egm_json_path)
-            self.scale_eval = cset.compound[egm_scale_name]
-            self.smear_eval = cset[egm_smear_name]
+        self.dataset_name = dataset_name
             
             
 #----------------------------------------------------------------------------------------------------------------------------#
@@ -72,13 +35,21 @@ class NanoAODSkimmer(processor.ProcessorABC):
         out["run"] = events.run
         out["event"] = events.event
         out["luminosityBlock"] = events.luminosityBlock
-        
-        is_data = not hasattr(events, "genWeight")
+        out["fixedGridRhoFastjetAll"] = ak.values_astype(events.Rho.fixedGridRhoFastjetAll, "float32")
         
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
         if hasattr(events, "bunchCrossing"):
-            out["bunchCrossing"] = events.bunchCrossing
+            out["bunchCrossing"] = events.bunchCrossing        
+        
+        # if not hasattr(self, "_printed_schema"):
+        #     self._printed_schema = True
+        #     # Top-level branches in Events
+        #     print("[DEBUG] top-level fields:", ak.fields(events))
+        #     print("[DEBUG] HLT fields:", ak.fields(events.HLT))
+        #     print("[DEBUG] Jet fields:", ak.fields(events.Jet))
+        #     print("[DEBUG] Electron fields:", ak.fields(events.Electron))
+
 
         #======================================================#
         # ------------------- Trigger logic -------------------#
@@ -130,108 +101,31 @@ class NanoAODSkimmer(processor.ProcessorABC):
             collection = getattr(events, obj)
             
             
-            ###-- MUON SELECTION --###
-            
+            # ---------------- MUON ----------------
             if obj == "Muon":
                 collection = collection[(collection.pt > 10) & (abs(collection.eta) < 2.5)]
-            
-            ###-- ELECTRON SELECTION --###    
-            
+
+            # -------------- ELECTRON --------------
             elif obj == "Electron":
                 ele = collection
+                collection = ele[(ele.pt > 15) & (abs(ele.eta) < 2.5)]              
                 
-                #####################################
-                # Apply Scale Correction (for Data) #
-                #####################################
-
-                if is_data:               
-                    run_b, scEta_b, r9_b, pt_b, seedGain_b = ak.broadcast_arrays(events.run, ele.superclusterEta, ele.r9, ele.pt, ele.seedGain)
-                    counts = ak.num(ele.pt)
-                    
-                    scale_flat = self.scale_eval.evaluate(
-                        "scale",
-                        ak.to_numpy(ak.flatten(run_b)),
-                        ak.to_numpy(ak.flatten(scEta_b)),
-                        ak.to_numpy(ak.flatten(r9_b)),
-                        ak.to_numpy(np.abs(ak.flatten(scEta_b))),
-                        ak.to_numpy(ak.flatten(pt_b)),
-                        ak.to_numpy(ak.flatten(seedGain_b)),
-                    )
-                    scale = ak.unflatten(ak.Array(scale_flat), counts)
-                    print(f"Multiplicative scale (for data): mean={ak.mean(ak.flatten(scale)):.6f}")
-                    
-                    ele = ak.with_field(ele, ele.pt * scale, "pt")
-            
-                
-                ######################################
-                # Apply Smearing Correction (for MC) #
-                ######################################    
-                
-                else:
-                    ele = ak.with_field(ele, ele.pt, "pt_raw")                  
-                    counts = ak.num(ele.pt_raw)
-                    
-                    smear_flat = self.smear_eval.evaluate(
-                        "smear",
-                        ak.to_numpy(ak.flatten(ele.pt_raw)),
-                        ak.to_numpy(ak.flatten(ele.r9)),
-                        ak.to_numpy(np.abs(ak.flatten(ele.superclusterEta))),
-                    )
-                    smear = ak.unflatten(ak.Array(smear_flat), counts)                   
-                    print(f"Smearing width (for MC): mean={ak.mean(ak.flatten(smear)):.6f}")
-
-                    n_flat = self._rng.normal(size=len(ak.flatten(ele.pt_raw)))
-                    n = ak.unflatten(ak.Array(n_flat), counts)
-
-                    corr_nom = 1.0 + smear * n
-                    ele = ak.with_field(ele, ele.pt_raw * corr_nom, "pt")
-                    
-                    if self.save_mc_variations:
-                        #--- smearing uncertainty ---#
-                        unc_smear_flat = self.smear_eval.evaluate(
-                            "esmear",
-                            ak.to_numpy(ak.flatten(ele.pt_raw)),
-                            ak.to_numpy(ak.flatten(ele.r9)),
-                            ak.to_numpy(np.abs(ak.flatten(ele.superclusterEta))),
-                            )
-                        unc_smear = ak.unflatten(ak.Array(unc_smear_flat), counts)
-                        print(f"Smearing uncertainties: {unc_smear}")
-                        
-                        corr_smear_up   = 1.0 + (smear + unc_smear) * n
-                        corr_smear_down = 1.0 + (smear - unc_smear) * n
-                        ele = ak.with_field(ele, ele.pt_raw * corr_smear_up,   "pt_smearUp")
-                        ele = ak.with_field(ele, ele.pt_raw * corr_smear_down, "pt_smearDown")
-                        
-                        #--- scale uncertainty ---#
-                        unc_scale_flat = self.smear_eval.evaluate(
-                            "escale",
-                            ak.to_numpy(ak.flatten(ele.pt_raw)),
-                            ak.to_numpy(ak.flatten(ele.r9)),
-                            ak.to_numpy(np.abs(ak.flatten(ele.superclusterEta))),
-                            )
-                        unc_scale = ak.unflatten(ak.Array(unc_scale_flat), counts)
-                        ele = ak.with_field(ele, ele.pt * (1.0 + unc_scale), "pt_scaleUp")
-                        ele = ak.with_field(ele, ele.pt * (1.0 - unc_scale), "pt_scaleDown")
-                
-                # The Scale and Smearing corrections should not be used for electrons 
-                # below ~15 GeV and should be used with caution between 15 and 20 GeV, 
-                # as they were not tuned for this pT range.
-                collection = ele[(ele.pt > 15) & (abs(ele.eta) < 2.5)]
-                
-                
-            ###-- JET SELECTION --###
+            # ---------------- JET -----------------
             elif obj == "Jet":
                 if hasattr(events, "Jet"):
                     collection = events.Jet
 
                     # Step 1: Compute raw_pt *before* filtering
                     rawFactor = getattr(collection, "rawFactor", ak.zeros_like(collection.pt))
-                    raw_pt = collection.pt * (1 - rawFactor)
+                    pt_raw    = collection.pt   * (1 - rawFactor)
+                    mass_raw  = collection.mass * (1 - rawFactor)
 
                     # Step 2: Apply cut on raw_pt
-                    selection_mask = (raw_pt > 15) & (abs(collection.eta) < 4.8)
+                    selection_mask = (pt_raw > 15) & (abs(collection.eta) < 4.8)
                     collection = collection[selection_mask]
-                    raw_pt = raw_pt[selection_mask]  # update raw_pt to match
+                    pt_raw     = pt_raw[selection_mask]
+                    mass_raw   = mass_raw[selection_mask]
+                    rawFactor  = rawFactor[selection_mask]
 
                     # Step 3: Now extract fields from filtered collection
                     eta = abs(collection.eta)
@@ -259,8 +153,11 @@ class NanoAODSkimmer(processor.ProcessorABC):
                         passJetIdTight
                     )
                     
-                    collection["passJetIdTight"] = passJetIdTight
-                    collection["passJetIdTightLepVeto"] = passJetIdTightLepVeto
+                    collection = ak.with_field(collection, passJetIdTight, "passJetIdTight")
+                    collection = ak.with_field(collection, passJetIdTightLepVeto, "passJetIdTightLepVeto")
+                    collection = ak.with_field(collection, rawFactor, "rawFactor")
+                    if hasattr(collection, "genJetIdx"):
+                        collection = ak.with_field(collection, collection.genJetIdx, "genJetIdx")
                     
                     # Step 4: Access regressed quantities from filtered collection
                     pnet_cor = getattr(collection, "PNetRegPtRawCorr", ak.ones_like(collection.pt))
@@ -268,8 +165,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
                     pnet_resol = getattr(collection, "PNetRegPtRawRes", ak.ones_like(collection.pt))
 
                     # Step 5: Recompute pt_regressed using filtered raw_pt and corrections
-                    pt_regressed = raw_pt * pnet_cor * pnet_cor_net
-                    collection["pt_regressed"] = pt_regressed
+                    collection = ak.with_field(collection, pt_raw * pnet_cor * pnet_cor_net, "pt_regressed")
            
             out[obj] = self.select_fields(collection, self.branches_to_keep[obj])
         return out
