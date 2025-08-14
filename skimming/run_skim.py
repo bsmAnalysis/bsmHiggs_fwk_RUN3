@@ -7,8 +7,8 @@ import os
 import json
 import argparse
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-from skim_processor import NanoAODSkimmer
-from skim_config import branches_to_keep, trigger_groups
+from skim_processor2 import NanoAODSkimmer
+from skim_config import branches_to_keep, trigger_groups, met_filter_flags
 # Suppress warnings about missing cross-reference indices
 from collections.abc import Mapping
 warnings.filterwarnings("ignore", message="Missing cross-reference index")
@@ -40,14 +40,13 @@ if args.job_index >= len(files):
 
 file_to_process = files[args.job_index]
 sample_name = meta["sample"]
-xsec = float(meta["xsec"])
 nevts = int(meta["nevents"])
 
 print(f"[INFO] Processing {file_to_process}")
-print(f"[INFO] Sample: {sample_name}, xsec={xsec}, nevts={nevts}")
+#print(f"[INFO] Sample: {sample_name}, xsec={xsec}, nevts={nevts}")
 
 # Adjust the config based on the sample name
-include_genpart = any(x in dataset_name for x in ["ZH_ZToAll_HToAATo4B", "WH_WToAll_HToAATo4B","VBFH_HToAATo4B","TTH_TTToAll_HToAATo4B"])
+include_genpart = any(x in dataset_name for x in ["ZH-ZToAll-HToAATo4B", "WH-WToAll-HToAATo4B","VBFH_HToAATo4B","TTH_TTToAll_HToAATo4B"])
 include_genttbarid = "TTto" in dataset_name
 
 # Modify the branches to keep
@@ -86,7 +85,7 @@ if events is None:
 
 # Initialize processor
 
-processor_instance = NanoAODSkimmer(branches_to_keep=branches_to_keep,trigger_groups=trigger_groups,dataset_name= dataset_name)
+processor_instance = NanoAODSkimmer(branches_to_keep=branches_to_keep,trigger_groups=trigger_groups,met_filter_flags=met_filter_flags, dataset_name= dataset_name)
 skimmed_output = processor_instance.process(events)
 
 
