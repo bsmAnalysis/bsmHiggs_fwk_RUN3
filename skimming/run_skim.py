@@ -7,7 +7,7 @@ import os
 import json
 import argparse
 from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
-from skim_processor2 import NanoAODSkimmer
+from skim_processor import NanoAODSkimmer
 from skim_config import branches_to_keep, trigger_groups, met_filter_flags
 # Suppress warnings about missing cross-reference indices
 from collections.abc import Mapping
