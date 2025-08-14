@@ -1,17 +1,18 @@
 
 branches_to_keep = {
-            "Muon": ["pt", "eta", "phi","charge","pdgId","tightId","mass","pfRelIso03_all","pfRelIso04_all"],                                                                                       
-            "Electron": ["pt", "eta", "phi","charge","pdgId","cutBased","mass","pfRelIso03_all","pfRelIso04_all",
-                         "seedGain","r9","superclusterEta","pt_raw","pt_smearUp", "pt_smearDown","pt_scaleUp","pt_scaleDown"],                                                                                  
-            "Jet": ["pt", "eta", "phi","btagUParTAK4probbb","svIdx1","svIdx2","mass","btagDeepFlavB","btagUParTAK4B","passJetIdTight", 
-                    "passJetIdTightLepVeto","pt_regressed","hadronFlavour","partonFlavour","pnet_resol"],
-            "PFMET": ["pt", "phi","sumEt"],
-            "PuppiMET": ["pt", "phi","sumEt"],
+            "Muon": ["pt","eta","phi","charge","pdgId","tightId","mass","pfRelIso03_all","pfRelIso04_all","ptErr",
+                     "nTrackerLayers","genPartIdx","genPartFlav"],
+            "Electron": ["pt","eta","phi","charge","pdgId","cutBased","mass","pfRelIso03_all","pfRelIso04_all",
+                         "seedGain","r9","superclusterEta"],   
+            "Jet": ["pt","eta","phi","mass","rawFactor","area","genJetIdx",
+                    "btagUParTAK4probbb","svIdx1","svIdx2","btagDeepFlavB","btagUParTAK4B",
+                    "passJetIdTight","passJetIdTightLepVeto","chEmEF","neEmEF","chMultiplicity",
+                    "pt_regressed","hadronFlavour","partonFlavour"],
+            "PFMET": ["pt","phi","sumEt"],
+            "PuppiMET": ["pt","phi","sumEt","phiUnclusteredDown","phiUnclusteredUp","ptUnclusteredDown","ptUnclusteredUp"],
             "Pileup":["nTrueInt","nPU"],
             "LHE": ["HT","Njets"],
             "PV": ["npvsGood","npvs"],
-            
-            
         }
 
 
