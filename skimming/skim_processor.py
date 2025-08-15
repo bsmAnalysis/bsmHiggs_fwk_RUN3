@@ -160,7 +160,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
                         passJetIdTight
                     )
                     
-                    collection = ak.with_field(collection, passJetIdTight, "passJetIdTight")
+                    
                     collection = ak.with_field(collection, passJetIdTightLepVeto, "passJetIdTightLepVeto")
                     collection = ak.with_field(collection, rawFactor, "rawFactor")
                     if hasattr(collection, "genJetIdx"):
