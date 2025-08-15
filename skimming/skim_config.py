@@ -28,7 +28,6 @@ trigger_groups = {
     7: ["Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ", "Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", "Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"],
     8: ["PFMET120_PFMHT120_IDTight","PFMET120_PFMHT120_IDTight_PFHT60","PFMETNoMu120_PFMHTNoMu120_IDTight","PFMETNoMu120_PFMHTNoMu120_IDTight_FilterHF", "PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"],
     9: ["QuadPFJet105_88_76_15"],
-    10: ["DoublePFJets116MaxDeta1p6_DoubleCaloBTagDeepCSV_p71"],
     11: ["PFHT330PT30_QuadPFJet_75_60_45_40_PNet3BTag_2p0"],
     12: ["PFHT330PT30_QuadPFJet_75_60_45_40_PNet3BTag_4p3"],
     13: ["PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepJet_4p5"],
