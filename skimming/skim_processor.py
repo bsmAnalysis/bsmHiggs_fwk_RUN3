@@ -40,7 +40,14 @@ class NanoAODSkimmer(processor.ProcessorABC):
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
         if hasattr(events, "bunchCrossing"):
-            out["bunchCrossing"] = events.bunchCrossing        
+            out["bunchCrossing"] = events.bunchCrossing 
+        # --- Theory weights (MC only) ---
+        if hasattr(events, "LHEScaleWeight"):
+            out["LHEScaleWeight"] = events.LHEScaleWeight  
+        if hasattr(events, "LHEPdfWeight"):
+            out["LHEPdfWeight"] = events.LHEPdfWeight    
+        if hasattr(events, "PSWeight"):
+            out["PSWeight"] = events.PSWeight            
         
         # if not hasattr(self, "_printed_schema"):
         #     self._printed_schema = True

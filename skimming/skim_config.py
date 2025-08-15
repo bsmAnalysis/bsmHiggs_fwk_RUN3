@@ -13,6 +13,7 @@ branches_to_keep = {
             "Pileup":["nTrueInt","nPU"],
             "LHE": ["HT","Njets"],
             "PV": ["npvsGood","npvs"],
+            "GenJet": ["pt"],
         }
 
 
