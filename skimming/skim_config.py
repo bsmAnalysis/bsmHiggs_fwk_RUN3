@@ -6,7 +6,7 @@ branches_to_keep = {
                          "seedGain","r9","superclusterEta","mvaIso_WP90","mvaIso_WP80"],   
             "Jet": ["pt","eta","phi","mass","rawFactor","area","genJetIdx",
                     "btagUParTAK4probbb","svIdx1","svIdx2","btagUParTAK4B",
-                    "passJetIdTightLepVeto","chEmEF","neEmEF","chMultiplicity",
+                    "passJetIdTight","passJetIdTightLepVeto","chEmEF","neEmEF","chMultiplicity",
                     "pt_regressed","hadronFlavour","partonFlavour"],
             "PFMET": ["pt","phi","sumEt"],
             "PuppiMET": ["pt","phi","sumEt","phiUnclusteredDown","phiUnclusteredUp","ptUnclusteredDown","ptUnclusteredUp"],
