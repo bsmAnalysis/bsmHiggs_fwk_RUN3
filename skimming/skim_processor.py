@@ -90,8 +90,6 @@ class NanoAODSkimmer(processor.ProcessorABC):
                 met_filter_mask &= passed  # combine filters
                
         
-        out["passMETFilters"] = met_filter_mask
-
         # Combine trigger and MET filter results into `has_trigger`
         combined_trigger_mask = trigger_mask & met_filter_mask
         
