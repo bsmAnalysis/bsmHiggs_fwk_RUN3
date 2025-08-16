@@ -8,7 +8,6 @@ branches_to_keep = {
                     "btagUParTAK4probbb","svIdx1","svIdx2","btagUParTAK4B",
                     "passJetIdTight","passJetIdTightLepVeto","chEmEF","neEmEF","chMultiplicity",
                     "pt_regressed","hadronFlavour","partonFlavour"],
-            "PFMET": ["pt","phi","sumEt"],
             "PuppiMET": ["pt","phi","sumEt","phiUnclusteredDown","phiUnclusteredUp","ptUnclusteredDown","ptUnclusteredUp"],
             "Pileup":["nTrueInt","nPU"],
             "LHE": ["HT","Njets"],
