@@ -147,8 +147,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
             out["fixedGridRhoFastjetAll"] = ak.values_astype(events.Rho.fixedGridRhoFastjetAll, "float32")
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
-        if hasattr(events, "bunchCrossing"):
-            out["bunchCrossing"] = events.bunchCrossing
+        
         if hasattr(events, "LHEPdfWeight"):
             out["LHEPdfWeight"] = events.LHEPdfWeight
 
@@ -174,7 +173,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
         for flag in self.met_filter_flags:
             if hasattr(events, flag):
                 met_filter_mask &= getattr(events, flag)
-        out["passMETFilters"] = met_filter_mask
+      
         out["has_trigger"]    = trigger_mask & met_filter_mask
         out["trigger_type"]   = trigger_type
     
