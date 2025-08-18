@@ -147,7 +147,8 @@ class NanoAODSkimmer(processor.ProcessorABC):
             out["fixedGridRhoFastjetAll"] = ak.values_astype(events.Rho.fixedGridRhoFastjetAll, "float32")
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
-        
+        if hasattr(events, "bunchCrossing"):
+            out["bunchCrossing"] = events.bunchCrossing
         if hasattr(events, "LHEPdfWeight"):
             out["LHEPdfWeight"] = events.LHEPdfWeight
 
@@ -198,10 +199,10 @@ class NanoAODSkimmer(processor.ProcessorABC):
                 rawFactor = ak.fill_none(getattr(collection, "rawFactor", ak.zeros_like(collection.pt)), 0.0)
                 pt_raw    = collection.pt * (1 - rawFactor)
             
-                sel       = (pt_raw > 15) & (np.abs(collection.eta) < 4.8)
+                sel        = (pt_raw > 15) & (np.abs(collection.eta) < 4.8)
                 collection = collection[sel]
                 rawFactor  = rawFactor[sel]
-                pt_raw     = pt_raw[sel]  # <-- IMPORTANT: align shapes with the sliced jets
+                pt_raw     = pt_raw[sel]  
             
                 # recompute tight lep-veto id for filtered jets
                 eta    = np.abs(collection.eta)
@@ -232,6 +233,21 @@ class NanoAODSkimmer(processor.ProcessorABC):
             
                 pt_regressed = pt_raw * pnet_cor * pnet_cor_net
                 collection   = ak.with_field(collection, ak.values_astype(pt_regressed, "float32"), "pt_regressed")
+                
+                # Save GenJet pT for matched jets; NaN if no match or on data
+                if hasattr(events, "GenJet") and hasattr(collection, "genJetIdx"):
+                    genIdx  = collection.genJetIdx
+                    has_gen = ak.values_astype(genIdx >= 0, bool)
+                    safe    = ak.mask(genIdx, has_gen)
+                    pt_gen  = events.GenJet[safe].pt
+                    # fill None (from masked) with NaN and cast to float32
+                    pt_gen  = ak.values_astype(ak.fill_none(pt_gen, np.nan), "float32")
+                    collection = ak.with_field(collection, pt_gen, "pt_genMatched")
+                else:
+                    # data or missing GenJet: make an array of NaNs with the right shape/dtype
+                    nan_arr = ak.values_astype(ak.ones_like(collection.pt), "float32") * np.nan
+                    collection = ak.with_field(collection, nan_arr, "pt_genMatched")
+
     
                         
             out[obj] = self.select_fields(collection, self.branches_to_keep[obj])
