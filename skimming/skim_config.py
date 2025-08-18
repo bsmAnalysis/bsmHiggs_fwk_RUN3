@@ -1,7 +1,7 @@
 
 branches_to_keep = {
-            "Muon": ["pt","eta","phi","charge","pdgId","tightId","looseId","mass","pfRelIso04_all"],
-            "Electron": ["pt","eta","phi","charge","pdgId","cutBased","mass","pfRelIso03_all",
+            "Muon": ["pt","eta","phi","charge","tightId","looseId","mass","pfRelIso04_all"],
+            "Electron": ["pt","eta","phi","charge","cutBased","mass","pfRelIso03_all",
                          "seedGain","r9","superclusterEta","mvaIso_WP90","mvaIso_WP80"],   
             "Jet": ["pt","eta","phi","mass","rawFactor","area","genJetIdx",
                     "btagUParTAK4probbb","btagUParTAK4B","passJetIdTight","passJetIdTightLepVeto",
