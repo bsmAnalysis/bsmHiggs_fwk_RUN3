@@ -149,8 +149,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
             out["genWeight"] = events.genWeight
         if hasattr(events, "bunchCrossing"):
             out["bunchCrossing"] = events.bunchCrossing
-        if hasattr(events, "LHEPdfWeight"):
-            out["LHEPdfWeight"] = events.LHEPdfWeight
+        
 
         #======================================================# 
         # ------------------- Trigger logic -------------------# 
