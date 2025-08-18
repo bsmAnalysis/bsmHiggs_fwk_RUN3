@@ -1,15 +1,13 @@
-
 branches_to_keep = {
             "Muon": ["pt","eta","phi","charge","tightId","looseId","mass","pfRelIso04_all"],
             "Electron": ["pt","eta","phi","charge","cutBased","mass","pfRelIso03_all",
                          "seedGain","r9","superclusterEta","mvaIso_WP90"],   
-            "Jet": ["pt","eta","phi","mass","rawFactor","area","genJetIdx",
+            "Jet": ["pt","eta","phi","mass","rawFactor","area","genJetIdx","pt_genMatched",
                     "btagUParTAK4probbb","btagUParTAK4B","passJetIdTight","passJetIdTightLepVeto",
-                    "chEmEF","neEmEF","chMultiplicity","pt_regressed","hadronFlavour","partonFlavour"],                  
-            "PuppiMET": ["pt","phi","sumEt","phiUnclusteredDown","phiUnclusteredUp","ptUnclusteredDown","ptUnclusteredUp"],
+                    "pt_regressed","hadronFlavour","partonFlavour"],                  
+            "PuppiMET": ["pt","phi"],
             "Pileup":["nTrueInt","nPU"],
             "PV": ["npvsGood","npvs"],
-            "GenJet": ["pt"],
         }
 
 
