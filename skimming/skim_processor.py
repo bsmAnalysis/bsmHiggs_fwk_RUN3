@@ -41,6 +41,10 @@ class NanoAODSkimmer(processor.ProcessorABC):
     # https://cms-jerc.web.cern.ch/Recommendations/#2024_1
     # Official Run-3 2024 requirement to remove detector “hot/cold”.
     
+    # https://cms-talk.web.cern.ch/t/jetvetomaps-usage-for-2018ul/61981
+    # ΔR(jet,PFmuon) < 0.2 : jet.muonIdx1 == -1 && jet.muonIdx2 == -1 
+    # Need to use jet.muonIdx1, jet.muonIdx2 next time we do the skimming
+    
     def _ensure_veto_loaded(self):
          if self._loaded_veto:
              return
@@ -114,14 +118,20 @@ class NanoAODSkimmer(processor.ProcessorABC):
         rawFactor_full = ak.fill_none(getattr(jets_full, "rawFactor", ak.zeros_like(jets_full.pt)), 0.0)
         pt_raw_full    = jets_full.pt * (1.0 - rawFactor_full)
     
-        mask_mu = _mask_lepton_overlap(jets_full, getattr(events, "Muon", None),     dr=0.2)
-        mask_el = _mask_lepton_overlap(jets_full, getattr(events, "Electron", None), dr=0.2)
+        # --- PF-muon overlap --- #
+        # https://cms-talk.web.cern.ch/t/jetvetomaps-usage-for-2018ul/61981
+        if hasattr(jets_full, "muonIdx1") and hasattr(jets_full, "muonIdx2"):
+            no_pfmu = (jets_full.muonIdx1 < 0) & (jets_full.muonIdx2 < 0)
+        else:
+            # Fallback: explicit ΔR>0.2 to reconstructed muons
+            no_pfmu = _mask_lepton_overlap(jets_full, getattr(events, "Muon", None), dr=0.2)
+
     
         jet_min = (
             (pt_raw_full > 15.0)
             & ak.values_astype(jets_full.passJetIdTight, bool)
             & ((jets_full.chEmEF + jets_full.neEmEF) < 0.9)
-            & mask_mu & mask_el
+            & no_pfmu
         )
 
 
@@ -222,9 +232,10 @@ class NanoAODSkimmer(processor.ProcessorABC):
                                                  passJetIdTight & (muEF < 0.8) & (chEmEF < 0.8),
                                                  passJetIdTight)
                 collection = ak.with_field(collection, passJetIdTightLepVeto, "passJetIdTightLepVeto")
+                collection = ak.with_field(collection, passJetIdTight, "passJetIdTight")
                 collection = ak.with_field(collection, rawFactor, "rawFactor")
                 if hasattr(collection, "genJetIdx"):
-                    collection = ak.with_field(collection, collection.genJetIdx, "genJetIdx")
+                     collection = ak.with_field(collection, collection.genJetIdx, "genJetIdx")
             
                 # --- PNet regressed pT (uses RAW pT) ---
                 pnet_cor     = getattr(collection, "PNetRegPtRawCorr", ak.ones_like(collection.pt))
@@ -243,7 +254,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
                     pt_gen  = ak.values_astype(ak.fill_none(pt_gen, np.nan), "float32")
                     collection = ak.with_field(collection, pt_gen, "pt_genMatched")
                 else:
-                    # data or missing GenJet: make an array of NaNs with the right shape/dtype
+                    # data: make an array of NaNs with the right shape/dtype
                     nan_arr = ak.values_astype(ak.ones_like(collection.pt), "float32") * np.nan
                     collection = ak.with_field(collection, nan_arr, "pt_genMatched")
 
