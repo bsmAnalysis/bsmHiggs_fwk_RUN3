@@ -15,7 +15,7 @@ trigger_groups = {
     0: ["Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8"],
     1: ["Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8"],
     2: ["IsoMu24"],
-    3: ["Ele23_Ele12_CaloIdL_TrackIdL_IsoVL","Ele32_WPTight_Gsf"],
+    3: ["Ele23_Ele12_CaloIdL_TrackIdL_IsoVL"],
     4: ["Ele30_WPTight_Gsf"],
     5: ["Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ", "Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", "Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ"],
     6: ["PFMET120_PFMHT120_IDTight","PFMET120_PFMHT120_IDTight_PFHT60","PFMETNoMu120_PFMHTNoMu120_IDTight","PFMETNoMu120_PFMHTNoMu120_IDTight_FilterHF", "PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60"],
