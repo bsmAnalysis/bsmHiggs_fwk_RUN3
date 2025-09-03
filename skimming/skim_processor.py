@@ -92,7 +92,18 @@ class NanoAODSkimmer(processor.ProcessorABC):
     def process(self, events):
         self._ensure_veto_loaded()
         n_before = len(events)
-        
+         # --- PV selection ---
+        if ("PV" in events.fields) and ("npvsGood" in ak.fields(events.PV)):
+            pv_mask = events.PV.npvsGood >= 1
+            n_after_pv = ak.sum(pv_mask)
+            print(f"selected {n_after_pv} / {n_before} events with npvsGood>=1")
+        else:
+            print(" No PV.npvsGood found skipping PV preselection.")
+            pv_mask = ak.ones_like(events.event, dtype=bool)
+            n_after_pv = n_before
+
+        events = events[pv_mask]
+        n_before = n_after_pv  
         jets_full = events.Jet        
         eta_abs   = np.abs(jets_full.eta)
         chMult    = jets_full.chMultiplicity
@@ -135,19 +146,50 @@ class NanoAODSkimmer(processor.ProcessorABC):
         )
 
 
+        # --- evaluate veto map per jet (True => jet is inside vetoed region) ---
         if self._jet_veto is not None:
             counts    = ak.num(jets_full.pt, axis=1)
             eta_flat  = ak.to_numpy(ak.flatten(jets_full.eta))
             phi_flat  = ak.to_numpy(ak.flatten(jets_full.phi))
             vflat     = self._jet_veto.evaluate(self._jet_veto_type, eta_flat, phi_flat)
             veto_j    = _unflatten_like(vflat, counts) > 0.5
-            veto_ev   = ak.any(jet_min & veto_j, axis=1)
-            events    = events[~veto_ev]   # events are vetoed here
-            jets_full = jets_full[~veto_ev]
-                   
-            n_after = len(events)
-            print(f"[JetVeto] dropped {n_before - n_after} / {n_before} events")
+        else:
+            veto_j    = ak.zeros_like(jets_full.pt, dtype=bool)
 
+        # --- define good/bad jets among the selected ones ---
+        good_j   = jet_min & ~veto_j
+        bad_j    = jet_min &  veto_j
+
+        num_good = ak.sum(good_j, axis=1)           # per-event int
+        has_bad  = ak.any(bad_j,  axis=1)           # per-event bool
+
+        # Strict JERC-style: require ≥2 good jets AND no bad selected jets
+        event_mask = (num_good >= 2) & (~has_bad)
+        event_mask = ak.values_astype(event_mask, bool)
+
+        # (Optional) quick sanity prints before indexing
+        print("DEBUG len(events) =", len(events),
+            "len(event_mask) =", len(event_mask))
+        n_total = len(events)
+        n_good_ge2      = int(ak.count_nonzero(num_good >= 2))
+        n_bad_any       = int(ak.count_nonzero(has_bad))
+        n_ge2_and_bad   = int(ak.count_nonzero((num_good >= 2) &  has_bad))
+        n_ge2_and_nobad = int(ak.count_nonzero((num_good >= 2) & ~has_bad))  # == kept
+        n_lt2_and_nobad = int(ak.count_nonzero((num_good <  2) & ~has_bad))
+        n_lt2_and_bad   = int(ak.count_nonzero((num_good <  2) &  has_bad))
+
+        print(f"[Debug] total={n_total} "
+            f"ge2_good={n_good_ge2} any_bad={n_bad_any} "
+            f"ge2_good&bad={n_ge2_and_bad} ge2_good&no_bad={n_ge2_and_nobad} "
+            f"<2_good&no_bad={n_lt2_and_nobad} <2_good&bad={n_lt2_and_bad}")
+        # --- apply ONCE to keep events (and keep jets aligned) ---
+        events    = events[event_mask]
+        jets_full = jets_full[event_mask]
+
+        kept = int(ak.count_nonzero(event_mask))
+        print(f"[JetVeto/Count] kept {kept} / {kept + ak.count_nonzero(~event_mask)} events (≥2 good & no bad)")
+
+            
         out = {}
         out["run"] = events.run
         out["event"] = events.event
@@ -157,10 +199,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
             out["fixedGridRhoFastjetAll"] = ak.values_astype(events.Rho.fixedGridRhoFastjetAll, "float32")
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
-        if hasattr(events, "bunchCrossing"):
-            out["bunchCrossing"] = events.bunchCrossing
         
-
         #======================================================# 
         # ------------------- Trigger logic -------------------# 
         #======================================================#
@@ -237,12 +276,15 @@ class NanoAODSkimmer(processor.ProcessorABC):
                 if hasattr(collection, "genJetIdx"):
                      collection = ak.with_field(collection, collection.genJetIdx, "genJetIdx")
             
-                # --- PNet regressed pT (uses RAW pT) ---
-                pnet_cor     = getattr(collection, "PNetRegPtRawCorr", ak.ones_like(collection.pt))
-                pnet_cor_net = getattr(collection, "PNetRegPtRawCorrNeutrino", ak.ones_like(collection.pt))
+                
+                # --- upart regressed pT (uses RAW pT) ---
+               
+
+                upart_cor     = getattr(collection, "UParTAK4RegPtRawCorr", ak.ones_like(collection.pt))
+                upart_cor_net = getattr(collection, "UParTAK4RegPtRawCorrNeutrino", ak.ones_like(collection.pt))
             
-                pt_regressed = pt_raw * pnet_cor * pnet_cor_net
-                collection   = ak.with_field(collection, ak.values_astype(pt_regressed, "float32"), "pt_regressed")
+                upart_pt_reg = pt_raw * upart_cor * upart_cor_net
+                collection   = ak.with_field(collection, ak.values_astype(upart_pt_reg, "float32"), "upart_pt_reg")
                 
                 # Save GenJet pT for matched jets; NaN if no match or on data
                 if hasattr(events, "GenJet") and hasattr(collection, "genJetIdx"):
