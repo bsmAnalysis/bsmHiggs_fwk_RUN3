@@ -4,7 +4,7 @@ branches_to_keep = {
                          "seedGain","r9","superclusterEta","mvaIso_WP90"],   
             "Jet": ["pt","eta","phi","mass","rawFactor","area","pt_genMatched",
                     "btagUParTAK4probbb","btagUParTAK4B","passJetIdTight","passJetIdTightLepVeto",
-                    "pt_regressed","hadronFlavour","partonFlavour"],                  
+                    "UParTAK4RegPtRawRes","upart_pt_reg","hadronFlavour","partonFlavour"],                  
             "PuppiMET": ["pt","phi"],
             "Pileup":["nTrueInt","nPU"],
             "PV": ["npvsGood","npvs"],
