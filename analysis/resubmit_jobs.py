@@ -7,7 +7,7 @@ import subprocess
 
 def job_outputs_exist(dataset_key, dataset_info, job_idx, outdir="."):
     # Default single-file naming 
-    candidates = [f"{dataset_key}_0l_{job_idx}.root"]
+    candidates = [f"{dataset_key}_{job_idx}.root"]
 
     # If this dataset is TT*, also accept flavor-split outputs
     meta = dataset_info.get("metadata", {})
