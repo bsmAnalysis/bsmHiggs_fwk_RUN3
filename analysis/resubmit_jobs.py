@@ -5,25 +5,38 @@ import json
 import glob
 import subprocess
 
+def job_outputs_exist(dataset_key, dataset_info, job_idx, outdir="."):
+    # Default single-file naming 
+    candidates = [f"{dataset_key}_0l_{job_idx}.root"]
+
+    # If this dataset is TT*, also accept flavor-split outputs
+    meta = dataset_info.get("metadata", {})
+    sample_base = os.path.basename(meta.get("sample", dataset_key)).replace(".root", "").replace("/", "_")
+    if sample_base.startswith("TT") or dataset_key.startswith("TT"):
+        for flav in ("ttLF", "ttCC", "ttBB"):
+            candidates.append(f"{sample_base}_{flav}_{job_idx}.root")
+
+    return any(os.path.exists(os.path.join(outdir, c)) for c in candidates)
+
+
 OUTPUT_DIR = "."
 DATASET_DIR = "datasets"
-FILES_TO_TRANSFER = ["run_analysis.py", "ZH_0lep_total_processor_v3.py", "x509up", "run_analysis.sh", "utils.tar.gz", "xgb_model.tar.gz"]
+FILES_TO_TRANSFER = ["run_analysis.py", "Wh_processor.py", "x509up", "run_analysis.sh", "utils.tar.gz", "xgb_model.tar.gz"]
 
-json_files = sorted(glob.glob(f"{DATASET_DIR}/Wto*.json"))
+json_files = sorted(glob.glob(f"{DATASET_DIR}/*.json"))
 
 for json_path in json_files:
     with open(json_path) as f:
         data = json.load(f)
 
-    dataset_basename = os.path.basename(json_path)  # e.g. ZH.json
+    dataset_basename = os.path.basename(json_path)  
 
     for dataset_key, dataset_info in data.items():
         n_jobs = len(dataset_info["files"])
         missing_jobs = []
 
         for i in range(n_jobs):
-            expected_file = f"{dataset_key}_0l_{i}.root"
-            if not os.path.exists(os.path.join(OUTPUT_DIR, expected_file)):
+            if not job_outputs_exist(dataset_key, dataset_info, i, OUTPUT_DIR):
                 missing_jobs.append(i)
 
         if not missing_jobs:
