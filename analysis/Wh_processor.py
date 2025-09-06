@@ -77,7 +77,7 @@ def _deltaR2(eta1, phi1, eta2, phi2):
 def _mask_lepton_overlap(jets, leptons, dr=0.4):
     """
     Per jet: True if ΔR(jet, ANY lepton) > dr.
-    Works even when an event has 0 leptons or 0 jets (vacuous truth).
+    Works even when an event has 0 leptons or 0 jets.
     """
     if leptons is None:
         return ak.ones_like(jets.pt, dtype=bool)
@@ -86,6 +86,7 @@ def _mask_lepton_overlap(jets, leptons, dr=0.4):
     pairs = ak.cartesian({"j": jets, "l": leptons}, axis=1, nested=True)
 
     # ΔR^2
+    # dphi = ((Δφ + π) % (2π)) - π
     dphi = np.arctan2(np.sin(pairs.j.phi - pairs.l.phi), np.cos(pairs.j.phi - pairs.l.phi))
     deta = pairs.j.eta - pairs.l.eta
     dr2  = dphi * dphi + deta * deta
@@ -239,6 +240,99 @@ def _lookup_th2_vals(x, y, xedges, yedges, vals):
 
 #----------------------------------------------------------------------------------------------------------------------------------------------
 
+def _btag_wp_threshold(self, working_point="M"):
+    """Return discriminator threshold for the given WP from the JSON; safe fallback if missing."""
+    if self._btag_wp_vals is not None:
+        try:
+            return float(self._btag_wp_vals.evaluate(str(working_point)))
+        except Exception:
+            pass
+        
+    defaults = {"L": 0.0246, "M": 0.1272, "T": 0.4648, "XT": 0.6298, "XXT": 0.9739}
+    return defaults.get(str(working_point), defaults["M"])
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def btag_sf_perjet(self, jets, working_point="M", systematic="central"):
+    if (self._btag_sf_node is None) or (jets is None) or (len(jets) == 0):
+        return ak.ones_like(jets.pt, dtype=float)
+
+    pt     = jets.pt
+    abseta = abs(jets.eta)
+    flav   = ak.values_astype(getattr(jets, "hadronFlavour", ak.zeros_like(jets.pt)), np.int32)
+
+    counts = ak.num(pt, axis=1)
+    try:
+        sf_flat = _eval_corr_vectorized(
+            self._btag_sf_node,
+            systematic=str(systematic),
+            working_point=str(working_point),
+            flavor=ak.to_numpy(ak.flatten(flav)),
+            abseta=ak.to_numpy(ak.flatten(abseta)),
+            pt=ak.to_numpy(ak.flatten(pt)),
+        )
+        sf_flat = np.asarray(sf_flat, dtype=float)
+    except Exception:
+        f_flat  = ak.to_numpy(ak.flatten(flav))
+        a_flat  = ak.to_numpy(ak.flatten(abseta))
+        p_flat  = ak.to_numpy(ak.flatten(pt))
+        sf_flat = np.ones_like(p_flat, dtype=float)
+        mask_b  = (f_flat == 5)
+        if np.any(mask_b):
+            try:
+                sf_flat[mask_b] = _eval_corr_vectorized(
+                    self._btag_sf_node,
+                    systematic=str(systematic),
+                    working_point=str(working_point),
+                    flavor=f_flat[mask_b],
+                    abseta=a_flat[mask_b],
+                    pt=p_flat[mask_b],
+                )
+            except Exception:
+                pass
+
+    return _unflatten_like(sf_flat, counts)
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def btag_event_weight_tagged_only(self, jets, working_point="T", score_field="btagUParTAK4B", systematic="central"):
+    """
+    Event b-tag weight (simple): product of SFs **for jets that pass the WP**.
+    """
+    if jets is None or len(jets) == 0:
+        return np.ones(ak.num(jets, axis=1), dtype=float)
+
+    thr = self._btag_wp_threshold(working_point)
+    tagged = jets[getattr(jets, score_field) >= thr]
+
+    sfs_tagged = self.btag_sf_perjet(tagged, working_point=working_point, systematic=systematic)
+    w = ak.prod(ak.fill_none(sfs_tagged, 1.0), axis=1)
+    return ak.to_numpy(w)
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+def btag_event_weight_full(self, jets, effs_mc, working_point="T", score_field="btagUParTAK4B", systematic="central"):
+    """
+    Full fixed-WP weight (needs MC eff per jet):
+      if tagged:      SF
+      else untagged: (1 - SF*ε)/(1 - ε)
+    """
+    if jets is None or len(jets) == 0 or effs_mc is None:
+        return np.ones(ak.num(jets, axis=1), dtype=float)
+
+    thr = self._btag_wp_threshold(working_point)
+    tagged_mask = (getattr(jets, score_field) >= thr)
+
+    sfs = self.btag_sf_perjet(jets, working_point=working_point, systematic=systematic)
+    eff = ak.where(effs_mc < 1e-6, 1e-6, ak.where(effs_mc > 1 - 1e-6, 1 - 1e-6, effs_mc))
+
+    perjet = ak.where(tagged_mask, sfs, (1.0 - sfs * eff) / (1.0 - eff))
+    w = ak.prod(ak.fill_none(perjet, 1.0), axis=1)
+    
+    return ak.to_numpy(w)
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+
 class Wh_Processor(processor.ProcessorABC):
     def __init__(self, xsec=1.0, nevts=1.0, isMC=True, dataset_name=None, isMVA=True, isQCD=False, runEval=False, verbose=False):
         self.xsec    = xsec
@@ -259,8 +353,23 @@ class Wh_Processor(processor.ProcessorABC):
         
         self.bdt_edges = np.linspace(0.0, 1.0, 51 + 1)  
         self.optim_Cuts1_bdt = self.bdt_edges[:-1].tolist()
-        self.systematics_labels = [""]  # Replace with actual systematic names later
         
+        self.systematics_labels = [""]  
+        # self.systematics_labels = [
+        #     "", # nominal
+        #     "_umetup","_umetdown",
+        #     "_jerup","_jerdown",
+        #     "_jesup","_jesdown",
+        #     "_scale_mup","_scale_mdown",
+        #     "_stat_eup","_stat_edown",
+        #     "_sys_eup","_sys_edown",
+        #     "_GS_eup","_GS_edown",
+        #     "_resRho_eup","_resRho_edown",
+        #     "_puup","_pudown",
+        #     "_pdfup","_pdfdown",
+        #     "_btagup","_btagdown",
+        # ]
+
         nvarsToInclude = len(self.systematics_labels)
         nCuts = len(self.optim_Cuts1_bdt)
         
@@ -268,6 +377,7 @@ class Wh_Processor(processor.ProcessorABC):
         CORR_DIR = os.path.join(HERE, "corrections")
         
         #--- Electron energy and smearing corrections (2024) ---#
+        # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3#2022_2023_and_2024_Scale_and_Sme
         self.egm_json_path = os.path.join(CORR_DIR, "electronSS_EtDependent.json.gz")
         #self.egm_json_path = "/eos/cms/store/group/phys_egamma/ScaleFactors/Data2024/SS/electronSS_EtDependent.json.gz"
         self._egm_scale = None
@@ -280,7 +390,6 @@ class Wh_Processor(processor.ProcessorABC):
                 def _take(cset, name):
                     try: return cset[name]
                     except Exception: return None
-                # DATA vs MC will be used at evaluation time
                 self._egm_scale = _take(egm_cset, "EGMScale_Compound_Ele_2024")
                 self._egm_smear = _take(egm_cset, "EGMSmearAndSyst_ElePTsplit_2024")
                 
@@ -368,7 +477,6 @@ class Wh_Processor(processor.ProcessorABC):
         if os.path.exists(self.jerc_json_path):
             try:
                 jerc = correctionlib.CorrectionSet.from_file(self.jerc_json_path)
-                # --- pick the first key that matches these substrings
                 def _pick(*parts):
                     for k in jerc:
                         if all(p in k for p in parts):
@@ -414,45 +522,40 @@ class Wh_Processor(processor.ProcessorABC):
         else:
             print("[ANA:JERC] jet_jerc.json not found; skipping JEC/JER.")
             
-    
-        # ================== #
-        #    JetVeto Maps    #
-        # ================== #
-        self.jetveto_json_path = os.path.join(CORR_DIR, "jetvetomaps.json.gz")
-        self._jet_veto = None
-        self._jet_veto_type = "jetvetomap"  
-        
-        if os.path.exists(self.jetveto_json_path):
-            try:
-                jvm = correctionlib.CorrectionSet.from_file(self.jetveto_json_path)
-        
-                def pick_veto_corr(cs):
-                    # Prefer an exact-looking name if present
-                    for k in cs:
-                        if "Summer24Prompt24_RunBCDEFGHI_V1" in str(k):
-                            return cs[k], str(k)
-                    # Otherwise pick the first correction whose inputs are (type, eta, phi)
-                    for k in cs:
-                        try:
-                            ins = [i.name for i in cs[k].inputs]
-                            if {"type", "eta", "phi"}.issubset(ins):
-                                return cs[k], str(k)
-                        except Exception:
-                            pass
-                    return None, None
-        
-                self._jet_veto, _key = pick_veto_corr(jvm)
-                if self._jet_veto is None:
-                    print("[ANA:JetVeto] Could not find a correction with inputs (type, eta, phi).")
-                    print("[ANA:JetVeto] Available corrections:", [str(k) for k in jvm])
-                else:
-                    print(f"[ANA:JetVeto] Loaded veto map correction: {_key} (use type='{self._jet_veto_type}')")
-            except Exception as e:
-                print(f"[ANA:JetVeto] Failed to load: {e}")
-        else:
-            print("[ANA:JetVeto] jetvetomaps.json.gz not found; veto disabled.")
-                                
             
+        # ====================== #
+        #    b-tagging (UParT)   #
+        # ====================== #
+        self.btag_json_path = os.path.join(CORR_DIR, "btagging_preliminary.json")
+        self._btag_wp_vals = None      
+        self._btag_sf_node = None     
+        
+        if os.path.exists(self.btag_json_path):
+            try:
+                btag_cset = correctionlib.CorrectionSet.from_file(self.btag_json_path)
+        
+                def _grab(cset, name):
+                    try: return cset[name]
+                    except Exception: return None
+        
+                self._btag_wp_vals = _grab(btag_cset, "UParTAK4_wp_values")
+                self._btag_sf_node = _grab(btag_cset, "UParTAK4_kinfit")
+        
+                if self._btag_wp_vals is None or self._btag_sf_node is None:
+                    print(f"[ANA:BTAG] Missing nodes in {self.btag_json_path}. Keys: {list(btag_cset.keys())}")
+                else:
+                    print("[ANA:BTAG] Loaded UParTAK4 WP + kinfit SFs.")
+            except Exception as e:
+                print(f"[ANA:BTAG] Failed to load {self.btag_json_path}: {e}")
+        else:
+            print("[ANA:BTAG] btagging_preliminary.json not found; skipping b-tag SFs.")
+
+                                
+        Wh_Processor._btag_wp_threshold             = _btag_wp_threshold
+        Wh_Processor.btag_sf_perjet                 = btag_sf_perjet
+        Wh_Processor.btag_event_weight_tagged_only  = btag_event_weight_tagged_only
+        Wh_Processor.btag_event_weight_full         = btag_event_weight_full
+    
 
         ##############
         # HISTOGRAMS #
@@ -530,7 +633,7 @@ class Wh_Processor(processor.ProcessorABC):
                     self._histograms[f"{prefix}_{region}_SR_3b_mbbj_shapes_{suffix}"]       = Hist.new.IntCategory(range(nCuts), name="cut_index").Reg(50, 0.0, 1000,       name="mbbj").Weight()
                     
                     for objt in ["H", "A", "W", "lepton", "MET", "MT", "bjet", "jet", "double-b jet", "bbj", "WH", "MET-lepton", "W-jet",
-                                 "jet-lepton_min", "bb1", "bb2", "4b", "bb_ave", "b1", "b2", "bb", "bdt", "wh_asym", "bb1", "bb2"
+                                 "jet-lepton_min", "bb1", "bb2", "4b", "bb_ave", "b1", "b2", "b3", "b4", "bb", "bdt", "wh_asym", "bb1", "bb2"
                                  "single_untag_jets", "single_jets", "single_bjets", "double_jets", "double_bjets", "double_untag_jets"]:
                              
                         self._histograms[f"eventflow_{suffix}"] = hist.Hist(hist.axis.StrCategory(
@@ -553,7 +656,11 @@ class Wh_Processor(processor.ProcessorABC):
                         self._histograms[f"pt_{objt}_{suffix}"]                         = Hist.new.Reg(100, 0, 1000, name="pt",    label=f"{objt} pT {suffix}").Weight()
                         self._histograms[f"{prefix}_{region}_pt_{objt}_{suffix}"]       = Hist.new.Reg(100, 0, 1000, name="pt",    label=f"{objt} pT {suffix}").Weight()
                         self._histograms[f"wh_pt_asym_{suffix}"]                        = Hist.new.Reg(50,  0, 1,    name="pt",    label=f"pt assymetry wh {suffix}").Weight()           
-                        self._histograms[f"{prefix}_{region}_wh_pt_asym_{suffix}"]      = Hist.new.Reg(50,  0, 1,    name="pt",    label=f"pt assymetry wh {suffix}").Weight()     
+                        self._histograms[f"{prefix}_{region}_wh_pt_asym_{suffix}"]      = Hist.new.Reg(50,  0, 1,    name="pt",    label=f"pt assymetry wh {suffix}").Weight()   
+                        self._histograms[f"phi_{objt}_{suffix}"]                        = Hist.new.Reg(50,  -np.pi, np.pi,name="phi",   label=f"{objt} phi {suffix}").Weight() 
+                        self._histograms[f"{prefix}_{region}_phi_{objt}_{suffix}"]      = Hist.new.Reg(50,  -np.pi, np.pi,name="phi",   label=f"{objt} phi {suffix}").Weight() 
+                        self._histograms[f"eta_{objt}_{suffix}"]                        = Hist.new.Reg(50,  -3, 3,   name="eta",   label=f"{objt} eta {suffix}").Weight() 
+                        self._histograms[f"{prefix}_{region}_eta_{objt}_{suffix}"]      = Hist.new.Reg(50,  -3, 3,   name="eta",   label=f"{objt} eta {suffix}").Weight() 
                         self._histograms[f"HT_{suffix}"]                                = Hist.new.Reg(100, 0, 1500, name="ht",    label=f"HT {suffix}").Weight()
                         self._histograms[f"{prefix}_{region}_HT_{suffix}"]              = Hist.new.Reg(100, 0, 1500, name="ht",    label=f"HT {suffix}").Weight()
                         self._histograms[f"pt_ratio_{suffix}"]                          = Hist.new.Reg(50,  0, 5,    name="ratio", label=f"pT(H)/pT(W) {suffix}").Weight()
@@ -570,12 +677,12 @@ class Wh_Processor(processor.ProcessorABC):
                         self._histograms[f"{prefix}_{region}_btag_min_{objt}_{suffix}"] = Hist.new.Reg(50,  0, 1,    name="btag",  label=f"btag min {suffix}").Weight()
                         self._histograms[f"btag_max_{objt}_{suffix}"]                   = Hist.new.Reg(50,  0, 1,    name="btag",  label=f"btag max {suffix}").Weight()
                         self._histograms[f"{prefix}_{region}_btag_max_{objt}_{suffix}"] = Hist.new.Reg(50,  0, 1,    name="btag",  label=f"btag max {suffix}").Weight()                      
-                        self._histograms[f"bdt_score_{suffix}"]                         = (Hist.new.Reg(100, 0, 1,   name="bdt",   label=f"bdt score {suffix}").Weight())              
-                        self._histograms[f"{prefix}_bdt_score_{suffix}"]                = (Hist.new.Reg(100, 0, 1,   name="bdt",   label=f"bdt score {suffix}").Weight())            
-                        self._histograms[f"btag_prod_{suffix}"]                         = (Hist.new.Reg(50, 0, 1,    name="btag_prod",   label=f"btag product {suffix}").Weight())              
-                        self._histograms[f"{prefix}_{region}_btag_prod_{suffix}"]       = (Hist.new.Reg(50, 0, 1,    name="btag_prod",   label=f"btag_prod {suffix}").Weight())            
-                        self._histograms[f"{prefix}_double_btag_score"]                 = (Hist.new.Reg(100, 0, 1,   name="score", label="Double tag UParT score").Weight())
-                        self._histograms[f"{prefix}_single_btag_score"]                 = (Hist.new.Reg(100, 0, 1,   name="score", label="Single tag UParT score").Weight())
+                        self._histograms[f"bdt_score_{suffix}"]                         = Hist.new.Reg(100, 0, 1,    name="bdt",   label=f"bdt score {suffix}").Weight()              
+                        self._histograms[f"{prefix}_bdt_score_{suffix}"]                = Hist.new.Reg(100, 0, 1,    name="bdt",   label=f"bdt score {suffix}").Weight()            
+                        self._histograms[f"btag_prod_{suffix}"]                         = Hist.new.Reg(50, 0, 1,     name="btag_prod",   label=f"btag product {suffix}").Weight()            
+                        self._histograms[f"{prefix}_{region}_btag_prod_{suffix}"]       = Hist.new.Reg(50, 0, 1,     name="btag_prod",   label=f"btag_prod {suffix}").Weight()            
+                        self._histograms[f"{prefix}_double_btag_score"]                 = Hist.new.Reg(100, 0, 1,    name="score", label="Double tag UParT score").Weight()
+                        self._histograms[f"{prefix}_single_btag_score"]                 = Hist.new.Reg(100, 0, 1,    name="score", label="Single tag UParT score").Weight()
 
                         
     @property
@@ -604,15 +711,19 @@ class Wh_Processor(processor.ProcessorABC):
         except TypeError:
             events = events.compute()
             n = len(events)
+            
+        isSignal = (
+            (self.dataset_name.startswith("ZH_ZToAll_HToAATo4B") or
+             self.dataset_name.startswith("WH_WToAll_HToAATo4B") and self.isMC)
+        )
         
-        verbose  = False     
-        genLevel = False
-
         output = {key: hist if not hasattr(hist, "copy") else hist.copy() for key, hist in self._histograms.items()}
+        
         
         ####################################
         #      GENERATOR LEVEL ANALYSIS    #
         ####################################
+        genLevel = False       
         if genLevel:
             if isSignal:
                 
@@ -741,55 +852,37 @@ class Wh_Processor(processor.ProcessorABC):
         #      DETECTOR LEVEL ANALYSIS    #
         ###################################
         
-        # ============================ #
-        # STEP 1 : Apply JET Veto Maps #
-        # ============================ #         
-        jets_in = events.Jet
-        mu_all  = events.Muon
+        # Better add this in the skimmer
+        if ("PV" in events.fields) and ("npvsGood" in ak.fields(events.PV)):
+            pv_mask = events.PV.npvsGood >= 1
+        else:
+            pv_mask = ak.ones_like(events.event, dtype=bool)  
         
-        rawFactor = ak.fill_none(getattr(jets_in, "rawFactor", ak.zeros_like(jets_in.pt)), 0.0)
-        pt_raw    = jets_in.pt   * (1.0 - rawFactor)
-        
-        # minimal selection for veto
-        jet_min = (
-            (pt_raw > 15.0)
-            & ak.values_astype(jets_in.passJetIdTight, bool)
-            & ((jets_in.chEmEF + jets_in.neEmEF) < 0.9)
-            & _mask_lepton_overlap(jets_in, mu_all, dr=0.2)
-        )
-        
-        veto_ev = ak.zeros_like(ak.sum(pt_raw, axis=1), dtype=bool)
-        if self._jet_veto is not None:
-            counts   = ak.num(jets_in.pt, axis=1)
-            eta_flat = ak.to_numpy(ak.flatten(jets_in.eta))
-            phi_flat = ak.to_numpy(ak.flatten(jets_in.phi))
-            
-            # IMPORTANT: first arg is a SCALAR string, not an array
-            vflat = self._jet_veto.evaluate(self._jet_veto_type, eta_flat, phi_flat)
-            
-            veto_j  = _unflatten_like(vflat, counts) > 0.5
-            veto_ev = ak.any(jet_min & veto_j, axis=1)
-            events  = events[~veto_ev]
-            
-            
-        # Build weights 
-        n_ev = len(events)
+        # ====================== #
+        # STEP 1 : Build weights #
+        # ====================== #   
+        events  = events[pv_mask]
+        n_ev    = len(events)
         weights = Weights(n_ev)
+        
         if self.isMC:
-            norm = np.full(n_ev, self.xsec / self.nevts, dtype="float64")
-            weights.add("norm", norm)
-
-            if hasattr(events, "genWeight"):
-                gw = ak.to_numpy(ak.fill_none(ak.values_astype(events.genWeight, "float64"), 1.0))
-                weights.add("gen", gw)
+            weights.add("norm", np.full(n_ev, self.xsec / self.nevts, dtype="float64"))
         else:
             weights.add("ones", np.ones(n_ev, dtype="float64"))
-        
-        
-                    
+            
+        print(f"[ENV] host={os.uname().nodename}  isMC={self.isMC}  dataset={self.dataset_name}")
+        print(f"[ENV] xsec/nevts={self.xsec}/{self.nevts} = {self.xsec/self.nevts:.3e}")
+
+        w_now = weights.weight()
+        print(f"[WEIGHTS] n_ev={len(w_now)}  sum={np.sum(w_now):.6g}  mean={np.mean(w_now):.6g}  "
+                  f"min={np.min(w_now):.3g}  max={np.max(w_now):.3g}")
+
+                                      
         # =============================== #
         # STEP 2 : EGM energy corrections #
         # =============================== #
+        # https://twiki.cern.ch/twiki/bin/view/CMS/EgammSFandSSRun3#2022_2023_and_2024_Scale_and_Sme
+        # Align electron energy response/resolution between data and simulation.
         ele_all = events.Electron
         
         if "event" not in ak.fields(ele_all):
@@ -799,7 +892,7 @@ class Wh_Processor(processor.ProcessorABC):
         absScEta = np.abs(scEta)
         
         if (not self.isMC) and (self._egm_scale is not None):
-            # DATA: multiplicative scale
+            # DATA: Multiply electron pT by a data scale factor from EGM JSON (depends on run, scEta, |scEta|, r9, pt, seedGain).
             run_e = ak.broadcast_arrays(events.run, ele_all.pt)[0]
             counts = ak.num(ele_all.pt, axis=1)
         
@@ -819,7 +912,7 @@ class Wh_Processor(processor.ProcessorABC):
             ElectronCorr = ak.with_field(ele_all, ele_corr_pt, "pt")
         
         elif self.isMC and (self._egm_smear is not None):
-            # MC: Gaussian smearing width from JSON
+            # MC: Smear electron pT using a Gaussian width from EGM JSON (depends on pt, r9, |scEta|), with a deterministic RNG per electron.
             counts = ak.num(ele_all.pt, axis=1)
         
             smear_width_flat = self._egm_smear.evaluate(
@@ -833,14 +926,17 @@ class Wh_Processor(processor.ProcessorABC):
             n = _unflatten_like(_rng_normal_like(ele_all), counts)  # deterministic per electron
             _val = ele_all.pt * (1.0 + smear_width * n)
             ele_corr_pt = ak.values_astype(ak.where(_val > 0.0, _val, 0.0), "float32")
+            # Electrons with corrected pt (all other fields unchanged).
             ElectronCorr = ak.with_field(ele_all, ele_corr_pt, "pt")
         
         else:
-            ElectronCorr = ele_all  # no EGM available
+            ElectronCorr = ele_all  
                 
         # ================================== #
-        # STEP 3 : JEC + JER for AK4 PFPuppi #
+        # STEP 3 : JEC + JER for AK4 Puppi   #
         # ================================== # 
+        # https://cms-jerc.web.cern.ch/Recommendations/#2024
+        # JEC brings jets onto the correct scale; JER makes MC jet resolution match data.
         jets_in = events.Jet
    
         if "event" not in ak.fields(jets_in):
@@ -856,6 +952,9 @@ class Wh_Processor(processor.ProcessorABC):
         
         pt_step = pt_raw
         
+        # --- Apply L1 → L2 → L3 (and Data residual for data) using correctionlib on (area, eta, phi, pt_step, ρ). --- #
+        
+        # JEC chain (all jets) #
         # L1
         if self._jec_L1 is not None:
             c = self._jec_L1
@@ -900,16 +999,8 @@ class Wh_Processor(processor.ProcessorABC):
                 "JetEta": jets_in.eta,
                 "JetPhi": jets_in.phi,
                 "Rho": rho,
-        
-                # pt raw synonyms
                 "JetPt": pt_raw,
-                "JetPtRaw": pt_raw,
-                "PtRaw": pt_raw,
-        
-                # run synonyms
-                "run": run_b,
                 "Run": run_b,
-                "RunNumber": run_b,
             }
         
             corr_flat = _eval_corr_vectorized(c, **kwargs)
@@ -928,43 +1019,43 @@ class Wh_Processor(processor.ProcessorABC):
             pt  = pt_jec
             eta = jets_in.eta
         
-            # Gen matching flag
-            genIdx  = jets_in.genJetIdx
-            has_gen = ak.values_astype(genIdx >= 0, bool)  
-            
-            if hasattr(events, "GenJet"):
-                safe_idx    = ak.mask(genIdx, has_gen)     # None where unmatched
-                matched_gen = events.GenJet[safe_idx]
-                pt_gen      = ak.fill_none(matched_gen.pt, 0.0)
-            else:
-                # No GenJet in the skim -> treat all jets as unmatched
-                has_gen = ak.zeros_like(has_gen, dtype=bool)
-                pt_gen  = ak.zeros_like(pt)
+            if hasattr(jets_in, "pt_genMatched"):
+                pt_gen  = jets_in.pt_genMatched      # NaN where unmatched / on data
+                has_gen = np.isfinite(pt_gen)        # True only where a match exists
                                 
             # SF nominal
             sf_nom_flat = _eval_corr_vectorized(self._jer_sf, JetEta=eta, JetPt=pt, systematic="nom")
-            sf_nom = _unflatten_like(sf_nom_flat, counts) if sf_nom_flat is not None else ak.ones_like(pt)
+            sf_nom      = _unflatten_like(sf_nom_flat, counts) if sf_nom_flat is not None else ak.ones_like(pt)
 
             # Resolution
             if self._jer_res is not None:
                 res_flat = _eval_corr_vectorized(self._jer_res, JetEta=eta, Rho=rho, JetPt=pt)
                 res = _unflatten_like(res_flat, counts)
-            else:
-                res = ak.zeros_like(pt)
+                
+            # ----- tight gen matching per twiki -----#
+            # https://cms-jerc.web.cern.ch/JER/
+                       
+            # |pT - pT_gen| < 3 * σ_JER * pT  (evaluate only where matched)
+            ptdiff_ok = ak.fill_none(
+                np.abs(ak.mask(pt, has_gen) - ak.mask(pt_gen, has_gen)) <
+                (3.0 * ak.mask(res, has_gen) * ak.mask(pt, has_gen)), False
+            )
         
+            match_tight = has_gen & ptdiff_ok
+
             # Start from un-smeared
             pt_corr = pt
         
-            # Matched jets: hybrid
-            _tmp = pt_gen + sf_nom * (pt - pt_gen)
-            pt_matched = ak.where(_tmp > 0.0, _tmp, 0.0)
-            pt_corr = ak.where(has_gen, pt_matched, pt_corr)
-                    
-            # Unmatched: stochastic (deterministic per-jet)
-            n = _unflatten_like(_rng_normal_like(jets_in), counts)
-            sigma = res * np.sqrt(np.maximum(sf_nom**2 - 1.0, 0.0))
+            # matched & tight: scaling
+            pt_matched = ak.where((pt_gen + sf_nom * (pt - pt_gen)) > 0.0,
+                                  pt_gen + sf_nom * (pt - pt_gen), 0.0)
+            pt_corr = ak.where(match_tight, pt_matched, pt_corr)
+        
+            # others: stochastic
+            n            = _unflatten_like(_rng_normal_like(jets_in), counts)
+            sigma        = res * np.sqrt(np.maximum(sf_nom**2 - 1.0, 0.0))
             smear_factor = 1.0 + sigma * n
-            pt_corr = ak.where(~has_gen, pt * smear_factor, pt_corr)
+            pt_corr      = ak.where(~match_tight, pt * smear_factor, pt_corr)
         
             # Propagate mass
             jer_factor = ak.where(pt > 0, pt_corr / pt, 1.0)
@@ -972,280 +1063,330 @@ class Wh_Processor(processor.ProcessorABC):
         else:
             pt_corr  = pt_jec
             mass_corr = mass_jec
-            
+        
         jets = ak.with_field(jets_in, ak.values_astype(pt_corr,  "float32"), "pt")
         jets = ak.with_field(jets,    ak.values_astype(mass_corr,"float32"), "mass")
         jets = ak.with_field(jets,    jec_factor, "jecFactor")
-        if self.isMC:
-            jerFactor = ak.values_astype(ak.where(pt_jec > 0, pt_corr / pt_jec, 1.0), "float32")
-        else:
-            jerFactor = ak.values_astype(ak.ones_like(pt_jec), "float32")
-
-        jets = ak.with_field(jets, jerFactor, "jerFactor")
+        jerFactor = ak.values_astype(ak.where(pt_jec > 0, pt_corr / pt_jec, 1.0) if self.isMC else ak.ones_like(pt_jec), "float32")
+        jets = ak.with_field(jets, jerFactor, "jerFactor")        
 
         # ================== #
         # STEP 4: Type-1 MET #
         # ================== #        
-        met_in = events.PuppiMET        
+        met_in = events.PuppiMET
         met_px, met_py = _ptphi_to_pxpy(met_in.pt, met_in.phi)
         
-        jets_in   = events.Jet
-        rawFactor = getattr(jets_in, "rawFactor", ak.zeros_like(jets_in.pt))
-        pt_raw    = jets_in.pt * (1.0 - rawFactor)
+        jets_nom  = events.Jet
+        pt_old    = jets_nom.pt 
+        rawFactor = ak.fill_none(getattr(jets_nom, "rawFactor", ak.zeros_like(jets_nom.pt)), 0.0)
+        pt_raw    = jets_nom.pt * (1.0 - rawFactor)
         
-        # --- jets that contribute to Type-1 MET
+        # --- Build L2×L3-only pT for PUPPI Type-1 "new" JEC --- #
+        # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETRun2Corrections#Type_I_Correction_Propagation_of
+        counts_j = ak.num(jets_nom.pt, axis=1)
+        rho_forL = ak.broadcast_arrays(events.fixedGridRhoFastjetAll, pt_raw)[0]
+        
+        pt_L2L3 = pt_raw
+        if self._jec_L2 is not None:
+            c2_flat = _eval_corr_vectorized(self._jec_L2,
+                                            JetA=jets_nom.area, JetEta=jets_nom.eta,
+                                            JetPt=pt_L2L3, Rho=rho_forL, JetPhi=jets_nom.phi)
+            if c2_flat is not None:
+                pt_L2L3 = pt_L2L3 * _unflatten_like(c2_flat, counts_j)
+        
+        if self._jec_L3 is not None:
+            c3_flat = _eval_corr_vectorized(self._jec_L3,
+                                            JetA=jets_nom.area, JetEta=jets_nom.eta,
+                                            JetPt=pt_L2L3, Rho=rho_forL, JetPhi=jets_nom.phi)
+            if c3_flat is not None:
+                pt_L2L3 = pt_L2L3 * _unflatten_like(c3_flat, counts_j)
+                          
+        # --- Jet mask for PUPPI Type-1 --- #
+        overlap_mu = _mask_lepton_overlap(jets_nom, events.Muon,  dr=0.4)
+        overlap_el = _mask_lepton_overlap(jets_nom, ElectronCorr, dr=0.4)
         jet_for_met = (
-            (pt_raw > 15.0)
-            & (np.abs(jets_in.eta) < 4.8)
-            & ak.values_astype(jets_in.passJetIdTight, bool)
-            & ak.values_astype(jets_in.passJetIdTightLepVeto, bool)
-            )
+            (pt_L2L3 > 15.0)
+            & (np.abs(jets_nom.eta) < 4.8)
+            & ak.values_astype(jets_nom.passJetIdTightLepVeto, bool)
+            & overlap_mu & overlap_el
+        )
         
-        # --- JEC contribution: Δp = (pt_jec - pt_raw) along jet φ
-        dpt_jec = ak.where(jet_for_met, (pt_jec - pt_raw), 0.0)
-        dpx_jec = ak.sum(dpt_jec * np.cos(jets_in.phi), axis=1)
-        dpy_jec = ak.sum(dpt_jec * np.sin(jets_in.phi), axis=1)
+        dpt_jec = ak.where(jet_for_met, (pt_L2L3 - pt_old), 0.0)
         
-        # --- JER contribution (MC only): Δp = (pt_corr - pt_jec)
+        # --- JER propagation (MC): apply nominal jer_ratio on top of the new JEC --- #
+        
         if self.isMC:
-            dpt_jer = ak.where(jet_for_met, (pt_corr - pt_jec), 0.0)
-            dpx_jer = ak.sum(dpt_jer * np.cos(jets_in.phi), axis=1)
-            dpy_jer = ak.sum(dpt_jer * np.sin(jets_in.phi), axis=1)
+            jer_ratio = ak.where(pt_jec > 0, pt_corr / pt_jec, 1.0)   
+            pt_final_met = pt_L2L3 * jer_ratio
+            dpt_jer = ak.where(jet_for_met, (pt_final_met - pt_L2L3), 0.0)
         else:
-            dpx_jer = ak.zeros_like(dpx_jec)
-            dpy_jer = ak.zeros_like(dpy_jec)
+            dpt_jer = ak.zeros_like(dpt_jec)
             
-        # --- apply to MET (subtract the jet momentum increments)
-        met_px_corr = met_px - (dpx_jec + dpx_jer)
-        met_py_corr = met_py - (dpy_jec + dpy_jer)
+        # --- Update MET --- #
+        dpx = ak.sum((dpt_jec + dpt_jer) * np.cos(jets_nom.phi), axis=1)
+        dpy = ak.sum((dpt_jec + dpt_jer) * np.sin(jets_nom.phi), axis=1)
+        met_px_corr = met_px - dpx
+        met_py_corr = met_py - dpy
+        
+        # MC: propagate electron energy correction to MET
+        if self.isMC:
+            dpx_el = ak.sum((ElectronCorr.pt - ele_all.pt) * np.cos(ele_all.phi), axis=1)
+            dpy_el = ak.sum((ElectronCorr.pt - ele_all.pt) * np.sin(ele_all.phi), axis=1)
+            met_px_corr = met_px_corr - ak.values_astype(dpx_el, "float64")
+            met_py_corr = met_py_corr - ak.values_astype(dpy_el, "float64")
         
         met_pt_corr, met_phi_corr = _pxpy_to_ptphi(met_px_corr, met_py_corr)
-        
-        # --- build a corrected MET view (keep raw as-is)
         PuppiMETCorr = ak.zip(
-            {
-                "pt":  ak.values_astype(met_pt_corr, "float32"),
-                "phi": ak.values_astype(met_phi_corr, "float32"),
-            },
+            {"pt": ak.values_astype(met_pt_corr, "float32"),
+             "phi": ak.values_astype(met_phi_corr, "float32")},
             with_name="MET",
         )
         
-        if self.isMC:
-            el0 = ele_all
-            el1 = ElectronCorr
-            dpx_el = ak.sum((el1.pt - el0.pt) * np.cos(el0.phi), axis=1)
-            dpy_el = ak.sum((el1.pt - el0.pt) * np.sin(el0.phi), axis=1)
-            met_px_corr = met_px_corr - dpx_el
-            met_py_corr = met_py_corr - dpy_el
-            met_pt_corr, met_phi_corr = _pxpy_to_ptphi(met_px_corr, met_py_corr)
-            PuppiMETCorr = ak.with_field(PuppiMETCorr, ak.values_astype(met_pt_corr, "float32"), "pt")
-            PuppiMETCorr = ak.with_field(PuppiMETCorr, ak.values_astype(met_phi_corr, "float32"), "phi")
-             
-            
-            # stash the systematics
-            systs = {"jets": {}, "met": {}, "weights": {}}
+        print("[JEC/JER] pt_jec stats:", 
+                  f"min={ak.min(jets.pt):.2f}  max={ak.max(jets.pt):.2f}  mean={ak.mean(jets.pt):.2f}")
+        print("[MET] PuppiMETCorr pt:",
+                  f"min={ak.min(PuppiMETCorr.pt):.2f}  max={ak.max(PuppiMETCorr.pt):.2f}  mean={ak.mean(PuppiMETCorr.pt):.2f}")
+
+
+        
+        # Stash the systematics
+        systs = {"jets": {}, "met": {}, "weights": {}}
                 
-            # ============================== #
-            # STEP 5 : JER up/down (MC only) #
-            # ============================== #
-            if self.isMC and (self._jer_sf is not None):
-                jets_in   = events.Jet
-                rawFactor = getattr(jets_in, "rawFactor", ak.zeros_like(jets_in.pt))
-                pt_raw    = jets_in.pt * (1.0 - rawFactor)
+        # # ============================== #
+        # # STEP 5 : JER up/down (MC only) #
+        # # ============================== #
+        # if self.isMC and (self._jer_sf is not None):
+        #     jets_in   = events.Jet
+        #     rawFactor = getattr(jets_in, "rawFactor", ak.zeros_like(jets_in.pt))
+        #     pt_raw    = jets_in.pt * (1.0 - rawFactor)
+        
+        #     # inputs at JEC level
+        #     eta    = jets_in.eta
+        #     pt     = pt_jec
+        #     rho    = ak.broadcast_arrays(events.fixedGridRhoFastjetAll, pt)[0]
+        #     counts = ak.num(pt, axis=1)
+        
+        #     # gen matching
+        #     genIdx  = jets_in.genJetIdx
+        #     has_gen = ak.values_astype(genIdx >= 0, bool)
+        
+        #     if hasattr(events, "GenJet"):
+        #         safe_idx    = ak.mask(genIdx, has_gen)
+        #         matched_gen = events.GenJet[safe_idx]
+        #         pt_gen      = ak.fill_none(matched_gen.pt, 0.0)
+        #     else:
+        #         has_gen = ak.zeros_like(has_gen, dtype=bool)
+        #         pt_gen  = ak.zeros_like(pt)
+        
+        #     # SF up/down
+        #     sf_up   = _unflatten_like(_eval_corr_vectorized(self._jer_sf, JetEta=eta, JetPt=pt, systematic="up"),   counts)
+        #     sf_down = _unflatten_like(_eval_corr_vectorized(self._jer_sf, JetEta=eta, JetPt=pt, systematic="down"), counts)
+        
+        #     # resolution at JEC kinematics
+        #     if self._jer_res is not None:
+        #         res = _unflatten_like(_eval_corr_vectorized(self._jer_res, JetEta=eta, Rho=rho, JetPt=pt), counts)
+        #     else:
+        #         res = ak.zeros_like(pt)
+        
+        #     # ----- same tight matching as in STEP 3 -----
+        #     R_CONE = 0.4
+        #     dr_cut = 0.5 * R_CONE
+        
+        #     j_phi_m = ak.mask(jets_in.phi, has_gen)
+        #     j_eta_m = ak.mask(jets_in.eta, has_gen)
+        #     g_phi   = ak.mask(matched_gen.phi if hasattr(events, "GenJet") else None, has_gen)
+        #     g_eta   = ak.mask(matched_gen.eta if hasattr(events, "GenJet") else None)
+        
+        #     dphi = np.arctan2(np.sin(j_phi_m - g_phi), np.cos(j_phi_m - g_phi))
+        #     deta = j_eta_m - g_eta
+        #     dr2  = dphi * dphi + deta * deta
+        #     dr_ok = ak.fill_none(dr2 < (dr_cut * dr_cut), False)
+        
+        #     ptdiff_ok = ak.fill_none(
+        #         np.abs(ak.mask(pt, has_gen) - ak.mask(pt_gen, has_gen)) <
+        #         (3.0 * ak.mask(res, has_gen) * ak.mask(pt, has_gen)), False
+        #     )
+        
+        #     match_tight = has_gen & dr_ok & ptdiff_ok
+        #     # -------------------------------------------
+        
+        #     # deterministic RNG per (event, jet)
+        #     if "event" not in ak.fields(jets_in):
+        #         jets_in = ak.with_field(jets_in, ak.broadcast_arrays(events.event, jets_in.pt)[0], "event")
+        #     n = _unflatten_like(_rng_normal_like(jets_in), counts)
+        
+        #     def _smear(pt_in, pt_gen_in, match_in, sf_in, res_in, n_in):
+        #         pt_m  = ak.where((pt_gen_in + sf_in * (pt_in - pt_gen_in)) > 0.0,
+        #                          pt_gen_in + sf_in * (pt_in - pt_gen_in), 0.0)
+        #         sigma = res_in * np.sqrt(np.maximum(sf_in**2 - 1.0, 0.0))
+        #         pt_u  = pt_in * (1.0 + sigma * n_in)
+        #         return ak.where(match_in, pt_m, pt_u)
+        
+        #     pt_jerUp   = _smear(pt, pt_gen, match_tight, sf_up,   res, n)
+        #     pt_jerDown = _smear(pt, pt_gen, match_tight, sf_down, res, n)
+        
+        #     # propagate to mass from JEC mass
+        #     mass_jerUp   = mass_jec * ak.where(pt_jec > 0, pt_jerUp   / pt_jec, 1.0)
+        #     mass_jerDown = mass_jec * ak.where(pt_jec > 0, pt_jerDown / pt_jec, 1.0)
+        
+        #     jets_jerUp   = ak.with_field(ak.with_field(jets_in, ak.values_astype(pt_jerUp,   "float32"), "pt"),
+        #                                  ak.values_astype(mass_jerUp,   "float32"), "mass")
+        #     jets_jerDown = ak.with_field(ak.with_field(jets_in, ak.values_astype(pt_jerDown, "float32"), "pt"),
+        #                                  ak.values_astype(mass_jerDown, "float32"), "mass")
+        
+        #     # --- MET variants (use local jet_for_met; rely on met_px/met_py from step 4) ---
+        #     def _met_variant(pt_step_var, pt_final_var):
+        #         jet_for_met = (
+        #             (pt_raw > 15.0)
+        #             & (np.abs(jets_in.eta) < 4.8)
+        #             & ak.values_astype(jets_in.passJetIdTightLepVeto, bool)
+        #         )
+        #         dpt_jec = ak.where(jet_for_met, pt_step_var  - pt_raw, 0.0)
+        #         dpt_jer = ak.where(jet_for_met, pt_final_var - pt_step_var, 0.0)
+        #         dpx = ak.sum((dpt_jec + dpt_jer) * np.cos(jets_in.phi), axis=1)
+        #         dpy = ak.sum((dpt_jec + dpt_jer) * np.sin(jets_in.phi), axis=1)
+        
+        #         px = met_px - dpx
+        #         py = met_py - dpy
+        
+        #         # electron shift (MC)
+        #         dpx_el = ak.sum((ElectronCorr.pt - ele_all.pt) * np.cos(ele_all.phi), axis=1)
+        #         dpy_el = ak.sum((ElectronCorr.pt - ele_all.pt) * np.sin(ele_all.phi), axis=1)
+        #         px = px - ak.values_astype(dpx_el, "float64")
+        #         py = py - ak.values_astype(dpy_el, "float64")
+        
+        #         ptv, phiv = _pxpy_to_ptphi(px, py)
+        #         return ak.zip({"pt": ak.values_astype(ptv, "float32"),
+        #                        "phi": ak.values_astype(phiv, "float32")}, with_name="MET")
+        
+        #     PuppiMETCorr_jerUp   = _met_variant(pt_jec, pt_jerUp)
+        #     PuppiMETCorr_jerDown = _met_variant(pt_jec, pt_jerDown)
+        
+        #     systs["jets"]["_jerup"]   = jets_jerUp
+        #     systs["jets"]["_jerdown"] = jets_jerDown
+        #     systs["met"]["_jerup"]    = PuppiMETCorr_jerUp
+        #     systs["met"]["_jerdown"]  = PuppiMETCorr_jerDown
+
                 
-                # inputs at JEC level
-                eta    = jets_in.eta
-                pt     = pt_jec                               
-                rho    = ak.broadcast_arrays(events.fixedGridRhoFastjetAll, pt)[0]
-                counts = ak.num(pt, axis=1)
+        # # ============================ #
+        # # STEP 6 : JES "Total" up/down # 
+        # # ============================ #
+        # if self._jes_unc_total is not None:
+        #     jets_in   = events.Jet
+        #     rawFactor = getattr(jets_in, "rawFactor", ak.zeros_like(jets_in.pt))
+        #     pt_raw    = jets_in.pt * (1.0 - rawFactor)
+        #     mass_raw  = jets_in.mass * (1.0 - rawFactor)  
+        #     counts    = ak.num(pt_jec, axis=1)            
+        
+        #     # fractional uncertainty u(eta, pt_jec)
+        #     unc_flat = _eval_corr_vectorized(self._jes_unc_total, JetEta=jets_in.eta, JetPt=pt_jec)
+        #     unc = _unflatten_like(unc_flat, counts)
+        
+        #     # reuse nominal JER ratio (so JES varies only the JEC stage)
+        #     jer_ratio = ak.where(pt_jec > 0, pt_corr / pt_jec, 1.0)
+        
+        #     # vary at JEC stage, then apply same JER ratio
+        #     pt_step_jesUp   = pt_jec * (1.0 + unc)
+        #     pt_step_jesDown = pt_jec * (1.0 - unc)
+        
+        #     pt_jesUp   = pt_step_jesUp   * jer_ratio
+        #     pt_jesDown = pt_step_jesDown * jer_ratio
+        
+        #     # propagate mass with same pT ratio w.r.t. *raw*
+        #     mass_jesUp   = ak.values_astype(mass_raw * ak.where(pt_raw > 0, pt_jesUp   / pt_raw, 1.0), "float32")
+        #     mass_jesDown = ak.values_astype(mass_raw * ak.where(pt_raw > 0, pt_jesDown / pt_raw, 1.0), "float32")
+        
+        #     jets_jesUp   = ak.with_field(jets_in, ak.values_astype(pt_jesUp,   "float32"), "pt")
+        #     jets_jesUp   = ak.with_field(jets_jesUp,   mass_jesUp,   "mass")
+        #     jets_jesDown = ak.with_field(jets_in, ak.values_astype(pt_jesDown, "float32"), "pt")
+        #     jets_jesDown = ak.with_field(jets_jesDown, mass_jesDown, "mass")
+        
+        #     # MET variant helper (recompute jet_for_met locally)
+        #     def _met_variant(pt_step_var, pt_final_var):
+        #         dpt_jec_var = ak.where(jet_for_met, pt_step_var  - pt_old, 0.0)    
+        #         dpt_jer_var = ak.where(jet_for_met, pt_final_var - pt_step_var, 0.0) 
                 
-                # gen matching
-                genIdx  = jets_in.genJetIdx
-                has_gen = ak.values_astype(genIdx >= 0, bool)   
-                
-                if hasattr(events, "GenJet"):
-                    safe_idx    = ak.mask(genIdx, has_gen)     # None where unmatched
-                    matched_gen = events.GenJet[safe_idx]
-                    pt_gen      = ak.fill_none(matched_gen.pt, 0.0)
-                else:
-                    has_gen = ak.zeros_like(has_gen, dtype=bool)
-                    pt_gen  = ak.zeros_like(pt)
-                                                       
-                # SF up/down
-                sf_up   = _unflatten_like(_eval_corr_vectorized(self._jer_sf, JetEta=eta, JetPt=pt, systematic="up"),   counts)
-                sf_down = _unflatten_like(_eval_corr_vectorized(self._jer_sf, JetEta=eta, JetPt=pt, systematic="down"), counts)
-                
-                # resolution at JEC kinematics
-                if self._jer_res is not None:
-                    res = _unflatten_like(_eval_corr_vectorized(self._jer_res, JetEta=eta, Rho=rho, JetPt=pt), counts)
-                else:
-                    res = ak.zeros_like(pt)
-                    
-                # deterministic RNG per (event, jet)
-                if "event" not in ak.fields(jets_in):
-                    jets_in = ak.with_field(jets_in, ak.broadcast_arrays(events.event, jets_in.pt)[0], "event")
-                n = _unflatten_like(_rng_normal_like(jets_in), counts)
+        #         dpx = ak.sum((dpt_jec_var + dpt_jer_var) * np.cos(jets_nom.phi), axis=1)
+        #         dpy = ak.sum((dpt_jec_var + dpt_jer_var) * np.sin(jets_nom.phi), axis=1)
             
-                def _smear(pt_in, pt_gen_in, has_gen_in, sf_in, res_in, n_in):
-                    _tmp = pt_gen_in + sf_in * (pt_in - pt_gen_in)
-                    pt_m = ak.where(_tmp > 0.0, _tmp, 0.0)
-                    sigma = res_in * np.sqrt(np.maximum(sf_in**2 - 1.0, 0.0))
-                    pt_u = pt_in * (1.0 + sigma * n_in)
-                    return ak.where(has_gen_in, pt_m, pt_u)
-                
-                pt_jerUp   = _smear(pt, pt_gen, has_gen, sf_up,   res, n)
-                pt_jerDown = _smear(pt, pt_gen, has_gen, sf_down, res, n)
-                
-                # propagate to mass from JEC mass
-                mass_jerUp   = mass_jec * ak.where(pt_jec > 0, pt_jerUp   / pt_jec, 1.0)
-                mass_jerDown = mass_jec * ak.where(pt_jec > 0, pt_jerDown / pt_jec, 1.0)
-                
-                jets_jerUp   = ak.with_field(ak.with_field(jets_in, ak.values_astype(pt_jerUp,   "float32"), "pt"),
-                                 ak.values_astype(mass_jerUp,   "float32"), "mass")
-                jets_jerDown = ak.with_field(ak.with_field(jets_in, ak.values_astype(pt_jerDown, "float32"), "pt"),
-                                 ak.values_astype(mass_jerDown, "float32"), "mass")
-                
-                # MET variants (Type-1 with JEC+JER), include electron shift (MC)
-                def _met_variant(pt_step_var, pt_final_var):
-                    jet_for_met = (
-                        (pt_raw > 15.0)
-                        & (np.abs(jets_in.eta) < 4.8)
-                        & ak.values_astype(jets_in.passJetIdTight, bool)
-                        & ak.values_astype(jets_in.passJetIdTightLepVeto, bool)
-                    )
-                    dpt_jec = ak.where(jet_for_met, pt_step_var  - pt_raw, 0.0)
-                    dpt_jer = ak.where(jet_for_met, pt_final_var - pt_step_var, 0.0)
-                    dpx = ak.sum((dpt_jec + dpt_jer) * np.cos(jets_in.phi), axis=1)
-                    dpy = ak.sum((dpt_jec + dpt_jer) * np.sin(jets_in.phi), axis=1)
+        #         px = met_px - dpx
+        #         py = met_py - dpy
             
-                    px = met_px - dpx     # met_px, met_py from Step 4
-                    py = met_py - dpy
+        #         if self.isMC:
+        #             dpx_el = ak.sum((ElectronCorr.pt - ele_all.pt) * np.cos(ele_all.phi), axis=1)
+        #             dpy_el = ak.sum((ElectronCorr.pt - ele_all.pt) * np.sin(ele_all.phi), axis=1)
+        #             px = px - ak.values_astype(dpx_el, "float64")
+        #             py = py - ak.values_astype(dpy_el, "float64")
             
-                    # electron MET shift (MC)
-                    el0, el1 = ele_all, ElectronCorr
-                    dpx_el = ak.sum((el1.pt - el0.pt) * np.cos(el0.phi), axis=1)
-                    dpy_el = ak.sum((el1.pt - el0.pt) * np.sin(el0.phi), axis=1)
-                    
-                    # avoid in-place ops and align dtype
-                    px = px - ak.values_astype(dpx_el, "float64")
-                    py = py - ak.values_astype(dpy_el, "float64")
+        #         ptv, phiv = _pxpy_to_ptphi(px, py)
+        #         return ak.zip({"pt": ak.values_astype(ptv, "float32"),
+        #                        "phi": ak.values_astype(phiv, "float32")}, with_name="MET")
+        
+        #     PuppiMETCorr_jesUp   = _met_variant(pt_step_jesUp,   pt_jesUp)
+        #     PuppiMETCorr_jesDown = _met_variant(pt_step_jesDown, pt_jesDown)
             
-                    ptv, phiv = _pxpy_to_ptphi(px, py)
-                    return ak.zip({"pt": ak.values_astype(ptv, "float32"),
-                                   "phi": ak.values_astype(phiv, "float32")}, with_name="MET")
-            
-                PuppiMETCorr_jerUp   = _met_variant(pt_jec, pt_jerUp)
-                PuppiMETCorr_jerDown = _met_variant(pt_jec, pt_jerDown)
-                               
-                systs["jets"]["_jerup"]   = jets_jerUp
-                systs["jets"]["_jerdown"] = jets_jerDown
-                systs["met"]["_jerup"]    = PuppiMETCorr_jerUp
-                systs["met"]["_jerdown"]  = PuppiMETCorr_jerDown
-                
-            # ============================ #
-            # STEP 6 : JES "Total" up/down # 
-            # ============================ #
-            if self._jes_unc_total is not None:
-                jets_in   = events.Jet
-                rawFactor = getattr(jets_in, "rawFactor", ak.zeros_like(jets_in.pt))
-                pt_raw    = jets_in.pt * (1.0 - rawFactor)
-                mass_raw  = jets_in.mass * (1.0 - rawFactor)  
-                counts    = ak.num(pt_jec, axis=1)            
-            
-                # fractional uncertainty u(eta, pt_jec)
-                unc_flat = _eval_corr_vectorized(self._jes_unc_total, JetEta=jets_in.eta, JetPt=pt_jec)
-                unc = _unflatten_like(unc_flat, counts)
-            
-                # reuse nominal JER ratio (so JES varies only the JEC stage)
-                jer_ratio = ak.where(pt_jec > 0, pt_corr / pt_jec, 1.0)
-            
-                # vary at JEC stage, then apply same JER ratio
-                pt_step_jesUp   = pt_jec * (1.0 + unc)
-                pt_step_jesDown = pt_jec * (1.0 - unc)
-            
-                pt_jesUp   = pt_step_jesUp   * jer_ratio
-                pt_jesDown = pt_step_jesDown * jer_ratio
-            
-                # propagate mass with same pT ratio w.r.t. *raw*
-                mass_jesUp   = ak.values_astype(mass_raw * ak.where(pt_raw > 0, pt_jesUp   / pt_raw, 1.0), "float32")
-                mass_jesDown = ak.values_astype(mass_raw * ak.where(pt_raw > 0, pt_jesDown / pt_raw, 1.0), "float32")
-            
-                jets_jesUp   = ak.with_field(jets_in, ak.values_astype(pt_jesUp,   "float32"), "pt")
-                jets_jesUp   = ak.with_field(jets_jesUp,   mass_jesUp,   "mass")
-                jets_jesDown = ak.with_field(jets_in, ak.values_astype(pt_jesDown, "float32"), "pt")
-                jets_jesDown = ak.with_field(jets_jesDown, mass_jesDown, "mass")
-            
-                # MET variant helper (recompute jet_for_met locally)
-                def _met_variant(pt_step_var, pt_final_var):
-                    jet_for_met = (
-                        (pt_raw > 15.0)
-                        & (np.abs(jets_in.eta) < 4.8)
-                        & ak.values_astype(jets_in.passJetIdTight, bool)
-                        & ak.values_astype(jets_in.passJetIdTightLepVeto, bool)
-                    )
-                    dpt_jec = ak.where(jet_for_met, pt_step_var  - pt_raw, 0.0)
-                    dpt_jer = ak.where(jet_for_met, pt_final_var - pt_step_var, 0.0)
-            
-                    dpx = ak.sum((dpt_jec + dpt_jer) * np.cos(jets_in.phi), axis=1)
-                    dpy = ak.sum((dpt_jec + dpt_jer) * np.sin(jets_in.phi), axis=1)
-            
-                    px = met_px - dpx      
-                    py = met_py - dpy
-            
-                    if self.isMC:
-                        el0, el1 = ele_all, ElectronCorr
-                        dpx_el = ak.sum((el1.pt - el0.pt) * np.cos(el0.phi), axis=1)
-                        dpy_el = ak.sum((el1.pt - el0.pt) * np.sin(el0.phi), axis=1)
-                        
-                        px = px - ak.values_astype(dpx_el, "float64")
-                        py = py - ak.values_astype(dpy_el, "float64")
-            
-                    ptv, phiv = _pxpy_to_ptphi(px, py)
-                    return ak.zip({"pt": ak.values_astype(ptv, "float32"),
-                                   "phi": ak.values_astype(phiv, "float32")}, with_name="MET")
-            
-                PuppiMETCorr_jesUp   = _met_variant(pt_step_jesUp,   pt_jesUp)
-                PuppiMETCorr_jesDown = _met_variant(pt_step_jesDown, pt_jesDown)
-                
-                systs["jets"]["_jesup"]   = jets_jesUp
-                systs["jets"]["_jesdown"] = jets_jesDown
-                systs["met"]["_jesup"]    = PuppiMETCorr_jesUp
-                systs["met"]["_jesdown"]  = PuppiMETCorr_jesDown
+        #     systs["jets"]["_jesup"]   = jets_jesUp
+        #     systs["jets"]["_jesdown"] = jets_jesDown
+        #     systs["met"]["_jesup"]    = PuppiMETCorr_jesUp
+        #     systs["met"]["_jesdown"]  = PuppiMETCorr_jesDown
             
                 
-            # ============================================ #
-            # STEP 7 : Unclustered MET (_umetup/_umetdown) #
-            # ============================================ #
-            pm_fields = set(ak.fields(events.PuppiMET))
-            need = {"ptUnclusteredUp", "phiUnclusteredUp", "ptUnclusteredDown", "phiUnclusteredDown"}
-            
-            if need.issubset(pm_fields):
-                # baseline: your corrected MET
-                px_corr, py_corr = _ptphi_to_pxpy(PuppiMETCorr.pt, PuppiMETCorr.phi)
-            
-                # deltas from Nano (raw PuppiMET → UnclusteredUp/Down)
-                px0,  py0  = _ptphi_to_pxpy(events.PuppiMET.pt,                 events.PuppiMET.phi)
-                pxUp, pyUp = _ptphi_to_pxpy(events.PuppiMET.ptUnclusteredUp,   events.PuppiMET.phiUnclusteredUp)
-                pxDn, pyDn = _ptphi_to_pxpy(events.PuppiMET.ptUnclusteredDown, events.PuppiMET.phiUnclusteredDown)
-            
-                dpx_up = pxUp - px0
-                dpy_up = pyUp - py0
-                dpx_dn = pxDn - px0
-                dpy_dn = pyDn - py0
-            
-                # apply those deltas on top of your corrected MET
-                pt_up, phi_up = _pxpy_to_ptphi(px_corr + dpx_up, py_corr + dpy_up)
-                pt_dn, phi_dn = _pxpy_to_ptphi(px_corr + dpx_dn, py_corr + dpy_dn)
-            
-                PuppiMETCorr_umetUp = ak.with_field(PuppiMETCorr, ak.values_astype(pt_up,  "float32"), "pt")
-                PuppiMETCorr_umetUp = ak.with_field(PuppiMETCorr_umetUp, ak.values_astype(phi_up, "float32"), "phi")
-            
-                PuppiMETCorr_umetDown = ak.with_field(PuppiMETCorr, ak.values_astype(pt_dn,  "float32"), "pt")
-                PuppiMETCorr_umetDown = ak.with_field(PuppiMETCorr_umetDown, ak.values_astype(phi_dn, "float32"), "phi")
-            
-                systs["met"]["_umetup"]   = PuppiMETCorr_umetUp
-                systs["met"]["_umetdown"] = PuppiMETCorr_umetDown
-                                
+        # # ============================================ #
+        # # STEP 7 : Unclustered MET (_umetup/_umetdown) #
+        # # ============================================ #
+        # pm_fields = set(ak.fields(events.PuppiMET))
+        # need = {"ptUnclusteredUp", "phiUnclusteredUp", "ptUnclusteredDown", "phiUnclusteredDown"}
+        
+        # if need.issubset(pm_fields):
+        #     # baseline: your corrected MET
+        #     px_corr, py_corr = _ptphi_to_pxpy(PuppiMETCorr.pt, PuppiMETCorr.phi)
+        
+        #     # deltas from Nano (raw PuppiMET → UnclusteredUp/Down)
+        #     px0,  py0  = _ptphi_to_pxpy(events.PuppiMET.pt,                events.PuppiMET.phi)
+        #     pxUp, pyUp = _ptphi_to_pxpy(events.PuppiMET.ptUnclusteredUp,   events.PuppiMET.phiUnclusteredUp)
+        #     pxDn, pyDn = _ptphi_to_pxpy(events.PuppiMET.ptUnclusteredDown, events.PuppiMET.phiUnclusteredDown)
+        
+        #     dpx_up = pxUp - px0
+        #     dpy_up = pyUp - py0
+        #     dpx_dn = pxDn - px0
+        #     dpy_dn = pyDn - py0
+        
+        #     # apply those deltas on top of your corrected MET
+        #     pt_up, phi_up = _pxpy_to_ptphi(px_corr + dpx_up, py_corr + dpy_up)
+        #     pt_dn, phi_dn = _pxpy_to_ptphi(px_corr + dpx_dn, py_corr + dpy_dn)
+        
+        #     PuppiMETCorr_umetUp = ak.with_field(PuppiMETCorr, ak.values_astype(pt_up,  "float32"), "pt")
+        #     PuppiMETCorr_umetUp = ak.with_field(PuppiMETCorr_umetUp, ak.values_astype(phi_up, "float32"), "phi")
+        
+        #     PuppiMETCorr_umetDown = ak.with_field(PuppiMETCorr, ak.values_astype(pt_dn,  "float32"), "pt")
+        #     PuppiMETCorr_umetDown = ak.with_field(PuppiMETCorr_umetDown, ak.values_astype(phi_dn, "float32"), "phi")
+        
+        #     systs["met"]["_umetup"]   = PuppiMETCorr_umetUp
+        #     systs["met"]["_umetdown"] = PuppiMETCorr_umetDown
+                            
+        # # ================================================= #
+        # # STEP 8 : Theory weight systematics (PDF / scales) #
+        # # ================================================= #
+        # w_one = np.ones(n_ev, dtype="float64")
+        
+        # #--- PDF up/down ---#
+        # if hasattr(events, "LHEPdfWeight"):
+        #     pdfw = events.LHEPdfWeight  
+        #     has_any = (ak.num(pdfw, axis=1) > 0)
+        #     # mean and std per event
+        #     pdf_mean = ak.where(has_any, ak.mean(pdfw, axis=1), 1.0)
+        #     pdf_var  = ak.where(has_any, ak.mean((pdfw - pdf_mean)**2, axis=1), 0.0)
+        #     pdf_std  = ak.to_numpy(ak.fill_none(np.sqrt(ak.to_numpy(pdf_var)), 0.0))
+        #     w_pdf_up   = 1.0 + pdf_std
+        #     w_pdf_down = 1.0 - pdf_std
+        # else:
+        #     w_pdf_up = w_one
+        #     w_pdf_down = w_one
+        
+        # systs["weights"]["_pdfup"]   = w_pdf_up
+        # systs["weights"]["_pdfdown"] = w_pdf_down
+
+
             
 ###################################################### S T A R T   T H E   A N A L Y S I S ##################################################### 
             
@@ -1288,13 +1429,12 @@ class Wh_Processor(processor.ProcessorABC):
         goodJet = (
             (jets.pt > 20)
             & (np.abs(jets.eta) < 2.5)
-            & jets.passJetIdTight
             & jets.passJetIdTightLepVeto
         )
 
         # WP constants 
-        BTAG_WP_TIGHT   = 0.4648     # AK4 single b-tag (UParT AK4B)
-        DBTAG_WP_MEDIUM = 0.38       # AK4 double-b (UParT AK4probbb)
+        BTAG_WP_TIGHT   = float(self._btag_wp_threshold("T"))     # AK4 single b-tag (UParT AK4B)
+        DBTAG_WP_MEDIUM = 0.38                                    # AK4 double-b (UParT AK4probbb)
                 
         single_jets = jets[goodJet]
         double_jets = jets[goodJet]
@@ -1328,7 +1468,76 @@ class Wh_Processor(processor.ProcessorABC):
         double_untag_jets = double_untag_jets[ak.argsort(double_untag_jets.pt, ascending=False)]
         
         n_double_bjets = ak.num(double_bjets)
- 
+        
+        # ===================== #
+        # b-tag efficiencies ε  #
+        # ===================== #
+        # https://btv-wiki.docs.cern.ch/PerformanceCalibration/fixedWPSFRecommendations/#scale-factor-recommendations-for-event-reweighting
+        
+        if self.isMC and (self._btag_sf_node is not None):
+            # --- choose the jet collection and tagger/WP you want to correct --- #
+            jets_for_btag = single_jets                 
+            score_field   = "btagUParTAK4B"             
+            wp_name       = "T"                         
+            thr           = float(self._btag_wp_threshold(wp_name))
+        
+            pt     = ak.to_numpy(ak.flatten(jets_for_btag.pt))
+            abseta = ak.to_numpy(ak.flatten(np.abs(jets_for_btag.eta)))
+            flav   = ak.to_numpy(ak.flatten(getattr(jets_for_btag, "hadronFlavour", ak.zeros_like(jets_for_btag.pt))))
+            passed = ak.to_numpy(ak.flatten(getattr(jets_for_btag, score_field) >= thr))
+        
+            # --- define ε binning (use SF JSON pT edges for consistency; simple |eta| binning) --- #
+            pt_edges  = np.array([20.0, 30.0, 50.0, 70.0, 100.0, 140.0, 200.0, 300.0, 600.0], dtype=float)
+            eta_edges = np.array([0.0, 2.5], dtype=float)
+        
+            nx, ny = len(pt_edges) - 1, len(eta_edges) - 1
+        
+            def _eff_table_for_flav(target_flav):
+                # digitize into bins
+                ix = np.clip(np.digitize(pt, pt_edges, right=False) - 1, 0, nx - 1)
+                iy = np.clip(np.digitize(abseta, eta_edges, right=False) - 1, 0, ny - 1)
+                mask = (flav == target_flav)
+                # accumulators
+                den = np.zeros((ny, nx), dtype=np.int64)
+                num = np.zeros((ny, nx), dtype=np.int64)
+                if mask.any():
+                    np.add.at(den, (iy[mask], ix[mask]), 1)
+                    np.add.at(num, (iy[mask], ix[mask]), passed[mask].astype(np.int64))
+                # raw ε
+                with np.errstate(divide="ignore", invalid="ignore"):
+                    eff = num / np.maximum(den, 1)  # avoids div by 0
+                # handle empty bins
+                if mask.any():
+                    global_rate = float(np.mean(passed[mask]))
+                else:
+                    global_rate = 0.0
+                eff[den == 0] = global_rate
+                # clip to sane range
+                eff = np.clip(eff, 1e-6, 1 - 1e-6)
+                return eff
+        
+            eff_b   = _eff_table_for_flav(5)
+            eff_c   = _eff_table_for_flav(4)
+            eff_udg = _eff_table_for_flav(0)   
+        
+            # --- lookup ε for each jet --- #
+            eff_flat = np.ones_like(pt, dtype=float)
+            eff_flat[flav == 5] = _lookup_th2_vals(pt[flav == 5],   abseta[flav == 5],   pt_edges, eta_edges, eff_b)
+            eff_flat[flav == 4] = _lookup_th2_vals(pt[flav == 4],   abseta[flav == 4],   pt_edges, eta_edges, eff_c)
+            eff_flat[flav == 0] = _lookup_th2_vals(pt[flav == 0],   abseta[flav == 0],   pt_edges, eta_edges, eff_udg)
+        
+            counts  = ak.num(jets_for_btag.pt, axis=1)
+            effs_mc = _unflatten_like(eff_flat, counts)
+        
+            # --- compute full fixed-WP weight --- #
+            w_btag_full = self.btag_event_weight_full(
+                jets=jets_for_btag,
+                effs_mc=effs_mc,
+                working_point=wp_name,
+                score_field=score_field,
+                systematic="central"
+            )
+            
         
 #=============================================================== EVENT SELECTION ===============================================================#
 
@@ -1401,13 +1610,18 @@ class Wh_Processor(processor.ProcessorABC):
             output["e_eventflow_boosted"].fill(cut="step1", weight=np.sum(weights.weight()[mask_step1 & mask_e]))
             output["e_eventflow_resolved"].fill(cut="step1", weight=np.sum(weights.weight()[mask_step1 & mask_e]))
             
-        # Triggers 
+        print("[CHK] step1:",
+          f"tot={np.sum(mask_step1)}  mu={np.sum(mask_step1 & (tag_cat=='mu'))}  e={np.sum(mask_step1 & (tag_cat=='e'))}")
+
+            
+        # Triggers + Noise filters
         #---------------------------------------------------------------------
-        trigger_2 = (events.trigger_type & (1 << 2)) != 0  # IsoMu24
-        trigger_5 = (events.trigger_type & (1 << 5)) != 0  # Ele30_WPTight_Gsf
+        hasTrigger = events.has_trigger
+        trigger_2  = (events.trigger_type & (1 << 2)) != 0  # IsoMu24
+        trigger_4  = (events.trigger_type & (1 << 4)) != 0  # Ele30_WPTight_Gsf
         
-        hasTriggerMu = trigger_2 
-        hasTriggerE  = trigger_5 
+        hasTriggerMu = ((hasTrigger) & (trigger_2))
+        hasTriggerE  = ((hasTrigger) & (trigger_4))
                 
         final_trigger_mask          = np.zeros(len(events), dtype=bool)
         final_trigger_mask[mask_mu] = ak.to_numpy(hasTriggerMu[mask_mu])
@@ -1705,6 +1919,12 @@ class Wh_Processor(processor.ProcessorABC):
         output["pt_ratio_boosted"].fill(ratio=pt_ratio_4a,                  weight=w4a)
         output["btag_prod_boosted"].fill(btag_prod=btag_prod_4a,            weight=w4a)
         output["deta_WH_boosted"].fill(deta=deta_wh_4a,                     weight=w4a)
+        output["eta_bb1_boosted"].fill(eta=lead_bb_4a.eta,                  weight=w4a)
+        output["eta_bb2_boosted"].fill(eta=sublead_bb_4a.eta,               weight=w4a)
+        output["phi_bb1_boosted"].fill(phi=lead_bb_4a.phi,                  weight=w4a)
+        output["phi_bb2_boosted"].fill(phi=sublead_bb_4a.phi,               weight=w4a)
+        #output["eta_MET_boosted"].fill(eta=met_4a.eta,                      weight=w4a)
+        output["phi_MET_boosted"].fill(phi=met_4a.phi,                      weight=w4a)
         
         mu_m4a = np.asarray(mask_mu[mask_step4a])
         e_m4a  = np.asarray(mask_e[mask_step4a])
@@ -1732,6 +1952,13 @@ class Wh_Processor(processor.ProcessorABC):
             output["mu_A_dr_bb_boosted"].fill(dr=dr_bb_4a[mu_m4a],                           weight=w_mu4a)
             output["mu_A_btag_prod_boosted"].fill(btag_prod=btag_prod_4a[mu_m4a],            weight=w_mu4a)
             output["mu_A_deta_WH_boosted"].fill(deta=deta_wh_4a[mu_m4a],                     weight=w_mu4a)
+            output["mu_A_eta_bb1_boosted"].fill(eta=lead_bb_4a[mu_m4a].eta,                  weight=w_mu4a)
+            output["mu_A_eta_bb2_boosted"].fill(eta=sublead_bb_4a[mu_m4a].eta,               weight=w_mu4a)
+            output["mu_A_phi_bb1_boosted"].fill(phi=lead_bb_4a[mu_m4a].phi,                  weight=w_mu4a)
+            output["mu_A_phi_bb2_boosted"].fill(phi=sublead_bb_4a[mu_m4a].phi,               weight=w_mu4a)
+            #output["mu_A_eta_MET_boosted"].fill(eta=met_4a[mu_m4a].eta,                      weight=w_mu4a)
+            output["mu_A_phi_MET_boosted"].fill(phi=met_4a[mu_m4a].phi,                      weight=w_mu4a)
+            
                                                    
         if np.any(e_m4a):
             w_e4a = w4a[e_m4a]
@@ -1756,6 +1983,12 @@ class Wh_Processor(processor.ProcessorABC):
             output["e_A_pt_ratio_boosted"].fill(ratio=pt_ratio_4a[e_m4a],                  weight=w_e4a)
             output["e_A_btag_prod_boosted"].fill(btag_prod=btag_prod_4a[e_m4a],            weight=w_e4a)
             output["e_A_deta_WH_boosted"].fill(deta=deta_wh_4a[e_m4a],                     weight=w_e4a)
+            output["e_A_eta_bb1_boosted"].fill(eta=lead_bb_4a[e_m4a].eta,                  weight=w_e4a)
+            output["e_A_eta_bb2_boosted"].fill(eta=sublead_bb_4a[e_m4a].eta,               weight=w_e4a)
+            output["e_A_phi_bb1_boosted"].fill(phi=lead_bb_4a[e_m4a].phi,                  weight=w_e4a)
+            output["e_A_phi_bb2_boosted"].fill(phi=sublead_bb_4a[e_m4a].phi,               weight=w_e4a)
+            #output["e_A_eta_MET_boosted"].fill(eta=met_4a[e_m4a].eta,                      weight=w_e4a)
+            output["e_A_phi_MET_boosted"].fill(phi=met_4a[e_m4a].phi,                      weight=w_e4a)
         
         weights_boosted = w4a
         n_boosted = len(weights_boosted)
@@ -1904,6 +2137,27 @@ class Wh_Processor(processor.ProcessorABC):
         mask_step2b = mask_step1 & (n_single_jets >= 3) 
         print(f"After STEP 2b: {np.sum(mask_step2b)} events remaining")
         
+        base_w_snapshot = weights.weight().copy()
+        w_btag_evt = np.ones(len(events), dtype="float64")
+        
+        # ---- b-tag SFs for RESOLVED only ---- #
+        if self.isMC and (self._btag_sf_node is not None):
+            w_btag_all = self.btag_event_weight_full(
+            jets=single_jets,
+            effs_mc=effs_mc,                 
+            working_point="T",
+            score_field="btagUParTAK4B",
+            systematic="central",
+        )
+            w_btag_all = self.btag_event_weight_tagged_only(
+            jets=single_jets,
+            working_point="T",
+            score_field="btagUParTAK4B",
+            systematic="central",
+        )
+        
+        weights.add("btag_UParTAK4B_T_resolved", w_btag_evt)
+        
         w2b = weights.weight()[np.asarray(mask_step2b)]
         
         single_jets_2b         = single_jets[mask_step2b]
@@ -2036,8 +2290,7 @@ class Wh_Processor(processor.ProcessorABC):
         vec_lead_b_4b      = make_vector(lead_b_4b)
         vec_sublead_b_4b   = make_vector(sublead_b_4b)
         wh_pt_asymmetry_4b = np.abs(pt_H - vec_W_4b.pt) / (pt_H + vec_W_4b.pt)       
-            
-        
+                   
         ele_mask_4b  = np.asarray(mask_e[mask_step4b])
         mu_mask_4b   = np.asarray(mask_mu[mask_step4b])
         
@@ -2068,9 +2321,22 @@ class Wh_Processor(processor.ProcessorABC):
         output["dphi_WH_resolved"].fill(dphi=dphi_wh_4b,                     weight=w4b)
         output["dphi_MET-lepton_resolved"].fill(dphi=dphi_metlep_4b,         weight=w4b)
         output["dr_WH_resolved"].fill(dr=dr_wh_4b,                           weight=w4b) 
+        output["eta_b1_resolved"].fill(eta=lead_b_4b.eta,                    weight=w4b) 
+        output["eta_b2_resolved"].fill(eta=sublead_b_4b.eta,                 weight=w4b) 
+        output["eta_b3_resolved"].fill(eta=single_bjets_4b[:, 2].eta,        weight=w4b) 
+        output["phi_b1_resolved"].fill(phi=lead_b_4b.phi,                    weight=w4b) 
+        output["phi_b2_resolved"].fill(phi=sublead_b_4b.phi,                 weight=w4b) 
+        output["phi_b3_resolved"].fill(phi=single_bjets_4b[:, 2].phi,        weight=w4b) 
+        #output["eta_MET_resolved"].fill(eta=met_4b.eta,                      weight=w4b) 
+        output["phi_MET_resolved"].fill(phi=met_4b.phi,                      weight=w4b) 
         
-
+        has4 = ak.num(single_bjets_4b) >= 4            
+        j4   = single_bjets_4b[has4][:, 3]             
+        w4   = w4b[has4]
         
+        output["eta_b4_resolved"].fill(eta=j4.eta, weight=w4)
+        output["phi_b4_resolved"].fill(phi=j4.phi, weight=w4)
+                
         if np.any(mu_mask_4b):
             wmu = w4b[mu_mask_4b]
             output["mu_eventflow_resolved"].fill(cut="step4", weight=np.sum(wmu))
@@ -2096,8 +2362,21 @@ class Wh_Processor(processor.ProcessorABC):
             output["mu_A_deta_WH_resolved"].fill(deta=deta_wh_4b[mu_mask_4b],                     weight=wmu)
             output["mu_A_dm_bbbb_min_resolved"].fill(dm=dm4b_4b[mu_mask_4b],                      weight=wmu)
             output["mu_A_mass_bbj_resolved"].fill(m=mbbj_4b[mu_mask_4b],                          weight=wmu)
+            output["mu_A_eta_b1_resolved"].fill(eta=lead_b_4b[mu_mask_4b].eta,                    weight=wmu)
+            output["mu_A_eta_b2_resolved"].fill(eta=sublead_b_4b[mu_mask_4b].eta,                 weight=wmu)
+            output["mu_A_eta_b3_resolved"].fill(eta=single_bjets_4b[:, 2][mu_mask_4b].eta,        weight=wmu)
+            output["mu_A_phi_b1_resolved"].fill(phi=lead_b_4b[mu_mask_4b].phi,                    weight=wmu)
+            output["mu_A_phi_b2_resolved"].fill(phi=sublead_b_4b[mu_mask_4b].phi,                 weight=wmu)
+            output["mu_A_phi_b3_resolved"].fill(phi=single_bjets_4b[:, 2][mu_mask_4b].phi,        weight=wmu)
+            #output["mu_A_eta_MET_resolved"].fill(eta=met_4b[mu_mask_4b].eta,                      weight=wmu)
+            output["mu_A_phi_MET_resolved"].fill(phi=met_4b[mu_mask_4b].phi,                      weight=wmu)
         
-
+            has4_mu = (ak.num(single_bjets_4b) >= 4) & mu_mask_4b
+            if ak.any(has4_mu):
+                j4_mu = single_bjets_4b[has4_mu][:, 3]
+                wmu4  = w4b[has4_mu]
+                output["mu_A_eta_b4_resolved"].fill(eta=j4_mu.eta, weight=wmu4)
+                output["mu_A_phi_b4_resolved"].fill(phi=j4_mu.phi, weight=wmu4)
                                                    
         if np.any(ele_mask_4b):
             wel = w4b[ele_mask_4b]
@@ -2124,6 +2403,21 @@ class Wh_Processor(processor.ProcessorABC):
             output["e_A_deta_WH_resolved"].fill(deta=deta_wh_4b[ele_mask_4b],                     weight=wel)
             output["e_A_dm_bbbb_min_resolved"].fill(dm=dm4b_4b[ele_mask_4b],                      weight=wel)
             output["e_A_mass_bbj_resolved"].fill(m=mbbj_4b[ele_mask_4b],                          weight=wel)
+            output["e_A_eta_b1_resolved"].fill(eta=lead_b_4b[ele_mask_4b].eta,                    weight=wel)
+            output["e_A_eta_b2_resolved"].fill(eta=sublead_b_4b[ele_mask_4b].eta,                 weight=wel)
+            output["e_A_eta_b3_resolved"].fill(eta=single_bjets_4b[:, 2][ele_mask_4b].eta,        weight=wel)
+            output["e_A_phi_b1_resolved"].fill(phi=lead_b_4b[ele_mask_4b].phi,                    weight=wel)
+            output["e_A_phi_b2_resolved"].fill(phi=sublead_b_4b[ele_mask_4b].phi,                 weight=wel)
+            output["e_A_phi_b3_resolved"].fill(phi=single_bjets_4b[:, 2][ele_mask_4b].phi,        weight=wel)
+            #output["e_A_eta_MET_resolved"].fill(eta=met_4b[ele_mask_4b].eta,                      weight=wel)
+            output["e_A_phi_MET_resolved"].fill(phi=met_4b[ele_mask_4b].phi,                      weight=wel)
+            
+            has4_e = (ak.num(single_bjets_4b) >= 4) & ele_mask_4b
+            if ak.any(has4_e):
+                j4_e = single_bjets_4b[has4_e][:, 3]
+                we4  = w4b[has4_e]
+                output["e_A_eta_b4_resolved"].fill(eta=j4_e.eta, weight=we4)
+                output["e_A_phi_b4_resolved"].fill(phi=j4_e.phi, weight=we4)
         
         weights_resolved = w4b
         n_resolved= len(weights_resolved)
@@ -2234,6 +2528,7 @@ class Wh_Processor(processor.ProcessorABC):
                 
                 
         # VERBOSES USED FOR DEBUGGING
+        verbose = False
         if verbose:
             # Gen level 
             if genLevel:
@@ -2309,7 +2604,18 @@ class Wh_Processor(processor.ProcessorABC):
             print(f"WH pT asymmetry:             {ak.count_nonzero(~ak.is_none(wh_pt_asymmetry_4b))}")
             print(f"b-tag product:               {ak.count_nonzero(~ak.is_none(btag_prod_4b))}")
             
-            
+            # Btagging SF weights ---- #
+            if self.isMC:
+                with_sf  = weights.weight()
+                base_res = base_w_snapshot[np.asarray(mask_step2b, dtype=bool)]
+                with_res = with_sf[np.asarray(mask_step2b, dtype=bool)]
+                print("\n[DEBUG] Resolved yield comparison:")
+                print(f"  events (mask_step2b) = {np.sum(mask_step2b)}")
+                print(f"  sum of weights (no btag SF)  = {np.sum(base_res):.6f}")
+                print(f"  sum of weights (with btag SF)= {np.sum(with_res):.6f}")
+                if np.sum(base_res) > 0:
+                    print(f"  ratio (with / without)       = {np.sum(with_res)/np.sum(base_res):.6f}")
+        
 
         return output
 
