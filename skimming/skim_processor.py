@@ -152,8 +152,6 @@ class NanoAODSkimmer(processor.ProcessorABC):
         n_bad_any       = int(ak.count_nonzero(has_bad))  
         n_ge2_and_nobad = int(ak.count_nonzero((num_good >= 2) & ~has_bad))  # == kept
         
-        print(f"[DEBUG] : Total events = {n_total}" f"ge2_good&no_bad={n_ge2_and_nobad}")
-        
         # --- apply ONCE to keep events (and keep jets aligned) ---
         events    = events[event_mask]
         jets_full = jets_full[event_mask]
