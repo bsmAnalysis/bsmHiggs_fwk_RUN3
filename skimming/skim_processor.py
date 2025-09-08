@@ -82,7 +82,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
         if ("PV" in events.fields) and ("npvsGood" in ak.fields(events.PV)):
             pv_mask    = events.PV.npvsGood >= 1
             n_after_pv = ak.sum(pv_mask)
-            print(f"selected {n_after_pv} / {n_before} events with npvsGood>=1")
+            print(f"Selected : {n_after_pv} / {n_before} events with npvsGood>=1")
         else:
             print(" No PV.npvsGood found skipping PV preselection.")
             #pv_mask = ak.ones_like(events.event, dtype=bool)
@@ -121,7 +121,6 @@ class NanoAODSkimmer(processor.ProcessorABC):
             & ((jets_full.chEmEF + jets_full.neEmEF) < 0.9)
         )
 
-
         # --- evaluate veto map per jet (True => jet is inside vetoed region) ---
         if self._jet_veto is not None:
             counts    = ak.num(jets_full.pt, axis=1)
@@ -146,28 +145,21 @@ class NanoAODSkimmer(processor.ProcessorABC):
         event_mask = ak.values_astype(event_mask, bool)
 
         # Quick sanity prints before indexing
-        print("DEBUG len(events) =", len(events),
-            "len(event_mask) =", len(event_mask))
+        print("[DEBUG] : len(events) = ", len(events), "len(event_mask) = ", len(event_mask))
         
         n_total         = len(events)
         n_good_ge2      = int(ak.count_nonzero(num_good >= 2))
-        n_bad_any       = int(ak.count_nonzero(has_bad))
-        n_ge2_and_bad   = int(ak.count_nonzero((num_good >= 2) &  has_bad))
+        n_bad_any       = int(ak.count_nonzero(has_bad))  
         n_ge2_and_nobad = int(ak.count_nonzero((num_good >= 2) & ~has_bad))  # == kept
-        n_lt2_and_nobad = int(ak.count_nonzero((num_good <  2) & ~has_bad))
-        n_lt2_and_bad   = int(ak.count_nonzero((num_good <  2) &  has_bad))
-
-        print(f"[Debug] total={n_total} "
-            f"ge2_good={n_good_ge2} any_bad={n_bad_any} "
-            f"ge2_good&bad={n_ge2_and_bad} ge2_good&no_bad={n_ge2_and_nobad} "
-            f"<2_good&no_bad={n_lt2_and_nobad} <2_good&bad={n_lt2_and_bad}")
+        
+        print(f"[DEBUG] : Total events = {n_total}" f"ge2_good&no_bad={n_ge2_and_nobad}")
         
         # --- apply ONCE to keep events (and keep jets aligned) ---
         events    = events[event_mask]
         jets_full = jets_full[event_mask]
 
         kept = int(ak.count_nonzero(event_mask))
-        print(f"[DEBUG: JetVeto/Count] kept {kept} / {kept + ak.count_nonzero(~event_mask)} events (≥2 good & no bad)")
+        print(f"[DEBUG] : JetVeto/Count kept {kept} / {kept + ak.count_nonzero(~event_mask)} events (≥2 good & no bad)")
         
         out = {}
         out["run"]   = events.run
@@ -216,7 +208,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
         events = events[met_filter_mask]
         
         kept = int(ak.count_nonzero(met_filter_mask))
-        print(f"[DEBUG: MET filter/Count] kept {kept} / {kept + ak.count_nonzero(~met_filter_mask)} before MET filter")
+        print(f"[DEBUG] : MET filter/Count kept {kept} / {kept + ak.count_nonzero(~met_filter_mask)} before MET filter")
     
         #======================================================# 
         # ------------------ Object selection -----------------# 
