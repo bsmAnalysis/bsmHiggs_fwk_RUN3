@@ -1,9 +1,9 @@
+from coffea import processor
+import correctionlib
 import awkward as ak
 import numpy as np
 import fnmatch
-from coffea import processor
 import os
-import correctionlib
 
 #------------------------------- helpers --------------------------------#
 
@@ -15,26 +15,22 @@ def _unflatten_like(flat, counts):
 class NanoAODSkimmer(processor.ProcessorABC):
     def __init__(self, branches_to_keep, trigger_groups, met_filter_flags, dataset_name=None, corrections_dir=None):
         self.branches_to_keep = branches_to_keep
-        self.trigger_groups = trigger_groups
+        self.trigger_groups   = trigger_groups
         self.met_filter_flags = met_filter_flags
-        self.dataset_name = dataset_name
-        self.corrections_dir = corrections_dir or os.path.join(os.path.dirname(__file__), "corrections")
-        self._jet_veto = None
-        self._jet_veto_type = "jetvetomap"
-        self._loaded_veto = False
+        self.dataset_name     = dataset_name
+        self.corrections_dir  = corrections_dir or os.path.join(os.path.dirname(__file__), "corrections")
+        self._jet_veto        = None
+        self._jet_veto_type   = "jetvetomap"
+        self._loaded_veto     = False
             
 #----------------------------------------------------------------------------------------------------------------------------#
 
     # -- load veto map (2024)-- #
-    # pt_raw = pt * (1 − rawFactor); select jets with pT_raw>15, tight ID, (chEmEF+neEmEF)<0.9, ΔR>0.2 from all leptons.
+    # pt_raw = pt * (1 − rawFactor); select jets with pT_raw>15, tight ID, (chEmEF+neEmEF)<0.9.
     # If any selected jet falls in a vetoed region, reject the whole event.
     # https://cms-jerc.web.cern.ch/Recommendations/#2024_1
     # Official Run-3 2024 requirement to remove detector “hot/cold”.
-    
-    # https://cms-talk.web.cern.ch/t/jetvetomaps-usage-for-2018ul/61981
-    # ΔR(jet,PFmuon) < 0.2 : jet.muonIdx1 == -1 && jet.muonIdx2 == -1 
-    # Need to use jet.muonIdx1, jet.muonIdx2 next time we do the skimming
-    
+        
     def _ensure_veto_loaded(self):
          if self._loaded_veto:
              return
@@ -182,6 +178,12 @@ class NanoAODSkimmer(processor.ProcessorABC):
             out["fixedGridRhoFastjetAll"] = ak.values_astype(events.Rho.fixedGridRhoFastjetAll, "float32")
         if hasattr(events, "genWeight"):
             out["genWeight"] = events.genWeight
+
+        #=======================================================# 
+        # ------------------ Pile up Info 2024 -----------------# 
+        #=======================================================#
+        # TBD : no pileup txt file for 2024 yet
+        # https://twiki.cern.ch/twiki/bin/view/CMS/PileupJSONFileforData
         
         #======================================================# 
         # ------------------- Trigger logic -------------------# 

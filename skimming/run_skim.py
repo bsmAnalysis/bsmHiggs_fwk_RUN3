@@ -70,7 +70,9 @@ for attempt in range(1, 6):
             uproot_options={"timeout": 200}
         )
         events = factory.events()
-        print(f"[INFO] Successfully loaded {len(events)} events.")
+        nevents_raw = int(len(events))
+        
+        print(f"[INFO] Successfully loaded {nevents_raw} events.")
         break
     except Exception as e:
         print(f"[WARNING] Attempt {attempt} failed: {e}")
@@ -114,6 +116,7 @@ for k, v in materialized_output.items():
 
 with uproot.recreate(output_name,compression=uproot.LZMA(9)) as rootfile:
     rootfile["Events"] = materialized_output
+    rootfile["Meta"] = {"nEvents": np.array([nevents_raw], dtype="i8")}
 
 print("[INFO] ROOT file written successfully.")
 # Write output
