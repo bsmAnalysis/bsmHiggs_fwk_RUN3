@@ -46,7 +46,7 @@ print(f"[INFO] Processing {file_to_process}")
 #print(f"[INFO] Sample: {sample_name}, xsec={xsec}, nevts={nevts}")
 
 # Adjust the config based on the sample name
-include_genpart = any(x in dataset_name for x in ["ZH-ZToAll-HToAATo4B", "WH-WToAll-HToAATo4B","VBFH_HToAATo4B","TTH_TTToAll_HToAATo4B"])
+include_genpart = any(x in dataset_name for x in ["ZH-ZToAll-HToAATo4B", "WH_WToAll_HToAATo4B","VBFH_HToAATo4B","TTH_TTToAll_HToAATo4B"])
 include_genttbarid = "TTto" in dataset_name
 
 # Modify the branches to keep
