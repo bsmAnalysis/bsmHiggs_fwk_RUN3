@@ -10,16 +10,6 @@ import correctionlib
 def _unflatten_like(flat, counts):
     return ak.unflatten(ak.Array(flat), counts)
 
-def _mask_lepton_overlap(jets, leptons, dr=0.4):
-    if (leptons is None) or (ak.num(leptons, axis=1).layout is None):
-        return ak.ones_like(jets.pt, dtype=bool)
-    pairs = ak.cartesian({"j": jets, "l": leptons}, axis=1, nested=True)
-    dphi = np.arctan2(np.sin(pairs.j.phi - pairs.l.phi),
-                      np.cos(pairs.j.phi - pairs.l.phi))
-    deta = pairs.j.eta - pairs.l.eta
-    dr2  = dphi * dphi + deta * deta
-    return ak.all(dr2 > (dr * dr), axis=2)
-
 #----------------------------------------------------------------------------------------------------------------------------#
 
 class NanoAODSkimmer(processor.ProcessorABC):
@@ -94,16 +84,16 @@ class NanoAODSkimmer(processor.ProcessorABC):
         n_before = len(events)
          # --- PV selection ---
         if ("PV" in events.fields) and ("npvsGood" in ak.fields(events.PV)):
-            pv_mask = events.PV.npvsGood >= 1
+            pv_mask    = events.PV.npvsGood >= 1
             n_after_pv = ak.sum(pv_mask)
             print(f"selected {n_after_pv} / {n_before} events with npvsGood>=1")
         else:
             print(" No PV.npvsGood found skipping PV preselection.")
-            pv_mask = ak.ones_like(events.event, dtype=bool)
-            n_after_pv = n_before
+            #pv_mask = ak.ones_like(events.event, dtype=bool)
+            #n_after_pv = n_before
 
-        events = events[pv_mask]
-        n_before = n_after_pv  
+        events    = events[pv_mask]
+        n_before  = n_after_pv  
         jets_full = events.Jet        
         eta_abs   = np.abs(jets_full.eta)
         chMult    = jets_full.chMultiplicity
@@ -128,21 +118,11 @@ class NanoAODSkimmer(processor.ProcessorABC):
     
         rawFactor_full = ak.fill_none(getattr(jets_full, "rawFactor", ak.zeros_like(jets_full.pt)), 0.0)
         pt_raw_full    = jets_full.pt * (1.0 - rawFactor_full)
-    
-        # --- PF-muon overlap --- #
-        # https://cms-talk.web.cern.ch/t/jetvetomaps-usage-for-2018ul/61981
-        if hasattr(jets_full, "muonIdx1") and hasattr(jets_full, "muonIdx2"):
-            no_pfmu = (jets_full.muonIdx1 < 0) & (jets_full.muonIdx2 < 0)
-        else:
-            # Fallback: explicit ΔR>0.2 to reconstructed muons
-            no_pfmu = _mask_lepton_overlap(jets_full, getattr(events, "Muon", None), dr=0.2)
 
-    
         jet_min = (
             (pt_raw_full > 15.0)
-            & ak.values_astype(jets_full.passJetIdTight, bool)
+            & ak.values_astype(jets_full.passJetIdTightLepVeto, bool)
             & ((jets_full.chEmEF + jets_full.neEmEF) < 0.9)
-            & no_pfmu
         )
 
 
@@ -162,15 +142,18 @@ class NanoAODSkimmer(processor.ProcessorABC):
 
         num_good = ak.sum(good_j, axis=1)           # per-event int
         has_bad  = ak.any(bad_j,  axis=1)           # per-event bool
-
-        # Strict JERC-style: require ≥2 good jets AND no bad selected jets
+        print("[DEBUG]: num_good: " + str(num_good))
+        print("[DEBUG]: has_bad:  " + str(has_bad))
+        
+        # Require ≥2 good jets AND no bad selected jets
         event_mask = (num_good >= 2) & (~has_bad)
         event_mask = ak.values_astype(event_mask, bool)
 
-        # (Optional) quick sanity prints before indexing
+        # Quick sanity prints before indexing
         print("DEBUG len(events) =", len(events),
             "len(event_mask) =", len(event_mask))
-        n_total = len(events)
+        
+        n_total         = len(events)
         n_good_ge2      = int(ak.count_nonzero(num_good >= 2))
         n_bad_any       = int(ak.count_nonzero(has_bad))
         n_ge2_and_bad   = int(ak.count_nonzero((num_good >= 2) &  has_bad))
@@ -182,16 +165,16 @@ class NanoAODSkimmer(processor.ProcessorABC):
             f"ge2_good={n_good_ge2} any_bad={n_bad_any} "
             f"ge2_good&bad={n_ge2_and_bad} ge2_good&no_bad={n_ge2_and_nobad} "
             f"<2_good&no_bad={n_lt2_and_nobad} <2_good&bad={n_lt2_and_bad}")
+        
         # --- apply ONCE to keep events (and keep jets aligned) ---
         events    = events[event_mask]
         jets_full = jets_full[event_mask]
 
         kept = int(ak.count_nonzero(event_mask))
-        print(f"[JetVeto/Count] kept {kept} / {kept + ak.count_nonzero(~event_mask)} events (≥2 good & no bad)")
-
-            
+        print(f"[DEBUG: JetVeto/Count] kept {kept} / {kept + ak.count_nonzero(~event_mask)} events (≥2 good & no bad)")
+        
         out = {}
-        out["run"] = events.run
+        out["run"]   = events.run
         out["event"] = events.event
         out["luminosityBlock"] = events.luminosityBlock
     
@@ -206,6 +189,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
         trigger_mask = ak.zeros_like(events.event, dtype=bool)
         trigger_type = ak.zeros_like(events.event, dtype=int)
         available_hlt = dir(events.HLT)
+        
         for bit, patterns in self.trigger_groups.items():
             group_fired = ak.zeros_like(events.event, dtype=bool)
             for pattern in patterns:
@@ -215,16 +199,22 @@ class NanoAODSkimmer(processor.ProcessorABC):
             trigger_mask = trigger_mask | group_fired
             trigger_type = trigger_type | (group_fired * (1 << bit))
 
+        out["has_trigger"]    = trigger_mask 
+        out["trigger_type"]   = trigger_type
+
         #======================================================# 
         # ------------------ MET filter logic -----------------# 
         #======================================================#
         met_filter_mask = ak.ones_like(events.event, dtype=bool)
+        
         for flag in self.met_filter_flags:
             if hasattr(events, flag):
                 met_filter_mask &= getattr(events, flag)
       
-        out["has_trigger"]    = trigger_mask & met_filter_mask
-        out["trigger_type"]   = trigger_type
+        events = events[met_filter_mask]
+        
+        kept = int(ak.count_nonzero(met_filter_mask))
+        print(f"[DEBUG: MET filter/Count] kept {kept} / {kept + ak.count_nonzero(~met_filter_mask)} before MET filter")
     
         #======================================================# 
         # ------------------ Object selection -----------------# 
@@ -252,7 +242,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
                 rawFactor  = rawFactor[sel]
                 pt_raw     = pt_raw[sel]  
             
-                # recompute tight lep-veto id for filtered jets
+                # Recompute tight lep-veto id for filtered jets
                 eta    = np.abs(collection.eta)
                 chMult = collection.chMultiplicity
                 neMult = collection.neMultiplicity
@@ -275,11 +265,8 @@ class NanoAODSkimmer(processor.ProcessorABC):
                 collection = ak.with_field(collection, rawFactor, "rawFactor")
                 if hasattr(collection, "genJetIdx"):
                      collection = ak.with_field(collection, collection.genJetIdx, "genJetIdx")
-            
-                
-                # --- upart regressed pT (uses RAW pT) ---
-               
-
+                     
+                # --- UParT regressed pT (uses RAW pT) -- #
                 upart_cor     = getattr(collection, "UParTAK4RegPtRawCorr", ak.ones_like(collection.pt))
                 upart_cor_net = getattr(collection, "UParTAK4RegPtRawCorrNeutrino", ak.ones_like(collection.pt))
             
@@ -298,9 +285,7 @@ class NanoAODSkimmer(processor.ProcessorABC):
                 else:
                     # data: make an array of NaNs with the right shape/dtype
                     nan_arr = ak.values_astype(ak.ones_like(collection.pt), "float32") * np.nan
-                    collection = ak.with_field(collection, nan_arr, "pt_genMatched")
-
-    
+                    collection = ak.with_field(collection, nan_arr, "pt_genMatched")  
                         
             out[obj] = self.select_fields(collection, self.branches_to_keep[obj])
         
