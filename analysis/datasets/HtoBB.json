@@ -52,7 +52,7 @@
         "metadata": {
             "das_names": "['/GluGluH-Hto2B_Par-M-125_TuneCP5_13p6TeV_powhegMINLO-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2_ext1-v2/NANOAODSIM']",
             "sample": "GluGluH-Hto2B_ext",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "30.363",
             "nevents": "19933636",
@@ -253,7 +253,7 @@
         "metadata": {
             "das_names": "['/VBFH-Hto2B_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "VBFH-Hto2B",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "2.372",
             "nevents": "9989440",
@@ -541,7 +541,7 @@
         "metadata": {
             "das_names": "['/TTH-Hto2B_Par-M-125_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "TTH-Hto2B",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "0.329",
             "nevents": "2443910",
