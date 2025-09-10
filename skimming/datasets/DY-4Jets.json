@@ -1,12 +1,12 @@
 {
-    "DYto2E-4Jets_2024": {
+    "DYto2E-4Jets_Bin-MLL-50": {
         "metadata": {
             "das_names": "['/DYto2E-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
-            "sample": "DYto2E-4Jets",
+            "sample": "DYto2E-4Jets_Bin-MLL-50",
             "year": "",
             "isMC": "True",
             "xsec": "1822.3333",
-            "nevents": "494826377",
+            "nevents": "491950637",
             "size": "976059230727"
         },
         "files": [
@@ -2833,10 +2833,10 @@
             "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIII2024Summer24NanoAODv15/DYto2E-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v3/90000/fec5cdb5-27c5-445f-b6e0-29f1442442f6.root"
         ]
     },
-    "DYto2Mu-4Jets_2024": {
+    "DYto2Mu-4Jets_Bin-MLL-50": {
         "metadata": {
             "das_names": "['/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
-            "sample": "DYto2Mu-4Jets",
+            "sample": "DYto2Mu-4Jets_Bin-MLL-50",
             "year": "",
             "isMC": "True",
             "xsec": "1822.3333",
@@ -6040,10 +6040,10 @@
             "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIII2024Summer24NanoAODv15/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v3/90000/ff3ba7a4-b71c-4cb3-88f1-9bd73daf4a89.root"
         ]
     },
-    "DYto2Tau-4Jets_2024": {
+    "DYto2Tau-4Jets_Bin-MLL-50": {
         "metadata": {
             "das_names": "['/DYto2Tau-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
-            "sample": "DYto2Tau-4Jets",
+            "sample": "DYto2Tau-4Jets_Bin-MLL-50",
             "year": "",
             "isMC": "True",
             "xsec": "1822.3333",
