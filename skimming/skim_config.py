@@ -38,12 +38,12 @@ trigger_groups = {
 
 
 met_filter_flags = [
-    "Flag_goodVertices",
-    "Flag_eeBadScFilter",
-    "Flag_globalSuperTightHalo2016Filter",
-    "Flag_EcalDeadCellTriggerPrimitiveFilter",
-    "Flag_BadPFMuonFilter",
-    "Flag_BadPFMuonDzFilter",
-    "Flag_ecalBadCalibFilter",
-    "Flag_hfNoisyHitsFilter"
+    "goodVertices",
+    "eeBadScFilter",
+    "globalSuperTightHalo2016Filter",
+    "EcalDeadCellTriggerPrimitiveFilter",
+    "BadPFMuonFilter",
+    "BadPFMuonDzFilter",
+    "ecalBadCalibFilter",
+    "hfNoisyHitsFilter"
 ]
