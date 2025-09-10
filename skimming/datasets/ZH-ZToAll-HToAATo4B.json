@@ -28,7 +28,7 @@
             "year": "2024",
             "isMC": "True",
             "xsec": "0.94",
-            "nevents": "800000",
+            "nevents": "721847",
             "size": "1936865416"
         },
         "files": [
@@ -59,7 +59,7 @@
             "year": "2024",
             "isMC": "True",
             "xsec": "0.94",
-            "nevents": "799282",
+            "nevents": "666452",
             "size": "1971868104"
         },
         "files": [
@@ -161,7 +161,7 @@
             "year": "2024",
             "isMC": "True",
             "xsec": "0.94",
-            "nevents": "500000",
+            "nevents": "499289",
             "size": "1289780495"
         },
         "files": [
@@ -286,7 +286,7 @@
             "year": "2024",
             "isMC": "True",
             "xsec": "0.94",
-            "nevents": "500000",
+            "nevents": "455298",
             "size": "1276888620"
         },
         "files": [
