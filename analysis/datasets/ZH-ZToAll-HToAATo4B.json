@@ -1,0 +1,674 @@
+{
+    "ZH-ZToAll-HToAATo4B_Par-M-12": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-12_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-12",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1900367888"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12/ZH-ZToAll-HToAATo4B_Par-M-12_8.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-15": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-15_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-15",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1936865416"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15/ZH-ZToAll-HToAATo4B_Par-M-15_17.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-20": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-20_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-20",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "799282",
+            "size": "1971868104"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_20.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20/ZH-ZToAll-HToAATo4B_Par-M-20_21.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-25": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-25_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-25",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1982583428"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25/ZH-ZToAll-HToAATo4B_Par-M-25_20.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-30": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-30_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-30",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1982612707"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30/ZH-ZToAll-HToAATo4B_Par-M-30_19.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-35": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-35_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-35",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1289780495"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_20.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_21.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_22.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_23.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_24.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_25.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_26.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_27.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35/ZH-ZToAll-HToAATo4B_Par-M-35_28.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-40": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-40_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-40",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1218147238"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40/ZH-ZToAll-HToAATo4B_Par-M-40_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40/ZH-ZToAll-HToAATo4B_Par-M-40_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40/ZH-ZToAll-HToAATo4B_Par-M-40_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40/ZH-ZToAll-HToAATo4B_Par-M-40_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40/ZH-ZToAll-HToAATo4B_Par-M-40_4.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-45": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-45_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-45",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1255657909"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45/ZH-ZToAll-HToAATo4B_Par-M-45_17.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-50": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-50_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-50",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1265017636"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50/ZH-ZToAll-HToAATo4B_Par-M-50_20.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-55": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-55_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-55",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1276888620"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_20.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_21.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_22.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_23.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55/ZH-ZToAll-HToAATo4B_Par-M-55_24.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-60": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-60_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-60",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1215058488"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60/ZH-ZToAll-HToAATo4B_Par-M-60_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60/ZH-ZToAll-HToAATo4B_Par-M-60_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60/ZH-ZToAll-HToAATo4B_Par-M-60_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60/ZH-ZToAll-HToAATo4B_Par-M-60_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60/ZH-ZToAll-HToAATo4B_Par-M-60_4.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-12_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-12_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-12",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1900367888"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024/ZH-ZToAll-HToAATo4B_Par-M-12_2024_8.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-15_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-15_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-15",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1936865416"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024/ZH-ZToAll-HToAATo4B_Par-M-15_2024_17.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-20_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-20_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-20",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "799282",
+            "size": "1971868104"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_20.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024/ZH-ZToAll-HToAATo4B_Par-M-20_2024_21.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-25_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-25_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-25",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1982583428"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024/ZH-ZToAll-HToAATo4B_Par-M-25_2024_20.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-30_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-30_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-30",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "800000",
+            "size": "1982612707"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024/ZH-ZToAll-HToAATo4B_Par-M-30_2024_19.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-35_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-35_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-35",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1289780495"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_20.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_21.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_22.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_23.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_24.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_25.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_26.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_27.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024/ZH-ZToAll-HToAATo4B_Par-M-35_2024_28.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-40_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-40_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-40",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1218147238"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024/ZH-ZToAll-HToAATo4B_Par-M-40_2024_4.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-45_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-45_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-45",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1255657909"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024/ZH-ZToAll-HToAATo4B_Par-M-45_2024_17.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-50_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-50_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-50",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1265017636"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024/ZH-ZToAll-HToAATo4B_Par-M-50_2024_20.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-55_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-55_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-55",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1276888620"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_4.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_5.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_6.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_7.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_8.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_9.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_10.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_11.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_12.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_13.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_14.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_15.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_16.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_17.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_18.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_19.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_20.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_21.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_22.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_23.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024/ZH-ZToAll-HToAATo4B_Par-M-55_2024_24.root"
+        ]
+    },
+    "ZH-ZToAll-HToAATo4B_Par-M-60_2024": {
+        "metadata": {
+            "das_names": "['/ZH-ZToAll-HToAATo4B_Par-M-60_TuneCP5_13p6TeV_madgraph-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
+            "sample": "ZH-ZToAll-HToAATo4B_Par-M-60",
+            "year": "2024",
+            "isMC": "True",
+            "xsec": "0.94",
+            "nevents": "500000",
+            "size": "1215058488"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024_0.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024_1.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024_2.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024_3.root",
+            "root://eosuser.cern.ch//eos/user/k/kpaschos/NTuples_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024/ZH-ZToAll-HToAATo4B_Par-M-60_2024_4.root"
+        ]
+    }
+}
