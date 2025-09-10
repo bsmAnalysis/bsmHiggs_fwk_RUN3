@@ -3,7 +3,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-40to70",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "1.0",
             "nevents": "110777315",
@@ -139,7 +139,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-70to100",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "58500000",
             "nevents": "108584880",
@@ -288,7 +288,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-100to200",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "1.0",
             "nevents": "120453600",
@@ -470,7 +470,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-200to400",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "1961000",
             "nevents": "115255250",
@@ -646,7 +646,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-400to600",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "95620",
             "nevents": "106725734",
@@ -832,7 +832,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-600to800",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "13540",
             "nevents": "128235651",
@@ -1074,7 +1074,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-800to1000",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "3033",
             "nevents": "124956604",
@@ -1349,7 +1349,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-1000to1200",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "883.7",
             "nevents": "114436708",
@@ -1586,7 +1586,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-1200to1500",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "383.5",
             "nevents": "107835822",
@@ -1829,7 +1829,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-1500to2000",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "125.2",
             "nevents": "113208234",
@@ -2090,7 +2090,7 @@
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
             "sample": "QCD-4Jets_Bin-HT-2000",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "26.49",
             "nevents": "91953615",
