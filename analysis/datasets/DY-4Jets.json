@@ -3,7 +3,7 @@
         "metadata": {
             "das_names": "['/DYto2E-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
             "sample": "DYto2E-4Jets_Bin-MLL-50",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "1822.3333",
             "nevents": "494826377",
@@ -2837,7 +2837,7 @@
         "metadata": {
             "das_names": "['/DYto2Mu-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
             "sample": "DYto2Mu-4Jets_Bin-MLL-50",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "1822.3333",
             "nevents": "530955854",
@@ -6044,7 +6044,7 @@
         "metadata": {
             "das_names": "['/DYto2Tau-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
             "sample": "DYto2Tau-4Jets_Bin-MLL-50",
-            "year": "",
+            "year": "2024",
             "isMC": "True",
             "xsec": "1822.3333",
             "nevents": "512421468",
