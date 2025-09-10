@@ -2,8 +2,8 @@
     "TWminusto4Q_2024": {
         "metadata": {
             "das_names": "['/TWminusto4Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TWminusto4Q_2024",
-            "year": "",
+            "sample": "TWminusto4Q",
+            "year": "2024",
             "isMC": "True",
             "xsec": "19.114",
             "nevents": "23999000",
@@ -169,8 +169,8 @@
     "TWminustoLNu2Q_2024": {
         "metadata": {
             "das_names": "['/TWminustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TWminustoLNu2Q_2024",
-            "year": "",
+            "sample": "TWminustoLNu2Q",
+            "year": "2024",
             "isMC": "True",
             "xsec": "18.473",
             "nevents": "28763293",
@@ -434,8 +434,8 @@
     "TWminusto2L2Nu_2024": {
         "metadata": {
             "das_names": "['/TWminusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TWminusto2L2Nu_2024",
-            "year": "",
+            "sample": "TWminusto2L2Nu",
+            "year": "2024",
             "isMC": "True",
             "xsec": "4.463",
             "nevents": "14998000",
@@ -623,8 +623,8 @@
     "TBbarQtoLNu_2024": {
         "metadata": {
             "das_names": "['/TBbarQtoLNu-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TBbarQtoLNu_2024",
-            "year": "",
+            "sample": "TBbarQtoLNu",
+            "year": "2024",
             "isMC": "True",
             "xsec": "47.241",
             "nevents": "44258039",
@@ -1027,8 +1027,8 @@
     "TBbarQto2Q_2024": {
         "metadata": {
             "das_names": "['/TBbarQto2Q-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TBbarQto2Q_2024",
-            "year": "",
+            "sample": "TBbarQto2Q",
+            "year": "2024",
             "isMC": "True",
             "xsec": "97.759",
             "nevents": "87576444",
@@ -1818,8 +1818,8 @@
     "TbarWplustoLNu2Q_2024": {
         "metadata": {
             "das_names": "['/TbarWplustoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TbarWplustoLNu2Q_2024",
-            "year": "",
+            "sample": "TbarWplustoLNu2Q",
+            "year": "2024",
             "isMC": "True",
             "xsec": "18.473",
             "nevents": "29395659",
@@ -2083,8 +2083,8 @@
     "TbarWplusto4Q_2024": {
         "metadata": {
             "das_names": "['/TbarWplusto4Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TbarWplusto4Q_2024",
-            "year": "",
+            "sample": "TbarWplusto4Q",
+            "year": "2024",
             "isMC": "True",
             "xsec": "19.114",
             "nevents": "24000000",
@@ -2291,8 +2291,8 @@
     "TbarWplusto2L2Nu_2024": {
         "metadata": {
             "das_names": "['/TbarWplusto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TbarWplusto2L2Nu_2024",
-            "year": "",
+            "sample": "TbarWplusto2L2Nu",
+            "year": "2024",
             "isMC": "True",
             "xsec": "4.463",
             "nevents": "15000000",
@@ -2394,8 +2394,8 @@
     "TbarBQtoLNu_2024": {
         "metadata": {
             "das_names": "['/TbarBQtoLNu-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TbarBQtoLNu_2024",
-            "year": "",
+            "sample": "TbarBQtoLNu",
+            "year": "2024",
             "isMC": "True",
             "xsec": "28.410",
             "nevents": "22102160",
@@ -2656,8 +2656,8 @@
     "TbarBQto2Q_2024": {
         "metadata": {
             "das_names": "['/TbarBQto2Q-t-channel-4FS_TuneCP5_13p6TeV_powheg-madspin-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "TbarBQto2Q_2024",
-            "year": "",
+            "sample": "TbarBQto2Q",
+            "year": "2024",
             "isMC": "True",
             "xsec": "58.790",
             "nevents": "43273264",
