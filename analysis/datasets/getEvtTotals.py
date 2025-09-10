@@ -3,12 +3,12 @@ import glob
 import os
 
 # ---- Config ----
-input_dir = "/eos/user/a/ataxeidi/skim_MC/DYto2Tau-4Jets/"
-file_pattern = "DYto2Tau-4Jets_*.root"
+input_dir = "/eos/user/a/ataxeidi/NTuples_2024/DYto2E-4Jets_Bin-MLL-50/"
+file_pattern = "DYto2E-4Jets_Bin-MLL-50_*.root"
 output_dir = "evt-counts"
 output_summary = os.path.join(output_dir, "summary.txt")
-tree_name = "Events"  # Use your actual tree name
-branch_to_count = "run"  # Use a known branch in the tree
+tree_name = "Meta"  # Use your actual tree name
+branch_value = "nEvents"  # Use a known branch in the tree
 
 # ---- Setup ----
 if not os.path.exists(output_dir):
@@ -36,14 +36,20 @@ for i, root_file in enumerate(root_files):
             print(f"  Tree '{tree_name}' not found in {root_file}")
             tf.Close()
             continue
-
-        n_entries = tree.GetEntries()
-        summary.append((os.path.basename(root_file), n_entries))
-
+        
+        
+        df = ROOT.RDataFrame(tree)
+        n_entries = int(df.Count().GetValue())
+        mean_val = float(df.Mean(branch_value).GetValue()) if n_entries > 0 else 0.0
+        sum_val  = float(df.Sum(branch_value).GetValue())  if n_entries > 0 else 0.0
+    
+        summary.append((os.path.basename(root_file), n_entries, mean_val, sum_val))
         out_txt = os.path.join(output_dir, os.path.basename(root_file).replace(".root", ".txt"))
         with open(out_txt, "w") as f:
             f.write(f"{root_file}\n")
-            f.write(f"Entries in '{branch_to_count}': {n_entries}\n")
+            f.write(f"Entries: {n_entries}\n")
+            f.write(f"Mean({branch_value}): {mean_val:.6g}\n")
+            f.write(f"Sum({branch_value}):  {sum_val:.6g}\n")
 
         tf.Close()
 
@@ -53,9 +59,19 @@ for i, root_file in enumerate(root_files):
 
 # ---- Write Summary ----
 with open(output_summary, "w") as fsum:
-    total = sum(x[1] for x in summary)
-    for fname, count in summary:
-        fsum.write(f"{fname:60}  {count:10}\n")
-    fsum.write(f"\nTOTAL EVENTS: {total}\n")
+    total_entries = sum(x[1] for x in summary)
+    # Straight sums of means don't mean much; instead aggregate sums across files
+    total_sum = sum(x[3] for x in summary)
+    overall_mean = (total_sum / total_entries) if total_entries > 0 else 0.0
 
-  
+    header = f"{'file':60}  {'entries':>10}  {'mean('+branch_value+')':>16}  {'sum('+branch_value+')':>16}\n"
+    fsum.write(header)
+    fsum.write("-" * (len(header)-1) + "\n")
+    for fname, nent, meanv, sumv in summary:
+        fsum.write(f"{fname:60}  {nent:10d}  {meanv:16.6g}  {sumv:16.6g}\n")
+
+    fsum.write("\n")
+    fsum.write(f"TOTAL ENTRIES: {total_entries}\n")
+    fsum.write(f"TOTAL SUM({branch_value}): {total_sum:.0f}\n")
+   
+
