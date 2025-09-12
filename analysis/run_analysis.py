@@ -232,13 +232,14 @@ if not dataset_name.startswith("QCD"):
 
 #  Split TTbar samples to tt+bb tt+cc tt+qq
 #  way to split found at: https://github.com/cms-sw/cmssw/blob/master/TopQuarkAnalysis/TopTools/plugins/GenTtbarCategorizer.cc
-
-if dataset_name.startswith("TT") and not isMVA:
+#see also:  https://twiki.cern.ch/twiki/bin/view/CMSPublic/GenHFHadronMatcher
+# about tt+LF : https://bamboo-hep.readthedocs.io/en/latest/recipes.html
+if dataset_name.startswith("TTto") and not isMVA:
     print("[INFO] TTbar sample detected splitting into ttLF, ttCC, ttBB")
     gen_id = events.genTtbarId
 
     masks = {
-        "ttLF": (gen_id % 100 == 0),
+        "ttLF": (gen_id % 100 < 41),
         "ttCC": (gen_id % 100 >= 41) & (gen_id % 100 <= 45),
         "ttBB": (gen_id % 100 >= 51) & (gen_id % 100 <= 55),
     }
