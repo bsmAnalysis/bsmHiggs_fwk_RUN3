@@ -6,12 +6,13 @@ import sys
 import re
 
 DATASET_DIR = "datasets"
-FILES_TO_TRANSFER = ["run_analysis.py", "ZH_0lep_total_processor_v3.py", "x509up", "run_analysis.sh", "utils.tar.gz", "xgb_model.tar.gz"]
+FILES_TO_TRANSFER = ["run_analysis.py", "VBFH_processor.py", "x509up", "run_analysis.sh", "utils.tar.gz", "xgb_model.tar.gz", "corrections.tar.gz"]
 
 # Read optional filter
 dataset_key_pattern = os.environ.get("FILTER_KEY")
+
 # Allow optional pattern for which files to submit
-pattern = sys.argv[1] if len(sys.argv) > 1 else "ZH*.json"
+pattern = sys.argv[1] if len(sys.argv) > 1 else "SingleTop.json"
 json_files = sorted(glob.glob(f"{DATASET_DIR}/{pattern}"))
 
 for json_path in json_files:

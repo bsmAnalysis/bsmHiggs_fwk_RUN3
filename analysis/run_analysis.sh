@@ -22,6 +22,11 @@ if [ -f xgb_model.tar.gz ]; then
     export PYTHONPATH=$PYTHONPATH:$(pwd)
 fi
 
+# Unpack corrections folder
+if [ -f corrections.tar.gz ]; then
+    tar -xzf corrections.tar.gz
+    export PYTHONPATH=$PYTHONPATH:$(pwd)
+fi
 
 # Output file names (written in current working directory)
 OUTFILE="${DATASET_KEY}_${JOBIDX}.root"
@@ -34,9 +39,6 @@ python run_analysis.py \
     --dataset ${DATASET_KEY} \
     --output ${OUTFILE} \
     --bdt_output ${BDTFILE}
-
-
-
 
 echo "Job finished for ${OUTFILE} and ${BDTFILE}"
 
