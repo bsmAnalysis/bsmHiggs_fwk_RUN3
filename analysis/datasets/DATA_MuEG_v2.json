@@ -1,0 +1,38 @@
+{
+    "MuonEG_v2_2024_EraI": {
+        "metadata": {
+            "das_names": "['/MuonEG/Run2024I-MINIv6NANOv15_v2-v2/NANOAOD']",
+            "sample": "MuonEG_v2",
+            "year": "2024",
+            "isMC": "False",
+            "primaryDataset": "MuonEG",
+            "era": "I",
+            "nevents": "14674636",
+            "size": "27085311494"
+        },
+        "files": [
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_0.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_1.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_2.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_3.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_4.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_5.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_6.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_7.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_8.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_9.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_10.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_11.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_12.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_13.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_14.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_15.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_16.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_17.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_18.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_19.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_20.root",
+            "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/MuonEG_v2_2024_EraI/MuonEG_v2_2024_EraI_21.root"
+        ]
+    }
+}

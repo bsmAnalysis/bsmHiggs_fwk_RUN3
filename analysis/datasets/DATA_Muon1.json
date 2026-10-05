@@ -1720,8 +1720,8 @@
             "isMC": "False",
             "primaryDataset": "Muon1",
             "era": "I",
-            "nevents": "97630010",
-            "size": "131571503162"
+            "nevents": "202819050",
+            "size": "270678445317"
         },
         "files": [
             "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/Muon1_2024_EraI/Muon1_2024_EraI_0.root",

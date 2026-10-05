@@ -192,3 +192,17 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+# Analysis runtime files
+/analysis/x509up*
+/analysis/out/
+/analysis/err/
+/analysis/log/
+/analysis/logs/
+/analysis/submissions*/
+/analysis/results*/
+/analysis/*.root
+/analysis/*.tar.gz
+/analysis/*.jdl
+/analysis/joblist*.txt
+/analysis/resub_joblist*.txt
+*~

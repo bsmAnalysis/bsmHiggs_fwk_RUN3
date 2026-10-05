@@ -2405,8 +2405,8 @@
             "isMC": "False",
             "primaryDataset": "EGamma0",
             "era": "I",
-            "nevents": "132904290",
-            "size": "207901997989"
+            "nevents": "283591964",
+            "size": "437234668225"
         },
         "files": [
             "root://eosuser.cern.ch//eos/user/g/georgia/RUN3/EGamma0_2024_EraI/EGamma0_2024_EraI_0.root",
