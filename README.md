@@ -79,6 +79,16 @@ Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chai
 # Skimming of datasets
 
 Run the following commands from the repository's `skimming/` directory.
+A valid CMS VOMS proxy is required for the remote CMS inputs used by this skimming workflow, including local tests on lxplus.
+
+From `skimming/`, create or renew the proxy:
+
+```bash
+voms-proxy-init --voms cms --valid 192:00 --out "$PWD/x509up"
+chmod 600 "$PWD/x509up"
+voms-proxy-info --file "$PWD/x509up" --all
+```
+`submit_all.py` and `resubmit_skim.py` automatically transfer `x509up` and set `X509_USER_PROXY` inside each job.
 
 ## Configure the skim
 
