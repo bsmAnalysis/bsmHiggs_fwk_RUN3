@@ -1,0 +1,16 @@
+process,flavour,nbjet,total_bins,exact_bins,high_nb_bins,nb_inclusive_bins,global_bins
+TTG-1Jets_Bin-PTG-200,b,nb0,18,0,0,0,18
+TTG-1Jets_Bin-PTG-200,b,nb1,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,b,nb2,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,b,nb3,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,b,nb4p,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,c,nb0,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,c,nb1,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,c,nb2,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,c,nb3,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,c,nb4p,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,light,nb0,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,light,nb1,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,light,nb2,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,light,nb3,18,18,0,0,0
+TTG-1Jets_Bin-PTG-200,light,nb4p,18,18,0,0,0

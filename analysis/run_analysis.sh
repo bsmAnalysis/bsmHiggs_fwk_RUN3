@@ -1,44 +1,23 @@
 #!/bin/bash
+# payload; submit_all.py's launcher extracts folders.
+set -e
 
-echo "Running on: $(hostname)"
-echo "Current directory: $(pwd)"
+JOBIDX="$1"
+DATASET_JSON="$2"
+DATASET_KEY="$3"
 
-JOBIDX=$1
-DATASET_JSON=$2
-DATASET_KEY=$3
-
-export X509_USER_PROXY=$(realpath x509up)
-
-# Unpack utilities if needed
-if [ -f utils.tar.gz ]; then
-    echo "Extracting utils.tar.gz..."
-    tar -xzf utils.tar.gz
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
+if [[ -f x509up ]]; then
+    export X509_USER_PROXY="$(pwd -P)/x509up"
 fi
+export PYTHONPATH="$(pwd -P)${PYTHONPATH:+:$PYTHONPATH}"
 
-# Unpack XGBoost models
-if [ -f xgb_model.tar.gz ]; then
-    tar -xzf xgb_model.tar.gz
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
-fi
-
-# Unpack corrections folder
-if [ -f corrections.tar.gz ]; then
-    tar -xzf corrections.tar.gz
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
-fi
-
-# Output file names (written in current working directory)
 OUTFILE="${DATASET_KEY}_${JOBIDX}.root"
 BDTFILE="bdt_${DATASET_KEY}_${JOBIDX}.root"
 
-# Run main analysis
-python run_analysis.py \
-    --job-index ${JOBIDX} \
-    --json ${DATASET_JSON} \
-    --dataset ${DATASET_KEY} \
-    --output ${OUTFILE} \
-    --bdt_output ${BDTFILE}
-
-echo "Job finished for ${OUTFILE} and ${BDTFILE}"
-
+# The submission mode supplies ANALYSIS_DRIVER. Arguments match your original run_analysis.sh,
+python "${ANALYSIS_DRIVER:-run_analysis.py}" \
+    --job-index "$JOBIDX" \
+    --json "$DATASET_JSON" \
+    --dataset "$DATASET_KEY" \
+    --output "$OUTFILE" \
+    --bdt_output "$BDTFILE"

@@ -10,7 +10,6 @@ def make_vector(objs):
         "phi": objs.phi,
         "mass": objs.mass
     }, with_name="PtEtaPhiMLorentzVector", behavior=vector.behavior)
-
 def make_regressed_vector(objs):
     return ak.zip({
         "pt": objs.regressed,
@@ -18,26 +17,21 @@ def make_regressed_vector(objs):
         "phi": objs.phi,
         "mass": objs.mass
     }, with_name="PtEtaPhiMLorentzVector", behavior=vector.behavior)
-
 def dr_bb_avg(bjets):
     output = []
-
     vec_bjets = make_vector(bjets)  # Vectorize the full jagged array
-
     for jets in vec_bjets:
         if len(jets) < 2:
             output.append(np.nan)
             continue
-
         drs = [j1.delta_r(j2) for j1, j2 in itertools.combinations(jets, 2)]
         avg_dr = np.mean(drs)
         output.append(avg_dr)
-
     return ak.Array(output)
 
 def min_dm_bb_bb(bjets, all_jets=None, btag_name="btagUParTAK4B"):
     '''
-    Computes minimum |m(bb) - m(bb)| from valid 2+2 b-jet combinations.
+    Computes minimum |m(bb) - m(bb)| from 2+2 b-jet combinations.
     Handles:
       - ≥4 b-jets: 3 unique 2+2 pairings
       - 3 b-jets + ≥1 untagged: select best untagged jet as 4th
@@ -98,12 +92,10 @@ def min_dm_bb_bb(bjets, all_jets=None, btag_name="btagUParTAK4B"):
     return ak.Array(output)
 
 def dr_bb_bb_avg(bjets, all_jets=None, btag_name="btagDeepFlavB"):
-    '''
-    Computes average ΔR between two bb pairs.
-    Same pairing logic as min_dm_bb_bb.
-    '''
+    
+    #Computes average ΔR between two bb pairs.
+   
     output = []
-
     for jets_b, jets_all in zip(bjets, all_jets if all_jets is not None else bjets):
         jets_b = list(jets_b)
         jets_all = list(jets_all)
@@ -218,56 +210,51 @@ def min_dm_doubleb_bb(double_bjets, single_bjets, all_jets=None, btag_name="btag
         else:
             output.append(np.nan)
             continue
-
         min_dm = float("inf")
         for b1, b2 in bb_combos:
             dm = abs((b1 + b2).mass - db.mass)
             if dm < min_dm:
                 min_dm = dm
-
         output.append(min_dm)
-
     return ak.Array(output)
-
 def higgs_kin(bjets, all_jets):
-    '''
-    Computes Higgs candidate 4-vector (mass, pt, phi) depending on:
-        - Case 1: len(all_jets) == 3 -> use the 3 b-jets (if ≥3 available)
-        - Case 2: len(all_jets) >= 4 -> use top 4 all_jets by pt
-    Returns:
-        Tuple of ak.Arrays: (mass, pt,ETA, phi)
-    '''
-    mass_list = []
-    pt_list = []
-    phi_list = []
-    eta_list = []
+    #Higgs candidate reconstructiona ssumes all_jets are already sorted by b-tag score
+    mass_list, pt_list, eta_list, phi_list = [], [], [], []
     for bjs, jets in zip(bjets, all_jets):
-        bjs = list(bjs)
+        bjs  = list(bjs)
         jets = list(jets)
-
         vec = None
 
-        # Case 1: Exactly 3 jets, use 3 b-jets if available
-        if len(jets) == 3 and len(bjs) == 3:
-            vec = bjs[0] + bjs[1] + bjs[2]
-
-        # Case 2: At least 4 jets, use top 4 by pt
-        elif len(jets) >= 4:
-            sorted_jets = sorted(jets, key=lambda j: j.pt, reverse=True)
-            vec = sorted_jets[0] + sorted_jets[1] + sorted_jets[2] + sorted_jets[3]
-
-        # Fallback: set dummy values (e.g. 0)
+        # Signal region (>=3 bjets)
+        if len(bjs) >= 3:
+            if len(jets) == 3:
+                vec = jets[0] + jets[1] + jets[2]
+            elif len(jets) >= 4:
+                vec = jets[0] + jets[1] + jets[2] + jets[3]
+        # Z control region (exactly 2 bjets)
+        elif len(bjs) == 2:
+            if len(jets) == 3:
+                vec = jets[0] + jets[1] + jets[2]
+            elif len(jets) >= 4:
+                vec = jets[0] + jets[1] + jets[2] + jets[3]
+        # Fallback
         if vec is None:
             mass_list.append(0.0)
             pt_list.append(0.0)
-            phi_list.append(0.0)
             eta_list.append(0.0)
+            phi_list.append(0.0)
         else:
             mass_list.append(vec.mass)
             pt_list.append(vec.pt)
-            phi_list.append(vec.phi)
             eta_list.append(vec.eta)
-    return ak.Array(mass_list), ak.Array(pt_list), ak.Array(phi_list), ak.Array(eta_list)
+            phi_list.append(vec.phi)
+
+    return (
+        ak.Array(mass_list),
+        ak.Array(pt_list),
+        ak.Array(eta_list),
+        ak.Array(phi_list),
+    )
 
 
 def m_bbj(bjets, all_jets):
@@ -283,19 +270,15 @@ def m_bbj(bjets, all_jets):
         ak.Array of masses with same length as input.
     '''
     out = []
-
     for bjs, jets in zip(bjets, all_jets):
         bjs = list(bjs)
         jets = list(jets)
-
         # Case 1: 3 b-jets and 3 jets
         if len(bjs) == 3 and len(jets) == 3:
             out.append((bjs[0] + bjs[1] + bjs[2]).mass)
             continue
-
         # Check untagged jets
         untagged = [j for j in jets if all(j is not bj for bj in bjs)]
-
         # Case 2: untagged jets exist
         if untagged:
             bb_pairs = list(itertools.combinations(bjs, 2))
@@ -305,7 +288,6 @@ def m_bbj(bjets, all_jets):
             j = max(untagged, key=lambda jet: jet.pt)
             out.append((b1 + b2 + j).mass)
             continue
-
         # Case 3: ≥4 b-jets, no untagged jets
         if len(bjs) >= 4:
             bb_pairs = list(itertools.combinations(bjs, 2))
@@ -318,10 +300,8 @@ def m_bbj(bjets, all_jets):
                 third_b = min(third_bs, key=lambda b: b.btagUParTAK4B)
                 out.append((b1 + b2 + third_b).mass)
                 continue
-
         # Fallback: take 3 highest-pt b-jets
         top3_bjets = sorted(bjs, key=lambda b: b.pt, reverse=True)[:3]
         m = (top3_bjets[0] + top3_bjets[1] + top3_bjets[2]).mass
         out.append(m)
-
     return ak.Array(out)
