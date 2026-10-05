@@ -1,0 +1,48 @@
+{
+    "proc": [
+           {
+            "color": 1,
+            "data": [
+	    	{
+                    "br": [
+                        1.0
+                    ],
+                    "dset": [
+                        "/MuonEG/Run2016B-03Feb2017_ver2-v2/MINIAOD"
+                    ],
+                    "dtag": "Data13TeV_MuEG2016B_ver2",
+                    "lumiMask": "$CMSSW_BASE/src/UserCode/bsmhiggs_fwk/data/json/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt",
+                    "xsec": 1.0
+                 }
+           ],
+            "fill": 0,
+            "isdata": true,
+            "keys": [
+	           "2l2v_mcbased"
+		 ],
+            "marker": 20,
+            "msize": 0.7,
+            "tag": "data"
+	    },
+    	  {
+	  "color": 592,
+          "data": [
+                {
+                    "br": [
+                        1.0
+                    ],
+		    "dset": [
+		        "/BulkGravTohhTohbbhbb_narrow_M-1000_13TeV-madgraph-herwig/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext2-v1/MINIAODSIM"
+		     ],
+	   	     "dtag": "MC13TeV_BulkGravTohhTohbbhbb_M-500",
+		     "xsec": 1.0
+		 }
+          ],
+	  "isdata": false,
+	  "keys": [
+	      "2l2v_mcbased"
+	      ],
+	  "tag": "X#rightarrow hh #rightarrow hbbhbb (M500)" 
+        }
+     ]
+}    		  	
