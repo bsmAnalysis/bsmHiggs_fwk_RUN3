@@ -1,12 +1,12 @@
 {
-  "TTto2L2Nu_2024": {
+  "TTto2L2Nu": {
     "metadata": {
       "das_names": "['/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v3/NANOAODSIM']",
       "sample": "TTto2L2Nu",
       "year": "2024",
       "isMC": "True",
-      "xsec": "96.9",
-      "nevents": "466316813",
+      "xsec": "88.3419",
+      "nevents": "470123263",
       "size": "1491578907810"
     },
     "files": [
@@ -792,14 +792,14 @@
       "root://cmsdcadisk.fnal.gov//dcache/uscmsdisk/store/mc/RunIII2024Summer24NanoAODv15/TTto2L2Nu_TuneCP5_13p6TeV_powheg-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v3/90000/fcc4f222-1f1f-417d-9257-4e9214c065d3.root"
     ]
   },
-  "TTtoLNu2Q_2024": {
+  "TTtoLNu": {
     "metadata": {
       "das_names": "['/TTtoLNu2Q_TuneCP5_13p6TeV_powheg-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
       "sample": "TTtoLNu",
       "year": "2024",
-      "xsec": "404.0",
+      "xsec": "365.34",
       "isMC": "True",
-      "nevents": "478409671",
+      "nevents": "484475057",
       "size": "1551097626505"
     },
     "files": [
@@ -1601,8 +1601,8 @@
       "sample": "TTto4Q",
       "year": "2024",
       "isMC": "True",
-      "xsec": "422.3",
-      "nevents": "468706061",
+      "xsec": "378.93",
+      "nevents": "472535695",
       "size": "1489775270959"
     },
     "files": [

@@ -206,3 +206,18 @@ cython_debug/
 /analysis/joblist*.txt
 /analysis/resub_joblist*.txt
 *~
+
+# Skimming runtime files
+/skimming/x509up*
+/skimming/out/
+/skimming/err/
+/skimming/log/
+/skimming/logs/
+/skimming/submissions*/
+/skimming/results*/
+/skimming/*.root
+/skimming/*.tar.gz
+/skimming/*.tgz
+/skimming/*.jdl
+/skimming/joblist*.txt
+/skimming/resub_joblist*.txt
