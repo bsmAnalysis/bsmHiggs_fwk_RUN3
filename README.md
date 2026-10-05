@@ -76,32 +76,115 @@ Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chai
 - Output files are written as `${PROCNAME}_${JOBNUM}.root`
 - Each job uses a unique seed injected via `inject_rand.py`
   
-# Perform skimming to your datasets and save to selected eos path (optional but recommended)
-### Prepare the Skimming Configuration
-Modify skimming/skim_config.py to select the branches and objects you want to keep.Configure HLT trigger groups if needed.
-If you want to change config script, you may need to do some changes to the skim_processor.py, depending on what kind of changes
-### define the datasets you want to skim
-From inside the skimming/ directory: put the datasets you want to skim inside the dataset folder
-### define the eos path you want to save the files
-in run_skimming.sh script (line 25)
-### skim your selected dataset and save to your eos path
-run:
+# Skimming of datasets
+
+Run the following commands from the repository's `skimming/` directory.
+
+## Configure the skim
+
+Edit `skim_config.py` to choose the branches, objects, HLT trigger groups and MET filters. Changes to object definitions or selections may also require changes to `skim_processor_ak4.py`.
+
+The HLT groups define the `trigger_type` bits saved in the output. The current skimmer does not require a fired trigger.
+
+Keep `corrections/` and `golden_json/` in this directory. 
+
+## Define the input datasets
+
+Place the generated dataset JSONs in `skimming/datasets/`. Each dataset key contains a `files` list of NanoAOD input locations and its metadata.
+
+These lists are generated using the [PocketCoffea dataset-handling tools](https://pocketcoffea.readthedocs.io/en/stable/datasets.html), which build file lists from CMS dataset definitions. Keep the definition JSONs outside `datasets/`, so wildcard submissions select only the generated file lists.
+
+CVMFS provides the Coffea container used here. NanoAOD inputs are read from the locations listed in the JSONs, normally through XRootD from CMS storage.
+
+Detailed dataset-definition and generation instructions can be added later to `skimming/README.md`.
+
+## Test before submission
+
+Prepare one job without running or submitting it:
+
 ```bash
-#to skim all datasets of all processes (in all json files)
-python submit_all.py
-# to skim the datasets of a selected process
-python submit_all.py QCD.json
-#to skim a single dataset of a selected process
-FILTER_KEY=HT100to200 python submit_all.py QCD.json
-```
-### Resubmit  if missing files from your generated eos folder:
-run:
-```bash
-python resubmit_skim.py
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' --dry-run --max-jobs 1
 ```
 
+Run exactly one job locally inside the same container used by Condor:
+
+```bash
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' --local-test
+```
+
+Local tests keep the ROOT output in the skimming directory and do not upload to EOS.
+
+Select a specific input-file index and filter dataset keys:
+
+```bash
+FILTER_KEY=12 python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' \
+    --job-index 5 --local-test
+```
+
+Indices start at zero: index `5` is the sixth file.
+
+## Choose the EOS destination and submit
+
+Set the output base directory with `--base-eos-dir`. The default is `/eos/user/a/ataxeidi/skim_MC_new`. Use the same destination when resubmitting.
+
+```bash
+EOS_BASE=/eos/user/a/ataxeidi/skim_MC_new
+
+# All datasets in all generated JSONs
+python3 submit_all.py '*.json' --base-eos-dir "$EOS_BASE"
+
+# All datasets in one process JSON
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' --base-eos-dir "$EOS_BASE"
+
+# Only dataset keys matching the regular expression
+FILTER_KEY=12 python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' \
+    --base-eos-dir "$EOS_BASE"
+```
+
+These are alternative submission examples. Quote wildcard patterns so the script expands them under `datasets/`.
+
+With no JSON argument, the current default is `ZH-ZToAll-HToAATo4B.json`. To select all JSONs, explicitly pass `'*.json'`.
+
+Production files are saved as:
+
+```text
+<EOS_BASE>/<dataset_key>/<dataset_key>_<index>.root
+```
+
+Logs go to the shared `out/` and `err/` directories. Keep `submissions/` while jobs are queued or running.
+
+## Resubmit missing skims
+
+Check running jobs, then preview missing-output resubmissions:
+
+```bash
+condor_q "$USER"
+
+python3 resubmit_skim.py '*.json' \
+    --base-eos-dir "$EOS_BASE" --dry-run
+```
+
+Remove `--dry-run` to submit the missing jobs:
+
+```bash
+python3 resubmit_skim.py '*.json' --base-eos-dir "$EOS_BASE"
+```
+
+`FILTER_KEY`, `--job-index` and `--max-jobs` also work for resubmission.
+
+Missing-output checks use exact EOS filenames. They do not validate ROOT contents or exclude already queued/running jobs. EOS authentication or network errors stop the check.
+
+## Container and authentication
+
+Submission, resubmission and local tests use the same default image:
+
+```text
+/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux8:0.7.21-fastjet-3.4.0.1
+```
+
+Use `--image /absolute/container/path` to override it.
+
 # Running  Analysis
-# Analysis
 
 Coffea analysis with jobs running in Singularity through HTCondor.
 
