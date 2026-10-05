@@ -1,9 +1,9 @@
 {
-    "QCD-4Jets_Bin-HT-40to70_2024": {
+    "QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-40to70",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
             "xsec": "1.0",
             "nevents": "110777315",
@@ -135,13 +135,13 @@
             "root://grid-cms-xrootd.physik.rwth-aachen.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-40to70_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/f9578b51-fedb-4f54-884c-14c43290267b.root"
         ]
     },
- "QCD-4Jets_Bin-HT-70to100_2024": {
+ "QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-70to100",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
-            "xsec": "58500000",
+            "xsec": "1.0",
             "nevents": "108584880",
             "size": "140349585523"
         },
@@ -284,11 +284,11 @@
             "root://grid-cms-xrootd.physik.rwth-aachen.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-70to100_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/fc5b10a5-c12c-403f-9216-5b3e9a7ec058.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-100to200_2024": {
+    "QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-100to200",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
             "xsec": "1.0",
             "nevents": "120453600",
@@ -466,13 +466,13 @@
             "root://xrootd-cms.infn.it:1194//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-100to200_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/f6727ccb-0c77-4eae-9e58-b4c89f198649.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-200to400_2024": {
+    "QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-200to400",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
-            "xsec": "1961000",
+            "xsec": "1961000.",
             "nevents": "115255250",
             "size": "220736429796"
         },
@@ -642,13 +642,13 @@
             "root://ccxrdcms.in2p3.fr:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-200to400_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/ebadf509-7f86-4fdd-99de-c8c8f3a4417d.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-400to600_2024": {
+    "QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-400to600",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
-            "xsec": "95620",
+            "xsec": "95620.",
             "nevents": "106725734",
             "size": "310707815361"
         },
@@ -828,13 +828,13 @@
             "root://grid-cms-xrootd.physik.rwth-aachen.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-400to600_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/f1bf0afa-8964-4b42-b8db-835db26ae425.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-600to800_2024": {
+    "QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-600to800",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
-            "xsec": "13540",
+            "xsec": "13540.",
             "nevents": "128235651",
             "size": "444481417520"
         },
@@ -1070,13 +1070,13 @@
             "root://grid-cms-xrootd.physik.rwth-aachen.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-600to800_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/fddb7a9b-84e7-4907-ae3d-6654006861d7.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-800to1000_2024": {
+    "QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-800to1000",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
-            "xsec": "3033",
+            "xsec": "3033.",
             "nevents": "124956604",
             "size": "472235462492"
         },
@@ -1345,11 +1345,11 @@
             "root://grid-cms-xrootd.physik.rwth-aachen.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-800to1000_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/ffd0abc4-3768-402a-84e8-41cc99978d4a.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-1000to1200_2024": {
+    "QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-1000to1200",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
             "xsec": "883.7",
             "nevents": "114436708",
@@ -1582,11 +1582,11 @@
             "root://grid-cms-xrootd.physik.rwth-aachen.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-1000to1200_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/cf8d1dc7-739d-4c18-bba2-286af34eed07.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-1200to1500_2024": {
+    "QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-1200to1500",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
             "xsec": "383.5",
             "nevents": "107835822",
@@ -1825,11 +1825,11 @@
             "root://dcache-cms-xrootd.desy.de:1094//store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-1200to1500_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/f938339d-3620-4e66-8f52-f1e9cf74d769.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-1500to2000_2024": {
+    "QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-1500to2000",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
             "xsec": "125.2",
             "nevents": "113208234",
@@ -2086,11 +2086,11 @@
             "root://eoscms.cern.ch//eos/cms/store/mc/RunIII2024Summer24NanoAODv15/QCD-4Jets_Bin-HT-1500to2000_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/150X_mcRun3_2024_realistic_v2-v2/90000/fd1475b5-04a6-405f-afa2-21b45d8306ec.root"
         ]
     },
-    "QCD-4Jets_Bin-HT-2000_2024": {
+    "QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8_": {
         "metadata": {
             "das_names": "['/QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8/RunIII2024Summer24NanoAODv15-150X_mcRun3_2024_realistic_v2-v2/NANOAODSIM']",
-            "sample": "QCD-4Jets_Bin-HT-2000",
-            "year": "2024",
+            "sample": "QCD-4Jets_Bin-HT-2000_TuneCP5_13p6TeV_madgraphMLM-pythia8",
+            "year": "",
             "isMC": "True",
             "xsec": "26.49",
             "nevents": "91953615",

@@ -1486,7 +1486,7 @@
     },
     "JetMET1_2024_EraI_2024_EraI": {
         "metadata": {
-            "das_names": "['/JetMET1/Run2024I-MINIv6NANOv15-v1/NANOAOD', '/JetMET1/Run2024I-MINIv6NANOv15-v2_v2/NANOAOD']",
+            "das_names": "['/JetMET1/Run2024I-MINIv6NANOv15-v1/NANOAOD']",
             "sample": "JetMET1",
             "year": "2024",
             "isMC": "False",
