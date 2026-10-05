@@ -76,93 +76,231 @@ Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chai
 - Output files are written as `${PROCNAME}_${JOBNUM}.root`
 - Each job uses a unique seed injected via `inject_rand.py`
   
-# Perform skimming to your datasets and save to selected eos path (optional but recommended)
-### Prepare the Skimming Configuration
-Modify skimming/skim_config.py to select the branches and objects you want to keep.Configure HLT trigger groups if needed.
-If you want to change config script, you may need to do some changes to the skim_processor.py, depending on what kind of changes
-### define the datasets you want to skim
-From inside the skimming/ directory: put the datasets you want to skim inside the dataset folder
-### define the eos path you want to save the files
-in run_skimming.sh script (line 25)
-### skim your selected dataset and save to your eos path
-run:
-```bash
-#to skim all datasets of all processes (in all json files)
-python submit_all.py
-# to skim the datasets of a selected process
-python submit_all.py QCD.json
-#to skim a single dataset of a selected process
-FILTER_KEY=HT100to200 python submit_all.py QCD.json
-```
-### Resubmit  if missing files from your generated eos folder:
-run:
-```bash
-python resubmit_skim.py
-```
+# Skimming of datasets
 
-# Running your analysis
-### 1. Clone the repository
+Run the following commands from the repository's `skimming/` directory.
 
-```bash
-git clone https://github.com/bsmAnalysis/HToAATo4B_RUN3_NANOv15.git
-cd HToAATo4B_RUN3_NANOv15
-```
+## Configure the skim
 
-### 2. Set up your proxy (if running on the grid)
+Edit `skim_config.py` to choose the branches, objects, HLT trigger groups and MET filters. Changes to object definitions or selections may also require changes to `skim_processor_ak4.py`.
+
+The HLT groups define the `trigger_type` bits saved in the output. The current skimmer does not require a fired trigger.
+
+Keep `corrections/` and `golden_json/` in this directory. 
+
+## Define the input datasets
+
+Place the generated dataset JSONs in `skimming/datasets/`. Each dataset key contains a `files` list of NanoAOD input locations and its metadata.
+
+These lists are generated using the [PocketCoffea dataset-handling tools](https://pocketcoffea.readthedocs.io/en/stable/datasets.html), which build file lists from CMS dataset definitions. Keep the definition JSONs outside `datasets/`, so wildcard submissions select only the generated file lists.
+
+CVMFS provides the Coffea container used here. NanoAOD inputs are read from the locations listed in the JSONs, normally through XRootD from CMS storage.
+
+Detailed dataset-definition and generation instructions can be added later to `skimming/README.md`.
+
+## Test before submission
+
+Prepare one job without running or submitting it:
 
 ```bash
-source init_cms_proxy.sh
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' --dry-run --max-jobs 1
 ```
 
-### 3. Define your analysis processor and import it in `run_analysis.py`
-
-Make sure your processor is in the project and correctly referenced.
-
-### 4. Test locally inside the Coffea Singularity container
+Run exactly one job locally inside the same container used by Condor:
 
 ```bash
-singularity shell /cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-dask:latest
-python run_analysis.py --job-index ${JOBIDX} --json ${DATASET_JSON} --dataset ${DATASET_KEY} --output ${OUTFILE}
-#you define them hardcoded
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' --local-test
 ```
-### 5. Submit all jobs
+
+Local tests keep the ROOT output in the skimming directory and do not upload to EOS.
+
+Select a specific input-file index and filter dataset keys:
 
 ```bash
-python submit_all.py
-#or of a selected process:
-python submit_all.py ZH_HToAATo4B.json  # all datasets inside  ZH_HToAATo4B.json
-#or of a selected dataset of a process:
-FILTER_KEY=M-15 python submit_all.py ZH_HToAATo4B.json
+FILTER_KEY=12 python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' \
+    --job-index 5 --local-test
 ```
-Also update the `FILES_TO_TRANSFER` list inside `submit_all.py` to include your processor. 
 
-### 6. Resubmit failed/missing jobs
+Indices start at zero: index `5` is the sixth file.
 
-```bash
-python resubmit_jobs.py
-```
-### 7. Clean up and move output `.root` files to CMSSW output directory (if you have installed CMSSW as described in production instructions)
+## Choose the EOS destination and submit
+
+Set the output base directory with `--base-eos-dir`. The default is `/eos/user/a/ataxeidi/skim_MC_new`. Use the same destination when resubmitting.
 
 ```bash
-python clean_dir.py
-```
-All `.root` outputs will be moved to:
+EOS_BASE=/eos/user/a/ataxeidi/skim_MC_new
 
-```
-CMSSW_15_0_5/src/outputs/
-```
-### Important: about utils to run on condor:
-when y want to update something in this folder, eg more fucntions to use in your analysis, in order to update the tarbal as well run:
-```bash
- tar -czf utils.tar.gz utils/
-```
-### To make the trees of each regime for bdt training:
-define your branches of each regime in your processor and have the run_eval=Falsee and is_MVA=True in run_analysis.py (line 45-46)
+# All datasets in all generated JSONs
+python3 submit_all.py '*.json' --base-eos-dir "$EOS_BASE"
 
-### To run bdt evalutation:
-upload your json files from the xgb training in the xgb_model folder and to submit on condor do:
+# All datasets in one process JSON
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' --base-eos-dir "$EOS_BASE"
+
+# Only dataset keys matching the regular expression
+FILTER_KEY=12 python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' \
+    --base-eos-dir "$EOS_BASE"
+```
+
+These are alternative submission examples. Quote wildcard patterns so the script expands them under `datasets/`.
+
+With no JSON argument, the current default is `ZH-ZToAll-HToAATo4B.json`. To select all JSONs, explicitly pass `'*.json'`.
+
+Production files are saved as:
+
+```text
+<EOS_BASE>/<dataset_key>/<dataset_key>_<index>.root
+```
+
+Logs go to the shared `out/` and `err/` directories. Keep `submissions/` while jobs are queued or running.
+
+## Resubmit missing skims
+
+Check running jobs, then preview missing-output resubmissions:
+
 ```bash
-# From the root of the repo
-tar -czf analysis/xgb_model.tar.gz xgb_model/
+condor_q "$USER"
+
+python3 resubmit_skim.py '*.json' \
+    --base-eos-dir "$EOS_BASE" --dry-run
+```
+
+Remove `--dry-run` to submit the missing jobs:
+
+```bash
+python3 resubmit_skim.py '*.json' --base-eos-dir "$EOS_BASE"
+```
+
+`FILTER_KEY`, `--job-index` and `--max-jobs` also work for resubmission.
+
+Missing-output checks use exact EOS filenames. They do not validate ROOT contents or exclude already queued/running jobs. EOS authentication or network errors stop the check.
+
+## Container and authentication
+
+Submission, resubmission and local tests use the same default image:
+
+```text
+/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux8:0.7.21-fastjet-3.4.0.1
+```
+
+Use `--image /absolute/container/path` to override it.
+
+# Running  Analysis
+
+Coffea analysis with jobs running in Singularity through HTCondor.
+
+Run these commands from the directory containing `submit_all.py`. Dataset JSON files belong in `datasets/`; quote wildcard patterns.
+
+## Main files
+
+| Files / folder | Purpose |
+| --- | --- |
+| `run_analysis.py`, `ZH_{0,2}lep_processor_fixedWP.py` | Analysis driver and channel processors |
+| `submit_all.py`, `resubmit_missing_jobs.py` | Submission and missing-output recovery |
+| `run_analysis.sh`, `run_gen.sh` | Job payloads |
+| `run_gen_haa4b.py`, `gen_haa4b_processor.py` | Generator-level studies |
+| `run_btag_efficiency.py`, `btag_efficiency_processor.py` | B-tag numerator/denominator production |
+| `make_*btag_eff*.py` | Efficiency ROOT maps and JSON conversion |
+| `datasets/`, `corrections/`, `utils/`, `xgb_model/` | Input lists, corrections, helpers and BDT models |
+| `cmssw/bsmhiggs_fwk/` | Plotting, datacards and Combine workflows |
+
+## Setup
+
+Local tests and Condor jobs use the same Coffea image:
+
+```text
+/cvmfs/unpacked.cern.ch/registry.hub.docker.com/coffeateam/coffea-base-almalinux8:0.7.21-fastjet-3.4.0.1
+```
+
+List the configured modes:
+
+```bash
+python3 submit_all.py --list-modes
+```
+
+## Test and submit
+
+Prepare one job without running or submitting it:
+
+```bash
+python3 submit_all.py 'ZH-*.json' --mode analysis-2lep --dry-run --max-jobs 1
+```
+
+Run one job locally inside Singularity:
+
+```bash
+python3 submit_all.py 'ZH-*.json' --mode analysis-2lep --local-test
+```
+
+`--local-test` runs exactly one job. Check its logs, exit code and ROOT output before submitting.
+
+Submit all files in the matching JSONs:
+
+```bash
+python3 submit_all.py 'ZH-*.json' --mode analysis-2lep
+```
+
+Use `--mode analysis-0lep` for 0-lepton jobs. The mode selects the processor in the staged driver copy. Set BDT evaluation/training options in `run_analysis.py` before submission.
+
+Filter dataset keys with a regular expression:
+
+```bash
+FILTER_KEY=2E python3 submit_all.py 'DY-4Jets*.json' \
+    --mode analysis-2lep --local-test
+```
+
+Select a specific input-file index:
+
+```bash
+FILTER_KEY='^ZH-ZToAll-HToAATo4B_Par-M-12$' \
+python3 submit_all.py 'ZH-ZToAll-HToAATo4B.json' \
+    --mode analysis-2lep --job-index 5 --local-test
+```
+
+Index `5` is the sixth file. Remove `--local-test` to submit it.
+
+Resource folders are archived automatically. `datasets/`, logs, submission directories and `cmssw/` are excluded. Exclude another folder with `--exclude-dir folder_name`, or add it to `EXCLUDE_DIRS`.
+
+## Outputs and resubmission
+
+Logs go to `out/` and `err/`; ROOT outputs return to the analysis directory. Keep `submissions/` while jobs are queued or running.
+
+Check your jobs and preview missing-output resubmissions:
+
+```bash
+condor_q "$USER"
+python3 resubmit_missing_jobs.py 'ZH-*.json' \
+    --mode analysis-2lep --dry-run
+```
+
+Remove `--dry-run` to resubmit. `FILTER_KEY` also works here.
+
+The default completion check uses nonempty analysis outputs; it does not validate ROOT contents or require BDT outputs.
+
+Check for missing jobs before merging with `hadd_root_files_per_json.py`.
+
+## B-tag efficiency maps
+
+Produce numerator/denominator counts → merge counts → build ROOT efficiency maps → convert to correctionlib JSON.
+
+Example for a merged DY count file:
+
+```bash
+python3 make_all_btag_eff_ratios_grouped.py \
+    out/btag_counts/DYto2E-4Jets_Bin-MLL-50_BTag.root \
+    --output-dir out/btag_ratios --strict-names
+
+python3 make_btag_eff_json.py \
+    out/btag_ratios/DYto2E-4Jets_Bin-MLL-50_BTag_ratio.root \
+    --output corrections/btag_eff_DY_example.json.gz \
+    --summary out/btag_eff_DY_example.csv --validate
+```
+
+This example contains only DY. Build full maps from the required inputs. `make_btag_eff_ratios_sample_keys.py` covers additional process mappings.
+
+## Plotting and statistical analysis
+
+The code in `cmssw/bsmhiggs_fwk/` provides plotting, datacard utilities and Combine workflows.
+
+Run these tools in the appropriate CMSSW environment. Document the plotting and limit commands in `cmssw/README.md`.
 ```
 have the run_eval=True and is_MVA=False in run_analysis.py (line 45-46)
