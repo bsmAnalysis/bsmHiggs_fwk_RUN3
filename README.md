@@ -79,6 +79,16 @@ Each job runs the full GEN-SIM → DIGI-HLT → AOD → MiniAOD → NANOAOD chai
 # Skimming of datasets
 
 Run the following commands from the repository's `skimming/` directory.
+A valid CMS VOMS proxy is required for the remote CMS inputs used by this skimming workflow, including local tests on lxplus.
+
+From `skimming/`, create or renew the proxy:
+
+```bash
+voms-proxy-init --voms cms --valid 192:00 --out "$PWD/x509up"
+chmod 600 "$PWD/x509up"
+voms-proxy-info --file "$PWD/x509up" --all
+```
+`submit_all.py` and `resubmit_skim.py` automatically transfer `x509up` and set `X509_USER_PROXY` inside each job.
 
 ## Configure the skim
 
@@ -96,7 +106,7 @@ These lists are generated using the [PocketCoffea dataset-handling tools](https:
 
 CVMFS provides the Coffea container used here. NanoAOD inputs are read from the locations listed in the JSONs, normally through XRootD from CMS storage.
 
-Detailed dataset-definition and generation instructions can be added later to `skimming/README.md`.
+Detailed dataset-definition instructions in `skimming/README.md`.
 
 ## Test before submission
 
