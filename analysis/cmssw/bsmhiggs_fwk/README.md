@@ -63,7 +63,6 @@ git cms-init
 ```
 
 ###  Install Combine
-
 Run from `CMSSW_14_1_5/src`:
 
 ```bash
@@ -75,8 +74,6 @@ git -c advice.detachedHead=false clone \
 
 ### Install CombineHarvester
 
-CombineHarvester provides `PostFitShapesFromWorkspace` and related utilities:
-
 ```bash
 git -c advice.detachedHead=false clone \
     --depth 1 --branch v3.1.0 \
@@ -85,7 +82,6 @@ git -c advice.detachedHead=false clone \
 ```
 
 ### Link the analysis package into CMSSW & build
-
 Still inside `CMSSW_14_1_5/src`:
 
 ```bash
