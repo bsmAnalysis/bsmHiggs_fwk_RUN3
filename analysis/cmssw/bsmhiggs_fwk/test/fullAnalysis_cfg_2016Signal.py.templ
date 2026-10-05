@@ -1,0 +1,79 @@
+import FWCore.ParameterSet.Config as cms
+
+from UserCode.bsmhiggs_fwk.mainNtuplizer_cfi import *
+
+#from JMEAnalysis.JetToolbox.jetToolbox_cff import jetToolbox
+
+from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.cerr.FwkReport.reportEvery = 5000
+
+process.load("PhysicsTools.PatAlgos.producersLayer1.patCandidates_cff")
+process.load("Configuration.EventContent.EventContent_cff")
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+
+
+#load run conditions
+#process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.load('Configuration.Geometry.GeometryIdeal_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+
+#------ Declare the correct global tag ------#
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+#process.GlobalTag.globaltag = '80X_dataRun2_2016SeptRepro_v7'
+process.GlobalTag.globaltag = '@gtag'
+
+process.options   = cms.untracked.PSet(
+   allowUnscheduled = cms.untracked.bool(True)
+)
+## b-tag discriminators
+bTagDiscriminators = [
+  'deepFlavourJetTags:probb',
+  'deepFlavourJetTags:probbb',
+]
+from PhysicsTools.PatAlgos.tools.jetTools import *
+## Update the slimmedJets in miniAOD: corrections from the chosen Global Tag are applied and the b-tag discriminators are re-evaluated
+#updateJetCollection(
+#    process,
+#    jetSource = cms.InputTag('slimmedJets'),
+#    jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+#    btagDiscriminators = bTagDiscriminators
+#)
+
+runOnMC=@isMC  
+if runOnMC:
+   runMetCorAndUncFromMiniAOD(process,  
+   			isData=False
+			)		
+else:
+   runMetCorAndUncFromMiniAOD(process,
+                           isData=True,
+                           )
+
+process.mainNtuplizer.isMC = cms.bool(@isMC)
+process.mainNtuplizer.dtag = cms.string("@dtag")
+process.mainNtuplizer.xsec = cms.double(@xsec)
+process.mainNtuplizer.mctruthmode = cms.int32(@mctruthmode)
+process.mainNtuplizer.verbose = cms.bool(@verbose)
+process.mainNtuplizer.metFilterBitsTag = cms.InputTag('TriggerResults','','HLT')
+process.mainNtuplizer.Legacy2016 = cms.bool(True)
+#process.mainNtuplizer.jetsTag = cms.InputTag('selectedUpdatedPatJets')
+#process.mainNtuplizer.fatjetsTag = cms.InputTag('packedPatJetsAK8PFCHSSoftDrop')
+
+process.source = cms.Source("PoolSource",
+	       	     fileNames = cms.untracked.vstring(),
+		     inputCommands=cms.untracked.vstring(
+			   'keep *', 
+ 		     	   'drop *_ctppsLocalTrackLiteProducer_*_RECO' 
+			   )        
+)
+
+#jetToolbox(process, 'ak8', 'jetSequence', 'out', PUMethod='CHS', addPruning=True, addSoftDrop=True,addNsubSubjets=True,addSoftDropSubjets=True,addNsub=True,Cut="pt>20")
+
+process.TFileService = cms.Service("TFileService",
+			fileName = cms.string("analysis.root")
+)
+                     		 				             
+process.p = cms.Path( process.fullPatMetSequence * process.mainNtuplizer )	
+

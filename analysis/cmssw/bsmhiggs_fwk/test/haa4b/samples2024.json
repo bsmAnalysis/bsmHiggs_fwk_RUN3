@@ -1,0 +1,433 @@
+{
+  "proc": [
+    {
+      "color": 1,
+      "data": [
+        {
+          "dtag": "DATA_Mu_2024"
+        },
+        {
+          "dtag": "DATA_EG_2024"
+        },
+        {
+          "dtag": "DATA_MuEG_2024"
+        }
+      ],
+      "fill": 0,
+      "isdata": true,
+      "keys": [
+        "haa_prod_data_had",
+        "haa_mcbased",
+        "haa_dataOnly"
+      ],
+      "marker": 20,
+      "msize": 0.7,
+      "tag": "data"
+    },
+    {
+      "color": 622,
+      "data": [
+        {
+          "dtag": "DY2Mu_2024"
+        },
+        {
+          "dtag": "DY2E_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_mcbased",
+        "haa_prod_DY",
+        "haa_ztoll"
+      ],
+      "tag": "Z#rightarrow ll"
+    },
+    {
+      "color": 852,
+      "data": [
+        {
+          "dtag": "other_bkgs_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_others",
+        "haa_mcbased"
+      ],
+      "tag": "Other Bkgs"
+    },
+    {
+      "color": 406,
+      "data": [
+        {
+          "dtag": "TTlf_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_TT",
+        "haa_mcbased"
+      ],
+      "mctruthmode": 1,
+      "tag": "t#bar{t} + light"
+    },
+    {
+      "color": 407,
+      "data": [
+        {
+          "dtag": "TTcc_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_TT",
+        "haa_mcbased"
+      ],
+      "mctruthmode": 4,
+      "tag": "t#bar{t} + c#bar{c}"
+    },
+    {
+      "color": 408,
+      "data": [
+        {
+          "dtag": "TTbb_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_TT",
+        "haa_mcbased"
+      ],
+      "mctruthmode": 5,
+      "tag": "t#bar{t} + b#bar{b}"
+    },
+    {
+      "color": 624,
+      "data": [
+        {
+          "dtag": "Z2Nu_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_ZNuNu",
+        "haa_mcbased",
+        "haa_ztonunu"
+      ],
+      "tag": "Z#rightarrow #nu #nu"
+    },
+    {
+      "color": 622,
+      "data": [
+        {
+          "dtag": "WJets_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_WJets",
+        "haa_mcbased"
+      ],
+      "tag": "W+Jets"
+    },
+    {
+      "color": 634,
+      "data": [
+        {
+          "dtag": "QCDB_2024"
+        }
+      ],
+      "isdata": false,
+      "keys": [
+        "haa_prod_QCD_HT",
+        "haa_mcbased"
+      ],
+      "tag": "QCD"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-12_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": false,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 3,
+      "lwidth": 3,
+      "resonance": 12,
+      "spimpose": true,
+      "tag": "Zh (12)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-15_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 4,
+      "lwidth": 3,
+      "resonance": 15,
+      "spimpose": true,
+      "tag": "Zh (15)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-20_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": false,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lwidth": 3,
+      "resonance": 20,
+      "spimpose": true,
+      "tag": "Zh (20)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-25_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 5,
+      "lwidth": 3,
+      "resonance": 25,
+      "spimpose": true,
+      "tag": "Zh (25)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-30_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 6,
+      "lwidth": 3,
+      "resonance": 30,
+      "spimpose": true,
+      "tag": "Zh (30)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-35_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 6,
+      "lwidth": 3,
+      "resonance": 35,
+      "spimpose": true,
+      "tag": "Zh (35)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-40_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 7,
+      "lwidth": 3,
+      "resonance": 40,
+      "spimpose": true,
+      "tag": "Zh (40)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-45_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 7,
+      "lwidth": 3,
+      "resonance": 45,
+      "spimpose": true,
+      "tag": "Zh (45)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-50_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 2,
+      "lwidth": 3,
+      "resonance": 50,
+      "spimpose": true,
+      "tag": "Zh (50)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-55_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": true,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 2,
+      "lwidth": 3,
+      "resonance": 55,
+      "spimpose": true,
+      "tag": "Zh (55)"
+    },
+    {
+      "data": [
+        {
+          "dtag": "ZH_ZToAll_HToAATo4B_M-60_2024",
+          "xsec": 0.9439,
+          "br": [
+            1.0
+          ]
+        }
+      ],
+      "fill": 0,
+      "isdata": false,
+      "isinvisible": false,
+      "issignal": true,
+      "keys": [
+        "haa_prod_VH",
+        "haa_signal",
+        "haa_mcbased"
+      ],
+      "lcolor": 1,
+      "lstyle": 8,
+      "lwidth": 3,
+      "resonance": 60,
+      "spimpose": true,
+      "tag": "Zh (60)"
+    }
+  ]
+}
