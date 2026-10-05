@@ -106,7 +106,7 @@ These lists are generated using the [PocketCoffea dataset-handling tools](https:
 
 CVMFS provides the Coffea container used here. NanoAOD inputs are read from the locations listed in the JSONs, normally through XRootD from CMS storage.
 
-Detailed dataset-definition and generation instructions can be added later to `skimming/README.md`.
+Detailed dataset-definition instructions in `skimming/README.md`.
 
 ## Test before submission
 
