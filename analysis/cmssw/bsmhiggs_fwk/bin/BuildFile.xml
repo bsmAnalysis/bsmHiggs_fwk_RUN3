@@ -1,4 +1,4 @@
-<Use name="lhapdf"/>
+<use name="lhapdf"/>
 <use name="roottmva"/>
 <use name="roofit"/>
 <use name="roostats"/>
