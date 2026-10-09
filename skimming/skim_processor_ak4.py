@@ -1,6 +1,10 @@
-# ============================
-# file: skim_processor_ak4.py
-# ============================
+
+# Event selection:
+#   golden JSON (data) + PV + MET filters
+#   -> JEC -> event-level jet-veto map
+#   -> optional JER / Type-1 PUPPI MET using full input collections
+#   -> define output jets with final corrected pT > 20 GeV -> require >= 2
+#   -> configured trigger OR -> common final event slice
 
 from coffea import processor
 from coffea.lumi_tools import LumiMask
@@ -9,7 +13,7 @@ import awkward as ak
 import numpy as np
 import fnmatch
 import os
-from typing import Optional, Dict, Tuple
+from typing import Optional, Tuple
 
 
 # ------------------------------- helpers -------------------------------- #
@@ -38,6 +42,14 @@ def _print_counts(label, mask):
 
 def _safe_get(obj, name, default):
     return getattr(obj, name) if hasattr(obj, name) else default
+
+
+def _raw_ak4_kinematics(jets):
+    # Only call on ORIGINAL NanoAOD jets, whose pt/mass match rawFactor.
+    # After replacing pt with a newly corrected value, this formula no longer
+    # recovers raw pT. Retain pt_raw separately throughout the correction chain.
+    raw_factor = ak.fill_none(_safe_get(jets, "rawFactor", ak.zeros_like(jets.pt)), 0.0)
+    return jets.pt * (1.0 - raw_factor), jets.mass * (1.0 - raw_factor)
 
 
 def _hist_counts(values_1d: np.ndarray, edges: np.ndarray) -> np.ndarray:
@@ -119,14 +131,23 @@ def _print_jet_pt_triplet(tag, jets, pt_raw, pt_full_jec, pt_full_jecjer, ev_idx
 
 class NanoAODSkimmerAK4(processor.ProcessorABC):
     """
-    AK4-only skimmer with:
-      - early event masks: golden JSON / PV / MET filters
-      - JEC from raw (AK4)
-      - optional JER smear via jer_smear.json.gz (jets only)
-      - Type-1 PuppiMET using CorrT1METJet + AK4, updated recipe (NO JER->MET)
-      - JVM (event-level veto) applied after MET & jets are computed
-      - debug hist arrays (returned in MetaHists)
+    AK4 skimmer with a common corrected-pT definition for counting and output.
+
+    Selected output jets have final corrected pT > 20 GeV; require at least two.
+    This definition and multiplicity cut are applied after corrections/MET.
+    Golden JSON, PV and MET filters are applied first.
+    The event veto uses the full JEC Jet collection with its own 15 GeV cut.
+    Type-1 PUPPI MET uses full AK4 + CorrT1METJet inputs, with no JER.
+    The configured trigger OR is required by default, as requested.
+
+    Jet.pt and Jet.mass include nominal JER for MC when do_jer=True and the
+    required inputs/payloads are available. Data use full JEC including the
+    residual correction. Disabling/skipping JER retains JEC-only output.
+    Normalization counters count input events before any selection.
     """
+
+    JET_PT_MIN = 20.0  # final jet pT: JEC (+ nominal JER for MC), no muon subtraction
+    MIN_SELECTED_JETS = 2
 
     def __init__(
         self,
@@ -136,9 +157,10 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         dataset_name: Optional[str] = None,
         corrections_dir: Optional[str] = None,
         golden_json_dir: Optional[str] = None,
-        do_jer: bool = True,          # affects jets only
+        do_jer: bool = True,          # MC output jets include nominal JER when available
         debug: bool = False,
         debug_event_index: int = 10,
+        require_trigger: bool = True,
     ):
         self.branches_to_keep = branches_to_keep
         self.trigger_groups = trigger_groups
@@ -148,11 +170,15 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         self.do_jer = bool(do_jer)
         self.debug = bool(debug)
         self.debug_event_index = int(debug_event_index)
+        # Set False only when trigger decisions should be recorded without a cut.
+        # Existing drivers need no change: the requested trigger cut is on by default.
+        self.require_trigger = bool(require_trigger)
 
         self.corrections_dir = corrections_dir or os.path.join(os.path.dirname(__file__), "corrections")
         self.golden_json_dir = golden_json_dir or os.path.join(os.path.dirname(__file__), "golden_json")
 
-        # Golden JSON
+        # Load the certified run/lumisection list once; process() applies it to data.
+        # Preserve the existing fallback: no golden JSON file means no lumi cut.
         self._lumi_mask = None
         golden_json_path = os.path.join(
             self.golden_json_dir,
@@ -235,7 +261,7 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
             self._cL2_mc = cset["Summer24Prompt24_V2_MC_L2Relative_AK4PFPuppi"]
             self._cL3_mc = cset["Summer24Prompt24_V2_MC_L3Absolute_AK4PFPuppi"]
 
-            # ---- JER (jets only; keep as you had) ----
+            # Preserve the JER payload keys from the supplied processor.
             self._cReso = cset["Summer23BPixPrompt23_RunD_JRV1_MC_PtResolution_AK4PFPuppi"]
             self._cJerSF = cset["Summer23BPixPrompt23_RunD_JRV1_MC_ScaleFactor_AK4PFPuppi"]
 
@@ -268,6 +294,8 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
     # ---------------- small utils ---------------- #
 
     def select_fields(self, collection, fields):
+        # Project requested fields only after all selections/calculations. Fields
+        # such as pt_raw can be used internally even when not saved in the config.
         if not fields:
             return collection
         all_fields = ak.fields(collection)
@@ -294,10 +322,7 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         Returns jagged:
           pt_raw, mass_raw, pt_l1, pt_full, mass_full
         """
-        rawFactor = ak.fill_none(_safe_get(jets, "rawFactor", ak.zeros_like(jets.pt)), 0.0)
-
-        pt_raw = jets.pt * (1.0 - rawFactor)
-        mass_raw = jets.mass * (1.0 - rawFactor)
+        pt_raw, mass_raw = _raw_ak4_kinematics(jets)
 
         if (not self._loaded_jerc) or (self._cset_jerc is None):
             return pt_raw, mass_raw, pt_raw, pt_raw, mass_raw
@@ -319,6 +344,7 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
 
         pt0 = _as_np_flat(pt_raw)
 
+        # Each JEC level receives the pT corrected by the previous level.
         l1 = cL1.evaluate(JetA, JetEta, pt0, Rho)
         pt1 = pt0 * l1
 
@@ -333,6 +359,7 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
             pt3 = pt3 * res
 
         pt0_safe = np.maximum(pt0, 1e-6)
+        # Apply the same complete JEC factor to the jet mass.
         factor_full = pt3 / pt0_safe
         mass_full_flat = _as_np_flat(mass_raw) * factor_full
 
@@ -369,6 +396,7 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
             return pt_in
 
         (pt_b, eta_b, phi_b, rho_b) = ak.broadcast_arrays(pt_in, eta, phi, rho)
+        # Flatten for correctionlib and retain counts to recover event/jet rows.
         counts = ak.num(pt_b, axis=1)
 
         JetPt = _as_np_flat(pt_b).astype(np.float64)
@@ -380,6 +408,7 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         sf = self._jer_sf(JetEta, JetPt, var).astype(np.float64)
 
         idx = gen_idx_for_each_reco
+        # Mask unmatched (-1) indices so they cannot select the last GenJet.
         idx_masked = ak.mask(idx, idx >= 0)
 
         gpt = ak.fill_none(gen_pt[idx_masked], -1.0)
@@ -390,10 +419,14 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         dR = np.sqrt((eta - geta) ** 2 + dphi ** 2)
 
         reso_j = ak.unflatten(ak.Array(reso), counts)
+        # Matched smearing requires both angular and resolution compatibility.
+        # GenPt=-1 tells the tool to use stochastic smearing for unmatched jets.
         is_match = (gen_idx_for_each_reco >= 0) & (dR < mindr) & (abs(pt_in - gpt) < 3.0 * reso_j * pt_in)
         genpt_for_tool = ak.where(is_match, gpt, ak.zeros_like(pt_in) - 1.0)
         GenPt = _as_np_flat(genpt_for_tool).astype(np.float64)
 
+        # Seeds use event identity, not the row number, so early event filtering
+        # and different chunk boundaries do not change surviving JER values.
         eid = cms_event_id_u64(events, like=pt_in)
         EventID = _as_np_flat(eid)
 
@@ -429,6 +462,8 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
     # ---------------- JetID (tight lepveto) ---------------- #
 
     def _jetid_tight_lepveto(self, jets):
+        # JetID is needed for veto eligibility. It is not an extra requirement
+        # in the corrected-pT-selected output jet definition.
         eta_abs = abs(jets.eta)
         chMult = jets.chMultiplicity
         neMult = jets.neMultiplicity
@@ -470,6 +505,11 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         - JEC factors are evaluated using jet_rawpt (no mu subtraction)
         - those factors are applied to pt_noMuRaw = rawpt*(1-muonSubtrFactor)
         - vector direction uses phi_noMuRaw = phi + muonSubtrDeltaPhi
+
+        This is the prescription on slides 5-6 of Nurfikri's 2 February 2026
+        JME presentation: retrieve factors with FULL raw jet pT first, then
+        apply them to the muon-subtracted momentum. Do not evaluate the JEC
+        lookup using pt_noMuRaw. Keep L1 from the payload rather than assume 1.
         """
         z = ak.zeros_like(events.event, dtype=np.float64)
         if len(jet_rawpt) == 0:
@@ -521,10 +561,13 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         pt_noMuL1   = ak.unflatten(ak.Array(pt_noMuL1_flat), counts)
         pt_noMuFull = ak.unflatten(ak.Array(pt_noMuFull_flat), counts)
 
+        # This MET-specific 15 GeV threshold is on corrected no-muon pT.
+        # It is independent of the final corrected-pT >20 output jet selection.
         pass_pt  = pt_noMuFull > 15.0
         pass_eta = np.abs(jet_eta) < 5.2
         pass_all = pass_pt & pass_eta & pass_em_mask
 
+        # Type-1 MET subtracts the vector sum of (full JEC - L1-only) jets.
         dpt = ak.where(pass_all, pt_noMuFull - pt_noMuL1, 0.0)
         sum_px = ak.sum(dpt * np.cos(phi_noMuRaw), axis=1)
         sum_py = ak.sum(dpt * np.sin(phi_noMuRaw), axis=1)
@@ -550,6 +593,8 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         met_py  = met_pt * np.sin(met_phi)
 
         # ---------- AK4 contribution ----------
+        # Use every input AK4 jet here. Applying the output corrected-pT >20 cut
+        # before this step would drop jets passing the MET-specific >15 cut.
         jets = events.Jet
         muSub  = _safe_get(jets, "muonSubtrFactor", ak.zeros_like(pt_raw_ak4))
         dphiMu = _safe_get(jets, "muonSubtrDeltaPhi", ak.zeros_like(pt_raw_ak4))
@@ -595,6 +640,8 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
                 pass_em_mask=pass_em_ct1,
             )
 
+        # Both collections contribute to the same event's MET correction.
+        # No JER-smeared quantities enter this calculation.
         met_px_corr = met_px - (sum_px_ak4 + sum_px_ct1)
         met_py_corr = met_py - (sum_py_ak4 + sum_py_ct1)
         met_pt_corr  = np.hypot(met_px_corr, met_py_corr)
@@ -612,7 +659,9 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         isData = not hasattr(events, "genWeight")
         print(f"\n[INFO] Starting events: {n_before} dataset='{self.dataset_name}' isData={isData} do_jer(jets)={self.do_jer}")
 
-        # ---------- counters ----------
+        # ---------- 1. Input normalization counters ----------
+        # Count the original chunk, before ANY cut, for later MC normalization.
+        # Zero genWeight contributes to nevents but neither sign counter.
         if not isData:
             gw = ak.to_numpy(events.genWeight)
             n_pos = int(np.count_nonzero(gw > 0))
@@ -622,7 +671,9 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
             n_neg = 0
         meta_counters = {"nevents": n_before, "nevents_pos": n_pos, "nevents_neg": n_neg}
 
-        # ---------- early masks (golden/PV/METfilters) ----------
+        # ---------- 2. Base event requirements ----------
+        # These masks are event-level arrays on the ORIGINAL chunk. Missing
+        # optional flags/PV or an unloaded lumi mask keep the existing fallbacks.
         if isData and (self._lumi_mask is not None):
             lumi_mask = ak.Array(self._lumi_mask(events.run, events.luminosityBlock))
         else:
@@ -649,79 +700,39 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         if n_base == 0:
             return {"Events": {}, "MetaCounters": meta_counters, "MetaHists": {}}
 
-        # Slice ONCE early; everything below must be based on events_b
+        # Apply all base requirements together to the COMPLETE event record.
+        # Every collection (Jet, GenJet, MET, HLT, etc.) follows the same slice.
         events_b = events[base_mask]
         assert len(events_b.event) == int(ak.count_nonzero(base_mask)), "[SANITY] base slicing mismatch!"
 
-        # ---------- rho ----------
+        # ---------- 3. Build correction inputs WITHOUT an output-jet cut ----------
         if hasattr(events_b, "Rho") and hasattr(events_b.Rho, "fixedGridRhoFastjetAll"):
             rho = events_b.Rho.fixedGridRhoFastjetAll
         else:
             rho = ak.zeros_like(events_b.event, dtype=np.float32)
 
-        # ---------- jets ----------
-        jets = events_b.Jet
-        passJetIdTightLepVeto = self._jetid_tight_lepveto(jets)
-        jets = ak.with_field(jets, passJetIdTightLepVeto, "passJetIdTightLepVeto")
+        # Keep the FULL Jet collection for corrections, MET and the veto map.
+        # The output selection is applied later, after any enabled MC JER.
+        jets_all = events_b.Jet
+        passJetIdTightLepVeto = self._jetid_tight_lepveto(jets_all)
+        jets_all = ak.with_field(jets_all, passJetIdTightLepVeto, "passJetIdTightLepVeto")
 
-        # ---------- JEC from raw ----------
+        # ---------- 4. JEC from raw: L1 -> L2 -> L3 (+ data residual) ----------
+        # jets_all still contains original NanoAOD pt/mass matching rawFactor.
+        # _apply_jec_ak4 recovers raw values before evaluating the new payloads.
         pt_raw, mass_raw, pt_l1_jec, pt_full_jec, mass_full_jec = self._apply_jec_ak4(
-            jets, rho=rho, run=events_b.run, isData=isData
+            jets_all, rho=rho, run=events_b.run, isData=isData
         )
-        # ---------------- RAW pt skim requirement ----------------
-        raw_jet_mask = pt_raw > 20.0
-        n_raw_jets = ak.sum(raw_jet_mask, axis=1)
-        skim_raw_mask = n_raw_jets >= 2
-
-        _print_counts("After >=2 RAW pt>20 jets", skim_raw_mask)
-        # ---------- optional JER smearing on AK4 jets output (jets only) ----------
-        pt_full_jecjer = pt_full_jec
-        mass_full_jecjer = mass_full_jec
-
-        if (not isData) and self.do_jer and (self._cJerSmear is not None):
-            if hasattr(events_b, "Jet") and hasattr(events_b.Jet, "genJetIdx") and hasattr(events_b, "GenJet"):
-                ak4_gen_idx = ak.values_astype(events_b.Jet.genJetIdx, np.int32)
-                pt_full_jecjer = self._jer_smear_tool(
-                    pt_in=pt_full_jec,
-                    eta=jets.eta,
-                    phi=jets.phi,
-                    rho=rho,
-                    events=events_b,
-                    gen_pt=events_b.GenJet.pt,
-                    gen_eta=events_b.GenJet.eta,
-                    gen_phi=events_b.GenJet.phi,
-                    gen_idx_for_each_reco=ak4_gen_idx,
-                    mindr=0.2,
-                    var="nom",
-                )
-                sf_mass = pt_full_jecjer / ak.where(pt_full_jec > 0, pt_full_jec, 1.0)
-                mass_full_jecjer = mass_full_jec * sf_mass
-            else:
-                print("[Skim:JER] Missing Jet.genJetIdx or GenJet: skipping AK4 jet smearing")
-
-        # corrected jet collections (for veto/output/hists)
-        jets_jec = ak.with_field(jets, pt_full_jec, "pt")
+        # Store raw pT BEFORE replacing NanoAOD pT/mass. Keep all input jets.
+        # The original rawFactor must never be used to undo this new JEC pT.
+        jets_jec = ak.with_field(jets_all, pt_full_jec, "pt")
         jets_jec = ak.with_field(jets_jec, mass_full_jec, "mass")
+        jets_jec = ak.with_field(jets_jec, pt_raw, "pt_raw")
 
-        jets_jecjer = ak.with_field(jets, pt_full_jecjer, "pt")
-        jets_jecjer = ak.with_field(jets_jecjer, mass_full_jecjer, "mass")
-
-        # ---------- Type-1 MET (compute BEFORE JVM; NO JER->MET) ----------
-        if not hasattr(events_b, "RawPuppiMET"):
-            raise RuntimeError("RawPuppiMET branch not found; cannot compute Type-1 PuppiMET.")
-
-        met_raw_pt  = events_b.RawPuppiMET.pt
-        met_raw_phi = events_b.RawPuppiMET.phi
-
-        met_t1_jec_pt, met_t1_jec_phi = self._type1_met_from_ak4_and_corrt1(
-            events=events_b,
-            rho=rho,
-            isData=isData,
-            pt_raw_ak4=pt_raw,
-        )
-
-        # ---------- Jet Veto Map (EVENT-LEVEL) AFTER jets+MET computed ----------
-        jets_for_veto = jets_jec  # as you requested (use JEC jets; not JER jets)
+        # ---------- 5. Jet-veto map: reject an ENTIRE event BEFORE MET ----------
+        # Evaluate the map on all jets. Only jets passing jet_min can veto.
+        # A jet with JEC pT >15 can veto even if it fails the final output cut.
+        jets_for_veto = jets_jec
         jet_min = (
             (jets_for_veto.pt > 15.0)
             & ak.values_astype(jets_for_veto.passJetIdTightLepVeto, bool)
@@ -737,19 +748,100 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
         else:
             veto_j = ak.zeros_like(jets_for_veto.pt, dtype=bool)
 
+        # bad_j is a PER-JET mask; ak.any reduces it to one decision per EVENT.
         bad_j = jet_min & veto_j
         veto_event_mask = ~ak.any(bad_j, axis=1)
         _print_counts("After JetVetoMap (event veto)", veto_event_mask)
         assert len(veto_event_mask) == len(events_b.event), "[SANITY] veto_event_mask base mismatch!"
 
-        # ---------- >=2 good jets selection (after veto) ----------
-        #good_j = jet_min & ~veto_j
-        #num_good = ak.sum(good_j, axis=1)
-        #jets_mask = veto_event_mask & (num_good >= 2)
-        jets_mask = skim_raw_mask & veto_event_mask
-        _print_counts("After >=2 good jets", jets_mask)
+        n_veto = int(ak.count_nonzero(veto_event_mask))
+        if n_veto == 0:
+            return {"Events": {}, "MetaCounters": meta_counters, "MetaHists": {}}
+
+        # This is an EVENT slice, not removal of individual vetoed jets.
+        # Slice the complete record AND every derived array with the SAME mask.
+        # GenJet/CorrT1METJet/HLT/MET follow the event record automatically;
+        # local JEC/JetID/rho arrays must follow explicitly. Local genJetIdx
+        # still indexes the GenJet collection inside its own event.
+        events_b = events_b[veto_event_mask]
+        rho = rho[veto_event_mask]
+        jets_all = jets_all[veto_event_mask]
+        jets_jec = jets_jec[veto_event_mask]
+        pt_raw = pt_raw[veto_event_mask]
+        mass_raw = mass_raw[veto_event_mask]
+        pt_l1_jec = pt_l1_jec[veto_event_mask]
+        pt_full_jec = pt_full_jec[veto_event_mask]
+        mass_full_jec = mass_full_jec[veto_event_mask]
+        jet_min = jet_min[veto_event_mask]
+        assert len(events_b) == len(jets_jec) == len(pt_raw) == len(rho) == n_veto, "[SANITY] veto slicing mismatch!"
+
+        # ---------- 6. Optional nominal MC JER for saved jets ----------
+        # Smear full JEC pT, and scale mass by the same smearing factor.
+        # The veto already used JEC-only jets; JER never enters Type-1 MET.
+        # Veto failures have been rejected; output multiplicity is still pending.
+        pt_full_jecjer = pt_full_jec
+        mass_full_jecjer = mass_full_jec
+
+        if (not isData) and self.do_jer and (self._cJerSmear is not None):
+            if hasattr(events_b, "Jet") and hasattr(events_b.Jet, "genJetIdx") and hasattr(events_b, "GenJet"):
+                ak4_gen_idx = ak.values_astype(events_b.Jet.genJetIdx, np.int32)
+                pt_full_jecjer = self._jer_smear_tool(
+                    pt_in=pt_full_jec,
+                    eta=jets_all.eta,
+                    phi=jets_all.phi,
+                    rho=rho,
+                    events=events_b,
+                    gen_pt=events_b.GenJet.pt,
+                    gen_eta=events_b.GenJet.eta,
+                    gen_phi=events_b.GenJet.phi,
+                    gen_idx_for_each_reco=ak4_gen_idx,
+                    mindr=0.2,
+                    var="nom",
+                )
+                sf_mass = pt_full_jecjer / ak.where(pt_full_jec > 0, pt_full_jec, 1.0)
+                mass_full_jecjer = mass_full_jec * sf_mass
+            else:
+                print("[Skim:JER] Missing Jet.genJetIdx or GenJet: skipping AK4 jet smearing")
+
+        # This is the FINAL jet momentum definition for both selection/output.
+        # On data, or when JER is disabled/unavailable, these values equal JEC.
+        # Keep true pt_raw and all other fields from the complete JEC collection.
+        jets_corrected = ak.with_field(jets_jec, pt_full_jecjer, "pt")
+        jets_corrected = ak.with_field(jets_corrected, mass_full_jecjer, "mass")
+
+        # ---------- 7. Type-1 PUPPI MET on events passing the veto ----------
+        # Start from RawPuppiMET; use FULL AK4 + CorrT1METJet inputs.
+        # Even raw-pT < 15 GeV jets can contribute if corrected no-muon pT >15.
+        # Apply |eta| < 5.2 and EM fraction <0.9, then subtract (full JEC - L1).
+        # Do not use the selected or JER-smeared output jets in this calculation.
+        if not hasattr(events_b, "RawPuppiMET"):
+            raise RuntimeError("RawPuppiMET branch not found; cannot compute Type-1 PuppiMET.")
+
+        met_raw_pt  = events_b.RawPuppiMET.pt
+        met_raw_phi = events_b.RawPuppiMET.phi
+
+        met_t1_jec_pt, met_t1_jec_phi = self._type1_met_from_ak4_and_corrt1(
+            events=events_b,
+            rho=rho,
+            isData=isData,
+            pt_raw_ak4=pt_raw,
+        )
+
+        # ---------- 8. Define OUTPUT jets, THEN require >=2 per event ----------
         
-        # ---------- Trigger OR (on events_b) ----------
+        output_jet_mask = ak.values_astype(jets_corrected.pt > self.JET_PT_MIN, bool)
+        selected_jets = jets_corrected[output_jet_mask]
+
+        # Reduce the selected collection to one multiplicity decision per EVENT.
+        # Count exactly the jets that will be saved, ensuring >=2 output jets.
+        n_selected_jets = ak.num(selected_jets, axis=1)
+        jet_multiplicity_mask = ak.values_astype(n_selected_jets >= self.MIN_SELECTED_JETS, bool)
+        _print_counts("After event veto and >=2 final corrected pt>20 jets", jet_multiplicity_mask)
+        assert len(jet_multiplicity_mask) == len(events_b), "[SANITY] final jet multiplicity mask mismatch!"
+
+        # ---------- 9. OR of ALL configured trigger groups ----------
+        # All decisions use the same events_b as the jets and MET. HLT patterns
+        # match available paths. trigger_type preserves the configured group bits.
         trigger_or = ak.zeros_like(events_b.event, dtype=bool)
         trigger_type = ak.zeros_like(events_b.event, dtype=np.int32)
         available_hlt = dir(events_b.HLT)
@@ -763,43 +855,52 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
             trigger_or = trigger_or | group_fired
             trigger_type = trigger_type | (ak.values_astype(group_fired, np.int32) << np.int32(bit))
 
-        _print_counts("After trigger OR", jets_mask & trigger_or)
+        _print_counts("After >=2 final corrected pt>20 jets and configured trigger OR", jet_multiplicity_mask & trigger_or)
 
-        final_mask_b = ak.values_astype(jets_mask , bool)
-        _print_counts("FINAL (within base)", final_mask_b)
+        # Trigger selection is ON by default. Set require_trigger=False in the
+        # constructor to retain events regardless of HLT while recording bits.
+        final_mask_b = ak.values_astype(
+            jet_multiplicity_mask & trigger_or if self.require_trigger else jet_multiplicity_mask, bool
+        )
+        _print_counts("FINAL (within veto-surviving events)", final_mask_b)
 
-        # ---------- Final slice ----------
+        # ---------- 10. Final event slice and selected output jets ----------
+        # final_mask_b selects EVENT rows everywhere: event identities, triggers,
+        # jet collections and MET. This guarantees saved jets belong to saved events.
         events_f = events_b[final_mask_b]
         trigger_type_f = trigger_type[final_mask_b]
         trigger_or_f = trigger_or[final_mask_b]
 
-        #jets_out_base = jets_for_veto[final_mask_b]
-        #good_j_f = good_j[final_mask_b]
-        #jets_out = jets_out_base[good_j_f]
-        # attach raw pt branch
-        jets_with_raw = ak.with_field(jets_for_veto, pt_raw, "pt_raw")
-
-        jets_out_base = jets_with_raw[final_mask_b]
-        jets_out = jets_out_base   # keep all jets in event
+        # selected_jets already contains only final corrected-pT >20 jets.
+        # Apply the identical event mask used for identities, HLT and MET.
+        jets_out = selected_jets[final_mask_b]
         met_t1_jec_pt_f = met_t1_jec_pt[final_mask_b]
         met_t1_jec_phi_f = met_t1_jec_phi[final_mask_b]
 
+        # Check event-row alignment and the final jet multiplicity contract.
+        assert len(jets_out) == len(events_f) == len(trigger_type_f) == len(trigger_or_f) == len(met_t1_jec_pt_f) == len(met_t1_jec_phi_f), "[SANITY] output event alignment mismatch!"
+        assert bool(ak.all(ak.num(jets_out, axis=1) >= self.MIN_SELECTED_JETS)), "[SANITY] fewer than two selected output jets!"
+        assert bool(ak.all(jets_out.pt > self.JET_PT_MIN)), "[SANITY] output jet below corrected-pT threshold!"
+
         # ---------- sanity prints ----------
-        if len(events_b) > 0:
-            i = min(self.debug_event_index, len(events_b) - 1)
-            print(f"[DBG] event index (within base) = {i}")
-            #print(f"      veto_event_mask={bool(veto_event_mask[i])}  num_good={int(num_good[i])}")
+        if self.debug and len(events_b) > 0:
+            i = min(max(self.debug_event_index, 0), len(events_b) - 1)
+            print(f"[DBG] event index (after event veto, before final cuts) = {i}")
             print(f"      RawPuppiMET pt/phi     : {float(met_raw_pt[i]):.3f} / {float(met_raw_phi[i]):.3f}")
             print(f"      T1(JEC)     pt/phi     : {float(met_t1_jec_pt[i]):.3f} / {float(met_t1_jec_phi[i]):.3f}")
 
-        # ---------- debug histograms ----------
+        # ---------- 11. Correction-monitoring histograms ----------
+        # Population: base + veto survivors, BEFORE final multiplicity/HLT cuts.
+        # Jet histograms use veto-eligible jets; output uses final corrected pT >20.
         edges_jet = np.linspace(0, 500, 51, dtype=np.float64)
         edges_met = np.linspace(0, 500, 51, dtype=np.float64)
 
-        jetpt_nano = _as_np_flat(jets.pt[jet_min])
+        jetpt_nano = _as_np_flat(jets_all.pt[jet_min])
         jetpt_jec = _as_np_flat(pt_full_jec[jet_min])
         jetpt_jecjer = _as_np_flat(pt_full_jecjer[jet_min]) if (not isData and self.do_jer) else jetpt_jec
 
+        # Keep the existing histogram convention: hMet_raw contains the input
+        # NanoAOD PuppiMET.pt, despite its historical "raw" histogram name.
         met_raw = ak.to_numpy(events_b.PuppiMET.pt)
         met_jec = ak.to_numpy(met_t1_jec_pt)
 
@@ -813,15 +914,23 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
             "hMet_t1_jec": _hist_counts(met_jec, edges_met),
         }
 
-        # ---------- build output ----------
+        # Keep input counters and pre-final-cut monitoring even if no event
+        # passes the final selection. The driver can omit an empty Events tree.
+        if len(events_f) == 0:
+            return {"Events": {}, "MetaCounters": meta_counters, "MetaHists": meta_hists}
+
+        # ---------- 12. Build saved branches on FINAL accepted events ----------
         out = {}
         out["run"] = events_f.run
         out["event"] = events_f.event
         out["luminosityBlock"] = events_f.luminosityBlock
         out["trigger_type"] = trigger_type_f
-        #out["has_trigger"] = trigger_or_f
+        # trigger_or_f is aligned with events_f; only trigger_type is saved,
+        # preserving the existing output schema.
 
-        # (optional ttbar top-pt weight kept as you had)
+        # Optional ttbar top-pT weight: unit weight unless exactly two last-copy
+        # tops exist. Build full-length arrays so mixed top multiplicities stay
+        # aligned with all accepted events.
         if hasattr(events_f, "genWeight"):
             is_ttbar_sample = "TTto" in (self.dataset_name or "")
             if is_ttbar_sample and hasattr(events_f, "GenPart"):
@@ -835,24 +944,24 @@ class NanoAODSkimmerAK4(processor.ProcessorABC):
 
                 topptWeight = ak.ones_like(events_f.event, dtype=np.float32)
                 has_two = (n_tops == 2)
-                genTops_two = genTops[has_two]
-
-                if ak.any(has_two):
-                    pt1 = ak.to_numpy(genTops_two[:, 0].pt)
-                    pt2 = ak.to_numpy(genTops_two[:, 1].pt)
-                    w_event = toppt_run3(pt1) * toppt_run3(pt2)
-                    topptWeight = ak.where(has_two, ak.Array(w_event.astype(np.float32)), topptWeight)
+                top_pts = ak.pad_none(genTops.pt, 2, axis=1, clip=True)
+                pt1 = ak.fill_none(top_pts[:, 0], 0.0)
+                pt2 = ak.fill_none(top_pts[:, 1], 0.0)
+                w_event = ak.values_astype(toppt_run3(pt1) * toppt_run3(pt2), "float32")
+                topptWeight = ak.where(has_two, w_event, topptWeight)
 
                 out["topptWeight"] = ak.values_astype(topptWeight, "float32")
 
-        # Overwrite PuppiMET with Type-1
+        # Save corrected MET (not RawPuppiMET), using the same final event mask.
         if hasattr(events_f, "PuppiMET"):
             puppi = events_f.PuppiMET
             puppi = ak.with_field(puppi, ak.values_astype(met_t1_jec_pt_f, "float32"), "pt")
             puppi = ak.with_field(puppi, ak.values_astype(met_t1_jec_phi_f, "float32"), "phi")
             out["PuppiMET"] = self.select_fields(puppi, self.branches_to_keep.get("PuppiMET", []))
 
-        # Save requested objects
+        # Save requested fields. pt_raw is retained for MET and optional output;
+        # include it in skim_config.py to save it. Other objects come from
+        # events_f, so their event rows stay aligned with jets and MET.
         for obj in self.branches_to_keep:
             if obj in ("PuppiMET",):
                 continue
